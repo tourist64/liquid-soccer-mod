@@ -190,7 +190,7 @@ icon_align = 1
 
 [node name="P1P2Button" type="Button" parent="TextureRect"]
 anchor_left = 0.708
-anchor_top = 0.778
+anchor_top = 0.788
 anchor_right = 0.966
 anchor_bottom = 0.908
 margin_left = 0.0
@@ -208,9 +208,9 @@ icon_align = 2
 
 [node name="CupButton" type="Button" parent="TextureRect"]
 anchor_left = 0.708
-anchor_top = 0.423
-anchor_right = 0.965
-anchor_bottom = 0.56
+anchor_top = 0.398
+anchor_right = 0.966
+anchor_bottom = 0.518
 margin_left = 0.0
 margin_top = 0.0
 margin_right = 0.0
@@ -225,9 +225,9 @@ text = "Chumps League"
 
 [node name="LeagueButton" type="Button" parent="TextureRect"]
 anchor_left = 0.708
-anchor_top = 0.275
-anchor_right = 0.967
-anchor_bottom = 0.406
+anchor_top = 0.268
+anchor_right = 0.966
+anchor_bottom = 0.388
 margin_left = 0.0
 margin_top = 0.0
 margin_right = 0.0
@@ -256,9 +256,9 @@ text = "version: 1.3.1  poki.com"
 
 [node name="WCButton" type="Button" parent="TextureRect"]
 anchor_left = 0.708
-anchor_top = 0.601
+anchor_top = 0.528
 anchor_right = 0.966
-anchor_bottom = 0.69
+anchor_bottom = 0.648
 margin_left = 0.0
 margin_top = 0.0
 margin_right = 0.0
@@ -271,9 +271,9 @@ text = "Womens Cup"
 
 [node name="MultiplayerButton" type="Button" parent="TextureRect"]
 anchor_left = 0.708
-anchor_top = 0.704
+anchor_top = 0.658
 anchor_right = 0.966
-anchor_bottom = 0.764
+anchor_bottom = 0.778
 margin_left = 0.0
 margin_top = 0.0
 margin_right = 0.0
