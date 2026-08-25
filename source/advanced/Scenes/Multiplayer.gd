@@ -194,11 +194,10 @@ func _on_Start_pressed():
 
 
 func _on_Back_pressed():
-	if input_action_running:
-		return
 	if current_screen == "nickname":
 		if OS.has_feature("HTML5"):
 			JavaScript.eval("window.slsMultiplayerLeave && window.slsMultiplayerLeave()", true)
+		input_action_running = false
 		get_tree().change_scene("res://Scenes/Menu.tscn")
 	elif current_screen == "choice":
 		_show_screen("NicknameScreen")
