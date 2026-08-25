@@ -1,10 +1,11 @@
 (function () {
   "use strict";
 
-
   const state = {
-    status: "Digite os dados da sala para começar.",
+    status: "Digite seu nickname para começar.",
     busy: false,
+    rooms_busy: false,
+    rooms: [],
     host: false,
     connected: false,
     started: false,
@@ -19,14 +20,18 @@
   let streamSent = false;
   let peerLoading = null;
 
+  const roomSlug = (room) => room.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 24) || "sala";
+
   const peerIdFor = (room) => {
     let hash = 2166136261;
     for (const char of room.trim().toLowerCase()) {
       hash ^= char.charCodeAt(0);
       hash = Math.imul(hash, 16777619);
     }
-    return "sls-" + (hash >>> 0).toString(36);
+    return "sls-" + (hash >>> 0).toString(36) + "-" + roomSlug(room);
   };
+
+  const roomNameFromId = (id) => id.split("-").slice(2).join("-").replace(/-/g, " ") || id;
 
   function setStatus(message) {
     state.status = message;
@@ -53,6 +58,7 @@
     script.onerror = () => {
       peerLoading = null;
       state.busy = false;
+      state.rooms_busy = false;
       setStatus("Não foi possível carregar o serviço multiplayer.");
     };
     document.head.appendChild(script);
@@ -110,10 +116,18 @@
 
   function setupConnection(conn, info, isHost) {
     connection = conn;
+    const timeout = window.setTimeout(() => {
+      if (!conn.open) {
+        state.busy = false;
+        setStatus("A sala não respondeu. Verifique o nome e tente novamente.");
+        conn.close();
+      }
+    }, 8000);
     conn.on("open", () => {
+      window.clearTimeout(timeout);
       if (!isHost) {
         conn.send({ type: "hello", nickname: info.nickname, password: info.password });
-        setStatus("Conectando à sala...");
+        setStatus("Validando a senha da sala...");
       }
     });
     conn.on("data", (message) => {
@@ -124,11 +138,13 @@
           window.setTimeout(() => conn.close(), 200);
           return;
         }
+        state.busy = false;
         state.connected = true;
         state.guest = message.nickname;
         conn.send({ type: "welcome", nickname: info.nickname });
         setStatus(message.nickname + " entrou na sala. Clique em iniciar partida.");
       } else if (!isHost && message.type === "welcome") {
+        state.busy = false;
         state.connected = true;
         setStatus("Conectado com " + message.nickname + ". Aguardando o início.");
       } else if (!isHost && message.type === "start") {
@@ -142,11 +158,16 @@
       }
     });
     conn.on("close", () => {
+      state.busy = false;
       state.connected = false;
       streamSent = false;
       setStatus("A conexão foi encerrada.");
     });
-    conn.on("error", () => setStatus("Não foi possível manter a conexão."));
+    conn.on("error", () => {
+      window.clearTimeout(timeout);
+      state.busy = false;
+      setStatus("Não foi possível conectar à sala.");
+    });
   }
 
   function setupPeer(info, isHost) {
@@ -159,10 +180,11 @@
     peer = new window.Peer(id);
     peer.on("open", () => {
       if (isHost) {
-        setStatus("Sala criada. Compartilhe nome e senha com seu amigo.");
+        state.busy = false;
+        setStatus("Sala criada. Aguardando seu amigo entrar.");
         pollHostStream();
       } else {
-        setupConnection(peer.connect(peerIdFor(info.room), { reliable: true }), info, false);
+        setupConnection(peer.connect(info.peer_id || peerIdFor(info.room), { reliable: true }), info, false);
       }
     });
     peer.on("connection", (conn) => {
@@ -177,15 +199,38 @@
     });
     peer.on("error", (error) => {
       state.busy = false;
+      state.host = false;
+      state.connected = false;
       const message = error.type === "unavailable-id" ? "Essa sala já existe." : "Falha na conexão: " + error.type;
       setStatus(message);
     });
   }
 
+  function listRooms() {
+    ensurePeer(() => {
+      state.rooms_busy = true;
+      const browserPeer = new window.Peer();
+      browserPeer.on("open", () => {
+        browserPeer.listAllPeers((ids) => {
+          state.rooms = ids.filter((id) => id.indexOf("sls-") === 0).map((id) => ({ id, name: roomNameFromId(id) }));
+          state.rooms_busy = false;
+          setStatus(state.rooms.length ? "Selecione uma sala e digite a senha para entrar." : "Nenhuma sala encontrada.");
+          browserPeer.destroy();
+        });
+      });
+      browserPeer.on("error", () => {
+        state.rooms_busy = false;
+        setStatus("Não foi possível buscar as salas.");
+        browserPeer.destroy();
+      });
+    });
+  }
+
   window.slsMultiplayerEnsure = () => ensurePeer(() => {});
   window.slsMultiplayerState = () => JSON.stringify(state);
+  window.slsMultiplayerListRooms = listRooms;
   window.slsMultiplayerCreate = (nickname, room, password) => ensurePeer(() => setupPeer({ nickname, room, password }, true));
-  window.slsMultiplayerJoin = (nickname, room, password) => ensurePeer(() => setupPeer({ nickname, room, password }, false));
+  window.slsMultiplayerJoin = (nickname, room, password) => ensurePeer(() => setupPeer({ nickname, room, password, peer_id: room }, false));
   window.slsMultiplayerStart = () => {
     if (!state.host || !state.connected) return;
     state.started = true;
