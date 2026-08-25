@@ -172,6 +172,11 @@ func _initP2Controls():
 	cswitch = "p2_switch"
 	cburst = "p2_burst"
 
+func _inputAction(action):
+	if Global.multiplayer_mode and myTeam and myTeam.teamID == 2 and action.begins_with("p1_"):
+		return Input.is_action_pressed(action.replace("p1_", "p2_"))
+	return Input.is_action_pressed(action)
+
 func chipPass2( var dir):
 	var h = 0.1 + smoothstep(0, 100, dir.length())
 			
@@ -214,9 +219,9 @@ func chipPass( var human):
 				if Global.touchPad.isActive():
 					var mov = Global.touchPad.get_force()
 					sw = sign(mov.y * jflip)
-				elif Input.is_action_pressed("p1_right"):
+				elif _inputAction("p1_right"):
 					sw = myTeam.playDir
-				elif Input.is_action_pressed("p1_left"):
+				elif _inputAction("p1_left"):
 					sw = myTeam.playDir * - 1.0
 			
 			if AI.state == AI.pstate.POSESSION:
@@ -376,9 +381,9 @@ func volleyShoot( var ai):
 	if abs(aim) < 0.1:
 		aim = 2.0 * smoothstep( - 25, 25, Global.ballpos.z) - 1.0
 	shotdir = myGoal
-	if (Input.is_action_pressed("p1_up")):
+	if (_inputAction("p1_up")):
 		aim = 0.2
-	elif (Input.is_action_pressed("p1_down")):
+	elif (_inputAction("p1_down")):
 		aim = 0.8
 	shotdir = lerp(myGoalL, myGoalR, aim)
 	shotdir = shotdir - Global.ballpos
@@ -418,13 +423,13 @@ func checkInput():
 			mov.x = 0
 		if (abs(mov.y) < 0.2):
 			mov.y = 0
-		if (Input.is_action_pressed("p1_left")):
+		if (_inputAction("p1_left")):
 			mov.x = - 1
-		elif (Input.is_action_pressed("p1_right")):
+		elif (_inputAction("p1_right")):
 			mov.x = 1
-		if (Input.is_action_pressed("p1_up")):
+		if (_inputAction("p1_up")):
 			mov.y = - 1
-		elif (Input.is_action_pressed("p1_down")):
+		elif (_inputAction("p1_down")):
 			mov.y = 1
 		
 		
@@ -462,9 +467,9 @@ func checkInput():
 			if Global.touchPad.isActive():
 				var m = Global.touchPad.get_force()
 				aim += m.y * jflip * - 1.0
-			if (Input.is_action_pressed("p1_up")):
+			if (_inputAction("p1_up")):
 				aim += - 1
-			elif (Input.is_action_pressed("p1_down")):
+			elif (_inputAction("p1_down")):
 				aim += 1
 			if abs(aim) < 0.1:
 				aim = 2.0 * smoothstep( - 25, 25, Global.ballpos.z) - 1.0
@@ -517,9 +522,9 @@ func checkInput():
 			if Global.touchPad.isActive():
 				m += Global.touchPad.get_force()
 				m.y *= jflip * - 1.0
-			if (Input.is_action_pressed("p1_up")):
+			if (_inputAction("p1_up")):
 				m.y += - 0.9
-			elif (Input.is_action_pressed("p1_down")):
+			elif (_inputAction("p1_down")):
 				m.y += 0.9
 		
 			shotcurl.y = range_lerp(m.x, - 1, 1, 1, - 1) * pCurl
@@ -547,13 +552,13 @@ func checkInput():
 			shooting = false
 			
 			var passD = Vector3.ZERO
-			if (Input.is_action_pressed("p1_left")):
+			if (_inputAction("p1_left")):
 				passD.x = - 1
-			elif (Input.is_action_pressed("p1_right")):
+			elif (_inputAction("p1_right")):
 				passD.x = 1
-			if (Input.is_action_pressed("p1_up")):
+			if (_inputAction("p1_up")):
 				passD.z = - 1
-			elif (Input.is_action_pressed("p1_down")):
+			elif (_inputAction("p1_down")):
 				passD.z = 1
 			passD.x += Input.get_joy_axis(myC, clr)
 			passD.z += Input.get_joy_axis(myC, cud) * jflip
@@ -603,13 +608,13 @@ func checkInput():
 				var m = Global.touchPad.get_force()
 				passD.x += m.x
 				passD.z += m.y * jflip * - 1.0
-			if (Input.is_action_pressed("p1_left")):
+			if (_inputAction("p1_left")):
 				passD.x = - 1
-			elif (Input.is_action_pressed("p1_right")):
+			elif (_inputAction("p1_right")):
 				passD.x = 1
-			if (Input.is_action_pressed("p1_up")):
+			if (_inputAction("p1_up")):
 				passD.z = - 1
-			elif (Input.is_action_pressed("p1_down")):
+			elif (_inputAction("p1_down")):
 				passD.z = 1
 			
 			lowshot = Input.is_action_pressed(clow)
@@ -1055,13 +1060,13 @@ func _doNewShot():
 		if Global.touchPad.isActive():
 			m += Global.touchPad.get_force()
 			m.y *= - 0.5
-		if (Input.is_action_pressed("p1_left")):
+		if (_inputAction("p1_left")):
 			m.x += - 0.5
-		elif (Input.is_action_pressed("p1_right")):
+		elif (_inputAction("p1_right")):
 			m.x += 0.5
-		if (Input.is_action_pressed("p1_up")):
+		if (_inputAction("p1_up")):
 			m.y += - 0.5
-		elif (Input.is_action_pressed("p1_down")):
+		elif (_inputAction("p1_down")):
 			m.y += 0.5
 		shotcurl.y = range_lerp(m.x, - 1, 1, 1, - 1) * pCurl
 	

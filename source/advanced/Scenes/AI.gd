@@ -93,6 +93,11 @@ func _initialize( var team, var goal, var goalL, var goalR, var _dGoal):
 	var theta = (myPlayer.myID / 7.0) * 2.0 * PI
 	xct = cos(theta)
 	yst = sin(theta)
+
+func _inputAction(action):
+	if Global.multiplayer_mode and myTeam and myTeam.teamID == 2 and action.begins_with("p1_"):
+		return Input.is_action_pressed(action.replace("p1_", "p2_"))
+	return Input.is_action_pressed(action)
 	
 	
 func changeState( var toState):
@@ -873,13 +878,13 @@ func tryFKPass():
 		idir.x = Input.get_joy_axis(myPlayer.myC, 0)
 		idir.z = Input.get_joy_axis(myPlayer.myC, 1)
 		idir.y = 0
-	if (Input.is_action_pressed("p1_left")):
+	if (_inputAction("p1_left")):
 		idir.x += - 1
-	elif (Input.is_action_pressed("p1_right")):
+	elif (_inputAction("p1_right")):
 		idir.x += 1
-	if (Input.is_action_pressed("p1_up")):
+	if (_inputAction("p1_up")):
 		idir.z = - 1
-	elif (Input.is_action_pressed("p1_down")):
+	elif (_inputAction("p1_down")):
 		idir.z = 1
 	if abs(idir.x) < 0.2:
 		idir.x = dir.x
@@ -914,13 +919,13 @@ func tryFKLongPass():
 		if ( not myTeam.AIteam):
 			dir.x = Input.get_joy_axis(myPlayer.myC, 0)
 			dir.z = Input.get_joy_axis(myPlayer.myC, 1)
-			if (Input.is_action_pressed("p1_left")):
+			if (_inputAction("p1_left")):
 				dir.x = - 1
-			elif (Input.is_action_pressed("p1_right")):
+			elif (_inputAction("p1_right")):
 				dir.x = 1
-			if (Input.is_action_pressed("p1_up")):
+			if (_inputAction("p1_up")):
 				dir.z = - 1
-			elif (Input.is_action_pressed("p1_down")):
+			elif (_inputAction("p1_down")):
 				dir.z = 1
 			dir.y = 0
 		var passTo = myTeam._findLongPass(pos, dir, myPlayer.myID)

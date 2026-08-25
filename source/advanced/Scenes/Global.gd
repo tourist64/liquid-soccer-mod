@@ -39,6 +39,7 @@ var game = null
 var joypads = []
 var p1human = true
 var p2human = false
+var multiplayer_mode = false
 var vsync = true
 var camtype = 0
 var camrot = false
@@ -137,13 +138,45 @@ func _ready():
 	
 	
 	loadLocks()
+	refreshMultiplayer()
 	
 	
+
+
+
+
 	
-	
-	
-	
-	
+
+func refreshMultiplayer():
+	if not OS.has_feature("HTML5"):
+		return false
+	var enabled = JavaScript.eval("window.location.search.indexOf('mp=host') >= 0", true)
+	if enabled:
+		multiplayer_mode = true
+		p1human = true
+		p2human = true
+		setupMultiplayerKeys()
+	return multiplayer_mode
+
+func setupMultiplayerKeys():
+	var keys = {
+		"p2_up": 16777232,
+		"p2_down": 16777234,
+		"p2_left": 16777231,
+		"p2_right": 16777233,
+		"p2_pass": OS.find_scancode_from_string("H"),
+		"p2_shoot": OS.find_scancode_from_string("J"),
+		"p2_chip": OS.find_scancode_from_string("K"),
+		"p2_thru": OS.find_scancode_from_string("L"),
+		"p2_burst": OS.find_scancode_from_string("U"),
+		"p2_switch": OS.find_scancode_from_string("I"),
+		"p2_low": OS.find_scancode_from_string("O")
+	}
+	for action in keys:
+		var event = InputEventKey.new()
+		event.set_scancode(keys[action])
+		InputMap.action_add_event(action, event)
+
 func _setupPoki():
 	PokiSDK.connect("commercial_break_done", self, "on_commercial_break_done")
 	PokiSDK.connect("rewarded_break_done", self, "on_rewarded_break_done")

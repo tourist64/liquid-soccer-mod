@@ -25,11 +25,13 @@ O arquivo `game3/index-mod.pck` usa a base avançada e o mod `super-mod-soccer`,
 
 ```powershell
 py modloader.py list
-py modloader.py validate mods/super-mod-soccer
-py modloader.py apply mods/super-mod-soccer
-py modloader.py verify mods/super-mod-soccer
+py modloader.py validate mods/multiplayer
+py modloader.py apply mods/multiplayer
+py modloader.py verify mods/multiplayer
 ```
 
 ## Multiplayer
 
-O plano é um modo 1 contra 1 com sala, senha e escolha de seleção. O GitHub Pages hospedará o jogo; a conexão entre jogadores deverá usar WebRTC com uma camada externa simples de sinalização, pois o Pages não mantém salas por conta própria.
+O MVP multiplayer fica em `game3/multiplayer.html`. Ele usa uma sala P2P com nickname e senha, transmite a tela do anfitrião e envia os controles do segundo jogador. O jogo continua hospedado no GitHub Pages; o PeerJS é usado somente para sinalização e WebRTC.
+
+Abra `http://localhost:8000/multiplayer.html` depois de iniciar o servidor dentro de `game3`. O anfitrião escolhe os dois times no jogo e o convidado controla o segundo time com as setas, `H`, `J`, `K`, `L`, `U` e `I`.

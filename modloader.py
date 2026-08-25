@@ -264,7 +264,7 @@ def build_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
     for name in ("validate", "apply", "verify"):
         command = commands.add_parser(name)
-        command.add_argument("mod", type=Path, nargs="?", default=DEFAULT_MODS_DIR / "super-mod-soccer")
+        command.add_argument("mod", type=Path, nargs="?", default=DEFAULT_MODS_DIR / "multiplayer")
     commands.add_parser("list")
     commands.add_parser("restore")
     return parser
