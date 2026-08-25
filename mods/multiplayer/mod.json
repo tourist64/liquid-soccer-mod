@@ -3,14 +3,7 @@
   "name": "Super Mod Soccer Online",
   "version": "0.1.0",
   "game": "SuperLiquidSoccer",
-  "patches": [
-    {
-      "path": "res://Scenes/Menu.tscn",
-      "find": "text = \"super\nliquid\nsoccer\"",
-      "replace": "text = \"super\nmod\nsoccer\"",
-      "count": 1
-    }
-  ],
+  "patches": [],
   "files": [
     {
       "path": "res://Scenes/Global.gdc",
@@ -25,6 +18,26 @@
     {
       "path": "res://Scenes/AI.gdc",
       "source": "files/Scenes/AI.gdc",
+      "overwrite": true
+    },
+    {
+      "path": "res://Scenes/Menu.gdc",
+      "source": "files/Scenes/Menu.gdc",
+      "overwrite": true
+    },
+    {
+      "path": "res://Scenes/Menu.tscn",
+      "source": "files/Scenes/Menu.tscn",
+      "overwrite": true
+    },
+    {
+      "path": "res://Scenes/Multiplayer.gdc",
+      "source": "files/Scenes/Multiplayer.gdc",
+      "overwrite": true
+    },
+    {
+      "path": "res://Scenes/Multiplayer.tscn",
+      "source": "files/Scenes/Multiplayer.tscn",
       "overwrite": true
     }
   ]

@@ -190,15 +190,15 @@ icon_align = 1
 
 [node name="P1P2Button" type="Button" parent="TextureRect"]
 anchor_left = 0.713
-anchor_top = 0.748
+anchor_top = 0.768
 anchor_right = 0.966
-anchor_bottom = 0.886
+anchor_bottom = 0.904
 margin_left = -0.189026
 margin_top = -0.0400085
 margin_right = 0.00195313
 margin_bottom = 0.719971
 focus_neighbour_left = NodePath("../TextureButton")
-focus_neighbour_top = NodePath("../WCButton")
+focus_neighbour_top = NodePath("../MultiplayerButton")
 focus_neighbour_right = NodePath("../PracticeButton")
 focus_neighbour_bottom = NodePath("../SettingsButton")
 input_pass_on_modal_close_click = false
@@ -266,8 +266,24 @@ margin_bottom = 11.0
 focus_neighbour_left = NodePath("../TextureButton")
 focus_neighbour_top = NodePath("../CupButton")
 focus_neighbour_right = NodePath("../P1P2Button")
-focus_neighbour_bottom = NodePath("../P1P2Button")
+focus_neighbour_bottom = NodePath("../MultiplayerButton")
 text = "Womens Cup"
+
+[node name="MultiplayerButton" type="Button" parent="TextureRect"]
+anchor_left = 0.709
+anchor_top = 0.704
+anchor_right = 0.966
+anchor_bottom = 0.752
+margin_left = 2.021
+margin_right = 0.00195313
+margin_bottom = 0.0
+focus_neighbour_left = NodePath("../TextureButton")
+focus_neighbour_top = NodePath("../WCButton")
+focus_neighbour_right = NodePath("../P1P2Button")
+focus_neighbour_bottom = NodePath("../P1P2Button")
+custom_styles/hover = SubResource( 6 )
+custom_styles/normal = SubResource( 6 )
+text = "Multiplayer"
 
 [node name="HelpButton" type="Button" parent="TextureRect"]
 self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
@@ -380,7 +396,7 @@ custom_constants/shadow_offset_y = 4
 custom_constants/shadow_as_outline = 0
 custom_fonts/font = SubResource( 2 )
 text = "super
-liquid
+mod
 soccer"
 
 [node name="Transition" parent="TextureRect" instance=ExtResource( 10 )]
@@ -393,6 +409,7 @@ anchor_bottom = 1.007
 [connection signal="pressed" from="TextureRect/CupButton" to="." method="_on_CupButton_pressed"]
 [connection signal="pressed" from="TextureRect/LeagueButton" to="." method="_on_LeagueButton_pressed"]
 [connection signal="pressed" from="TextureRect/WCButton" to="." method="_on_WCButton_pressed"]
+[connection signal="pressed" from="TextureRect/MultiplayerButton" to="." method="_on_MultiplayerButton_pressed"]
 [connection signal="pressed" from="TextureRect/HelpButton" to="." method="_on_Button_pressed"]
 [connection signal="pressed" from="TextureRect/EditButton" to="." method="_on_EditButton_pressed"]
 [connection signal="pressed" from="TextureRect/PracticeButton" to="." method="_on_PracticeButton_pressed"]

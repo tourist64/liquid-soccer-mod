@@ -25,9 +25,9 @@ py -m http.server 8000
 Depois abra:
 
 - Jogo normal: `http://localhost:8000/index-mod.html`
-- Multiplayer: `http://localhost:8000/multiplayer.html`
+- O multiplayer fica no próprio menu do jogo, no botão `Multiplayer`.
 
-No multiplayer, o anfitrião cria a sala e escolhe os dois times no jogo. O segundo jogador entra com o mesmo nome de sala e senha e controla o time visitante com:
+No multiplayer, o anfitrião cria a sala, o segundo jogador entra com o mesmo nome e senha, e os dois seguem o fluxo normal do jogo para escolher os times. O visitante controla o segundo time com:
 
 | Ação | Tecla |
 | --- | --- |
@@ -63,8 +63,7 @@ py modloader.py apply mods/super-mod-soccer
 ```text
 .
 ├── game3/                 # Build web publicada
-│   ├── multiplayer.html   # Lobby multiplayer
-│   └── multiplayer.js    # Sinalização, WebRTC e controles
+│   └── multiplayer-bridge.js # Sinalização, WebRTC e controles do modo interno
 ├── mods/                  # Mods instaláveis
 ├── source/
 │   ├── advanced/          # Base avançada recuperada
@@ -84,7 +83,6 @@ No repositório do GitHub, selecione **Settings → Pages → Source: GitHub Act
 
 - Mostrar nicknames dentro da partida.
 - Melhorar feedback de conexão e reconexão.
-- Criar uma tela de seleção de times dentro do lobby.
 - Adicionar novos mods sem precisar editar a build manualmente.
 
 ## Status

@@ -1,0 +1,415 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://Res/OLDBLEND.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://Scenes/Menu.gd" type="Script" id=2]
+[ext_resource path="res://Scenes/GCup.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Images/lineLight29.png" type="Texture" id=4]
+[ext_resource path="res://Res/UI.tres" type="Theme" id=9]
+[ext_resource path="res://Scenes/Transition.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Res/Republiko-Outline3.otf" type="DynamicFontData" id=18]
+
+[sub_resource type="StyleBoxFlat" id=4]
+bg_color = Color( 0.803922, 0.231373, 0.231373, 1 )
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color( 0.960784, 0.796078, 0.439216, 1 )
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+corner_detail = 16
+
+[sub_resource type="StyleBoxFlat" id=7]
+bg_color = Color( 0.466667, 0.333333, 0.00784314, 1 )
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color( 0.960784, 0.796078, 0.439216, 1 )
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+corner_detail = 16
+
+[sub_resource type="StyleBoxFlat" id=6]
+bg_color = Color( 0.07, 0.17, 0.3, 1 )
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id=5]
+bg_color = Color( 0.803922, 0.231373, 0.231373, 1 )
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+corner_detail = 12
+
+[sub_resource type="DynamicFont" id=1]
+size = 200
+outline_size = 6
+outline_color = Color( 0.960784, 0.796078, 0.439216, 1 )
+use_mipmaps = true
+use_filter = true
+font_data = ExtResource( 18 )
+
+[sub_resource type="DynamicFont" id=8]
+size = 160
+outline_size = 5
+outline_color = Color( 0.745098, 0.854902, 0.87451, 1 )
+use_mipmaps = true
+font_data = ExtResource( 18 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 32
+use_mipmaps = true
+use_filter = true
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 137
+outline_size = 9
+outline_color = Color( 0.976471, 0.952941, 0.952941, 1 )
+use_mipmaps = true
+use_filter = true
+font_data = ExtResource( 1 )
+
+[node name="Menu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -1031.0
+margin_bottom = -580.0
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme = ExtResource( 9 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_vertical_guides_": [ 515.0 ]
+}
+
+[node name="TextureRect" type="ColorRect" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_right = 1031.0
+margin_bottom = 580.0
+grow_horizontal = 2
+grow_vertical = 2
+rect_min_size = Vector2( 1031, 580 )
+color = Color( 0.0941176, 0.215686, 0.321569, 1 )
+
+[node name="ViewportContainer" type="ViewportContainer" parent="TextureRect"]
+margin_left = 245.0
+margin_top = 36.0
+margin_right = 757.0
+margin_bottom = 548.0
+
+[node name="Viewport" type="Viewport" parent="TextureRect/ViewportContainer"]
+size = Vector2( 512, 512 )
+transparent_bg = true
+handle_input_locally = false
+render_target_update_mode = 3
+
+[node name="Camera" type="Camera" parent="TextureRect/ViewportContainer/Viewport"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0246872, 2.0083 )
+fov = 46.2
+
+[node name="GCup" parent="TextureRect/ViewportContainer/Viewport" instance=ExtResource( 3 )]
+transform = Transform( 0.903702, 0.428162, 0, -0.428162, 0.903702, 0, 0, 0, 1, -0.132629, -0.277442, 1.30779 )
+
+[node name="ColorRect" type="ColorRect" parent="TextureRect"]
+self_modulate = Color( 1, 1, 1, 0.666667 )
+margin_left = 91.0
+margin_top = -2.0
+margin_right = 154.0
+margin_bottom = 584.0
+color = Color( 0.054902, 0.109804, 0.34902, 1 )
+
+[node name="ColorRect2" type="ColorRect" parent="TextureRect"]
+self_modulate = Color( 1, 1, 1, 0.666667 )
+margin_left = 168.0
+margin_right = 204.0
+margin_bottom = 582.0
+color = Color( 0.384314, 0.690196, 0.823529, 1 )
+
+[node name="ColorRect3" type="ColorRect" parent="TextureRect"]
+self_modulate = Color( 1, 1, 1, 0.666667 )
+margin_left = 64.0
+margin_top = 1.0
+margin_right = 84.0
+margin_bottom = 584.0
+color = Color( 0.0235294, 0.243137, 0.172549, 1 )
+
+[node name="TextureButton" type="Button" parent="TextureRect"]
+anchor_left = 0.321
+anchor_top = 0.722
+anchor_right = 0.673
+anchor_bottom = 0.818
+margin_left = 5.04901
+margin_top = -46.76
+margin_right = 0.315918
+margin_bottom = 0.200012
+focus_neighbour_left = NodePath("../PracticeButton")
+focus_neighbour_top = NodePath("../WCButton")
+focus_neighbour_right = NodePath("../P1P2Button")
+focus_neighbour_bottom = NodePath("../P1P2Button")
+custom_colors/font_color = Color( 1, 0.988235, 0.988235, 1 )
+custom_styles/normal = SubResource( 4 )
+action_mode = 0
+text = "play match"
+
+[node name="SettingsButton" type="Button" parent="TextureRect"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.854
+anchor_top = 0.189
+anchor_right = 0.938
+anchor_bottom = 0.197
+margin_left = 5.526
+margin_top = -45.62
+margin_right = 25.922
+margin_bottom = 5.74001
+focus_neighbour_left = NodePath("../TextureButton")
+focus_neighbour_top = NodePath("../P1P2Button")
+focus_neighbour_right = NodePath("../PracticeButton")
+focus_neighbour_bottom = NodePath("../PracticeButton")
+icon = ExtResource( 4 )
+icon_align = 1
+
+[node name="P1P2Button" type="Button" parent="TextureRect"]
+anchor_left = 0.713
+anchor_top = 0.768
+anchor_right = 0.966
+anchor_bottom = 0.904
+margin_left = -0.189026
+margin_top = -0.0400085
+margin_right = 0.00195313
+margin_bottom = 0.719971
+focus_neighbour_left = NodePath("../TextureButton")
+focus_neighbour_top = NodePath("../MultiplayerButton")
+focus_neighbour_right = NodePath("../PracticeButton")
+focus_neighbour_bottom = NodePath("../SettingsButton")
+input_pass_on_modal_close_click = false
+custom_styles/normal = SubResource( 7 )
+text = "Penalties!"
+icon_align = 2
+
+[node name="CupButton" type="Button" parent="TextureRect"]
+anchor_left = 0.718
+anchor_top = 0.423
+anchor_right = 0.965
+anchor_bottom = 0.56
+margin_left = -5.25806
+margin_top = 2.65997
+margin_right = 1.05096
+margin_bottom = 8.89999
+focus_neighbour_left = NodePath("../TextureButton")
+focus_neighbour_top = NodePath("../LeagueButton")
+focus_neighbour_right = NodePath("../WCButton")
+focus_neighbour_bottom = NodePath("../WCButton")
+custom_styles/hover = SubResource( 6 )
+custom_styles/normal = SubResource( 6 )
+text = "Chumps League"
+
+[node name="LeagueButton" type="Button" parent="TextureRect"]
+anchor_left = 0.723
+anchor_top = 0.275
+anchor_right = 0.967
+anchor_bottom = 0.406
+margin_left = -10.719
+margin_top = -10.0
+margin_right = 0.148926
+margin_bottom = 0.119995
+focus_neighbour_left = NodePath("../TextureButton")
+focus_neighbour_top = NodePath("../SettingsButton")
+focus_neighbour_right = NodePath("../WCButton")
+focus_neighbour_bottom = NodePath("../WCButton")
+custom_styles/hover = SubResource( 5 )
+custom_styles/pressed = SubResource( 5 )
+custom_styles/normal = SubResource( 5 )
+text = "World Cup '26"
+
+[node name="Label" type="Label" parent="TextureRect"]
+modulate = Color( 0.686275, 0.686275, 0.686275, 0.686275 )
+anchor_left = 0.298
+anchor_top = 0.899
+anchor_right = 0.501
+anchor_bottom = 0.899
+margin_left = 463.762
+margin_top = 14.58
+margin_right = 513.469
+margin_bottom = 40.58
+rect_scale = Vector2( 0.8, 0.8 )
+text = "version: 1.3.1  poki.com"
+
+[node name="WCButton" type="Button" parent="TextureRect"]
+anchor_left = 0.709
+anchor_top = 0.601
+anchor_right = 0.821
+anchor_bottom = 0.7
+margin_left = 2.021
+margin_top = 0.419983
+margin_right = 150.549
+margin_bottom = 11.0
+focus_neighbour_left = NodePath("../TextureButton")
+focus_neighbour_top = NodePath("../CupButton")
+focus_neighbour_right = NodePath("../P1P2Button")
+focus_neighbour_bottom = NodePath("../MultiplayerButton")
+text = "Womens Cup"
+
+[node name="MultiplayerButton" type="Button" parent="TextureRect"]
+anchor_left = 0.709
+anchor_top = 0.704
+anchor_right = 0.966
+anchor_bottom = 0.752
+margin_left = 2.021
+margin_right = 0.00195313
+margin_bottom = 0.0
+focus_neighbour_left = NodePath("../TextureButton")
+focus_neighbour_top = NodePath("../WCButton")
+focus_neighbour_right = NodePath("../P1P2Button")
+focus_neighbour_bottom = NodePath("../P1P2Button")
+custom_styles/hover = SubResource( 6 )
+custom_styles/normal = SubResource( 6 )
+text = "Multiplayer"
+
+[node name="HelpButton" type="Button" parent="TextureRect"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.752
+anchor_top = 0.189
+anchor_right = 0.951
+anchor_bottom = 0.197
+margin_left = -35.312
+margin_top = -45.62
+margin_right = -129.481
+margin_bottom = 4.74001
+focus_neighbour_left = NodePath("../P1P2Button")
+focus_neighbour_top = NodePath("../TextureButton")
+focus_neighbour_right = NodePath("../TextureButton")
+focus_neighbour_bottom = NodePath("../TextureButton")
+text = "?"
+
+[node name="EditButton" type="Button" parent="TextureRect"]
+visible = false
+self_modulate = Color( 1, 1, 1, 0.513726 )
+anchor_left = 0.056
+anchor_top = 0.857
+anchor_right = 0.215
+anchor_bottom = 0.943
+margin_left = -9.736
+margin_top = 173.94
+margin_right = -9.92194
+margin_bottom = 174.06
+disabled = true
+text = "Edit Teams"
+
+[node name="PracticeButton" type="Button" parent="TextureRect"]
+visible = false
+anchor_left = 0.712
+anchor_top = 0.236
+anchor_right = 0.89
+anchor_bottom = 0.254
+margin_left = -577.336
+margin_top = 257.72
+margin_right = -529.17
+margin_bottom = 300.08
+focus_neighbour_left = NodePath("../P1P2Button")
+focus_neighbour_top = NodePath("../SettingsButton")
+focus_neighbour_right = NodePath("../TextureButton")
+focus_neighbour_bottom = NodePath("../SettingsButton")
+text = "tutorial"
+
+[node name="Stats" type="Label" parent="TextureRect"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+self_modulate = Color( 1, 1, 1, 0.67451 )
+anchor_left = 0.039
+anchor_top = 0.035
+anchor_right = 0.158
+anchor_bottom = 0.052
+margin_left = 64.791
+margin_top = -12.3
+margin_right = 968.284
+margin_bottom = 13.54
+rect_scale = Vector2( 0.8, 0.8 )
+align = 1
+
+[node name="Label3" type="Label" parent="TextureRect"]
+visible = false
+modulate = Color( 0.27451, 0.235294, 0.156863, 1 )
+self_modulate = Color( 1, 1, 1, 0.109804 )
+margin_left = 295.0
+margin_top = 98.0
+margin_right = 631.0
+margin_bottom = 354.0
+custom_colors/font_color = Color( 0.6, 0.0980392, 0.0980392, 1 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 1 )
+text = "26"
+
+[node name="Label2" type="Label" parent="TextureRect"]
+anchor_left = 0.032
+anchor_top = 0.505
+anchor_right = 0.249
+anchor_bottom = 0.8
+margin_left = 0.00799942
+margin_top = 0.100006
+margin_right = 0.280975
+custom_colors/font_color = Color( 0.156863, 0.372549, 0.168627, 1 )
+custom_fonts/font = SubResource( 8 )
+text = "26"
+
+[node name="Label4" type="Label" parent="TextureRect"]
+self_modulate = Color( 1, 1, 1, 0.490196 )
+anchor_left = 0.042
+anchor_top = 0.783
+anchor_right = 0.254
+anchor_bottom = 0.845
+margin_left = -0.302002
+margin_top = -0.140045
+margin_right = 0.125916
+margin_bottom = 0.199982
+custom_fonts/font = SubResource( 3 )
+text = "Global Cup Edition"
+
+[node name="Label5" type="Label" parent="TextureRect"]
+margin_left = 37.0
+margin_top = 16.0
+margin_right = 370.0
+margin_bottom = 346.0
+custom_colors/font_color = Color( 0.980392, 0.976471, 0.952941, 1 )
+custom_colors/font_outline_modulate = Color( 0.894118, 0.721569, 0.341176, 1 )
+custom_constants/shadow_offset_x = 5
+custom_constants/line_spacing = -30
+custom_constants/shadow_offset_y = 4
+custom_constants/shadow_as_outline = 0
+custom_fonts/font = SubResource( 2 )
+text = "super
+mod
+soccer"
+
+[node name="Transition" parent="TextureRect" instance=ExtResource( 10 )]
+anchor_right = 1.012
+anchor_bottom = 1.007
+
+[connection signal="pressed" from="TextureRect/TextureButton" to="." method="_on_TextureButton_pressed"]
+[connection signal="pressed" from="TextureRect/SettingsButton" to="." method="_on_SettingsButton_pressed"]
+[connection signal="pressed" from="TextureRect/P1P2Button" to="." method="_on_P1P2Button_pressed"]
+[connection signal="pressed" from="TextureRect/CupButton" to="." method="_on_CupButton_pressed"]
+[connection signal="pressed" from="TextureRect/LeagueButton" to="." method="_on_LeagueButton_pressed"]
+[connection signal="pressed" from="TextureRect/WCButton" to="." method="_on_WCButton_pressed"]
+[connection signal="pressed" from="TextureRect/MultiplayerButton" to="." method="_on_MultiplayerButton_pressed"]
+[connection signal="pressed" from="TextureRect/HelpButton" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="TextureRect/EditButton" to="." method="_on_EditButton_pressed"]
+[connection signal="pressed" from="TextureRect/PracticeButton" to="." method="_on_PracticeButton_pressed"]

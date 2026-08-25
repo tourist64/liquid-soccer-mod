@@ -57,6 +57,7 @@ func setButtons():
 	$TextureRect / P1P2Button.text = Global.ll.menus[1]
 	$TextureRect / CupButton.text = Global.ll.menus[2]
 	$TextureRect / WCButton.text = Global.ll.menus[3]
+	$TextureRect / MultiplayerButton.text = "Multiplayer"
 	
 	$TextureRect / HelpButton.text = "?"
 	$TextureRect / PracticeButton.text = Global.ll.menus[6]
@@ -186,6 +187,12 @@ func _on_WCButton_pressed():
 	var _foo = get_tree().change_scene("res://Scenes/GlobalCupSelect.tscn")
 
 
+func _on_MultiplayerButton_pressed():
+	trans._wipeOff()
+	yield(trans.tween, "tween_completed")
+	var _foo = get_tree().change_scene("res://Scenes/Multiplayer.tscn")
+
+
 func _on_PracticeButton_pressed():
 	trans._wipeOff()
 	Global.isPenalties = false
@@ -193,5 +200,3 @@ func _on_PracticeButton_pressed():
 	yield(trans.tween, "tween_completed")
 	
 	var _foo = get_tree().change_scene("res://Scenes/training.tscn")
-
-
