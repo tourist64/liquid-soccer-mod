@@ -1,0 +1,15 @@
+* text=auto
+
+*.pck binary
+*.wasm binary
+*.gdc binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.wav binary
+*.mp3 binary
+*.dae binary
+*.glb binary
+*.mesh binary
