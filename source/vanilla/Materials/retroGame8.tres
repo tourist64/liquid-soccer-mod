@@ -1,0 +1,26 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=2]
+
+[ext_resource path="res://Materials/retroGame.gdshader" type="Shader" id=1]
+
+[sub_resource type="ViewportTexture" id=1]
+viewport_path = NodePath("VPC/VP")
+
+[resource]
+resource_local_to_scene = true
+render_priority = 1
+shader = ExtResource( 1 )
+shader_param/player_position = Vector2( 0.5, 0.5 )
+shader_param/color = Color( 0.223529, 0.227451, 0.219608, 0.827451 )
+shader_param/MULTIPLIER = 1.0
+shader_param/SCALE = 1.67
+shader_param/SOFTNESS = 0.517
+shader_param/resolution = Vector2( 240, 135 )
+shader_param/grille_opacity = 0.129
+shader_param/scanlines_opacity = 0.288
+shader_param/scanlines_width = 0.221
+shader_param/warp_amount = 0.046
+shader_param/color_depth = 4.0
+shader_param/brightness = 1.78
+shader_param/vignette_intensity = 0.375
+shader_param/vignette_opacity = 0.482
+shader_param/vpt = SubResource( 1 )

@@ -1,0 +1,21 @@
+[gd_resource type="Environment" load_steps=2 format=2]
+
+[ext_resource path="res://Materials/SmallStadiumSky.tres" type="ProceduralSky" id=1]
+
+[resource]
+background_mode = 2
+background_sky = ExtResource( 1 )
+ambient_light_color = Color( 0.733333, 0.733333, 0.733333, 1 )
+ambient_light_energy = 0.87
+fog_color = Color( 0.482353, 0.490196, 0.498039, 1 )
+fog_depth_begin = 64.0
+fog_depth_end = 804.0
+fog_depth_curve = 1.41421
+fog_height_min = -24.0
+fog_height_max = -30.0
+fog_height_curve = 2.0
+tonemap_exposure = 0.75
+dof_blur_far_enabled = true
+dof_blur_far_distance = 130.91
+dof_blur_far_transition = 42.08
+dof_blur_far_quality = 2

@@ -1,0 +1,136 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Images/dialogLarge.png" type="Texture" id=1]
+[ext_resource path="res://Res/UI.tres" type="Theme" id=2]
+[ext_resource path="res://Scenes/WCStanding.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Scenes/WCGroup.gd" type="Script" id=4]
+[ext_resource path="res://Scenes/LeagueTie.tscn" type="PackedScene" id=5]
+
+[node name="WCGroup" type="Control"]
+anchor_right = 0.281
+anchor_bottom = 0.331
+theme = ExtResource( 2 )
+script = ExtResource( 4 )
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+visible = false
+self_modulate = Color( 0.572549, 0.180392, 0.160784, 1 )
+margin_left = -8.0
+margin_top = -8.0
+margin_right = 760.0
+margin_bottom = 504.0
+rect_scale = Vector2( 0.567, 0.734 )
+texture = ExtResource( 1 )
+
+[node name="TextureRect" type="TextureRect" parent="."]
+self_modulate = Color( 0.85098, 0.85098, 0.85098, 1 )
+margin_right = 600.0
+margin_bottom = 512.0
+rect_scale = Vector2( 0.7, 0.7 )
+texture = ExtResource( 1 )
+expand = true
+stretch_mode = 1
+
+[node name="Label" type="Label" parent="TextureRect"]
+anchor_top = 0.026
+anchor_right = 0.026
+anchor_bottom = 0.026
+margin_top = -0.312
+margin_right = 583.4
+margin_bottom = 38.688
+text = "Group 1"
+align = 1
+
+[node name="TeamEntry" parent="TextureRect" instance=ExtResource( 3 )]
+anchor_left = 0.057
+anchor_top = 0.107
+anchor_right = 0.818
+margin_left = 0.223999
+margin_top = 0.416
+margin_right = 1194.0
+margin_bottom = 432.0
+
+[node name="TeamEntry2" parent="TextureRect" instance=ExtResource( 3 )]
+anchor_left = 0.057
+anchor_top = 0.196
+anchor_right = 0.818
+margin_left = 0.223999
+margin_top = 0.416
+margin_right = 1194.0
+margin_bottom = 432.0
+
+[node name="TeamEntry3" parent="TextureRect" instance=ExtResource( 3 )]
+anchor_left = 0.057
+anchor_top = 0.283
+anchor_right = 0.818
+margin_left = 0.223999
+margin_top = 0.416
+margin_right = 1194.0
+margin_bottom = 432.0
+
+[node name="TeamEntry4" parent="TextureRect" instance=ExtResource( 3 )]
+anchor_left = 0.057
+anchor_top = 0.364
+anchor_right = 0.818
+margin_left = 0.223999
+margin_top = 0.416
+margin_right = 1194.0
+margin_bottom = 432.0
+
+[node name="Ties" type="Control" parent="."]
+anchor_left = 0.017
+anchor_right = 0.043
+margin_left = -39.0748
+margin_top = -38.0
+margin_right = 620.693
+margin_bottom = 501.0
+rect_min_size = Vector2( 666, 39 )
+rect_scale = Vector2( 0.8, 0.8 )
+
+[node name="Tie" parent="Ties" instance=ExtResource( 5 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 151.429
+margin_top = 250.0
+margin_right = 151.429
+margin_bottom = 250.0
+
+[node name="Tie2" parent="Ties" instance=ExtResource( 5 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 151.429
+margin_top = 294.286
+margin_right = 151.429
+margin_bottom = 294.286
+
+[node name="Tie3" parent="Ties" instance=ExtResource( 5 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 150.0
+margin_top = 335.714
+margin_right = 153.568
+margin_bottom = 335.714
+
+[node name="Tie4" parent="Ties" instance=ExtResource( 5 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 150.0
+margin_top = 378.571
+margin_right = 153.568
+margin_bottom = 378.571
+
+[node name="Tie5" parent="Ties" instance=ExtResource( 5 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 151.429
+margin_top = 418.572
+margin_right = 154.997
+margin_bottom = 418.572
+
+[node name="Tie6" parent="Ties" instance=ExtResource( 5 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 151.429
+margin_top = 460.0
+margin_right = 155.229
+margin_bottom = 460.0

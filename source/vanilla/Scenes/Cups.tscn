@@ -1,0 +1,83 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Res/Cups.dae" type="PackedScene" id=1]
+[ext_resource path="res://Res/Cups.tres" type="Environment" id=2]
+[ext_resource path="res://Scenes/Cups.gd" type="Script" id=3]
+
+[sub_resource type="SpatialMaterial" id=1]
+albedo_color = Color( 0.733333, 0.611765, 0.45098, 1 )
+metallic = 1.0
+metallic_specular = 1.0
+roughness = 0.12
+
+[node name="Cups" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+
+[node name="Camera" type="Camera" parent="." index="0"]
+transform = Transform( -1, 2.77194e-09, 8.73788e-08, 0, 0.999498, -0.0317073, -8.74228e-08, -0.0317073, -0.999498, 0, 8, -50 )
+environment = ExtResource( 2 )
+current = true
+fov = 41.8
+near = 10.0
+far = 80.0
+
+[node name="Cups" parent="." index="1"]
+transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0 )
+
+[node name="Cup1" parent="Cups" index="0"]
+transform = Transform( 40, 0, 0, 0, 40, 0, 0, 0, 40, 0, 0, -20 )
+
+[node name="revolvedSurface1" parent="Cups/Cup1" index="1"]
+use_in_baked_light = true
+generate_lightmap = false
+
+[node name="Cup2" parent="Cups" index="1"]
+transform = Transform( 60, 0, 0, 0, 60, 0, 0, 0, 60, 0, 0, 20 )
+
+[node name="Cup3" parent="Cups" index="2"]
+transform = Transform( -3.0598e-06, 0, 70, 0, 70, 0, -70, 0, -3.0598e-06, -20, 0, 0 )
+
+[node name="Cup4" parent="Cups" index="3"]
+transform = Transform( -3.0598e-06, 0, 70, 0, 70, 0, -70, 0, -3.0598e-06, 20, 0, 0 )
+
+[node name="Cup5" parent="Cups" index="4"]
+transform = Transform( 50, 0, 0, 0, 50, 0, 0, 0, 50, 0, 0, 0 )
+visible = false
+
+[node name="Cup6" parent="Cups" index="5"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0 )
+visible = false
+
+[node name="pCube1" parent="Cups/Cup6/group1" index="0"]
+material/0 = SubResource( 1 )
+
+[node name="pCube2" parent="Cups/Cup6/group1" index="1"]
+material/0 = SubResource( 1 )
+
+[node name="pCube3" parent="Cups/Cup6/group1" index="2"]
+material/0 = SubResource( 1 )
+
+[node name="pCube4" parent="Cups/Cup6/group1" index="3"]
+material/0 = SubResource( 1 )
+
+[node name="pCube1_ncl1_1" parent="Cups/Cup6/group2" index="0"]
+material/0 = SubResource( 1 )
+
+[node name="pCube2_ncl1_1" parent="Cups/Cup6/group2" index="1"]
+material/0 = SubResource( 1 )
+
+[node name="pCube3_ncl1_1" parent="Cups/Cup6/group2" index="2"]
+material/0 = SubResource( 1 )
+
+[node name="pCube4_ncl1_1" parent="Cups/Cup6/group2" index="3"]
+material/0 = SubResource( 1 )
+
+[node name="pSphere2" parent="Cups/Cup6" index="3"]
+material/0 = SubResource( 1 )
+
+[node name="Tween" type="Tween" parent="." index="3"]
+
+[node name="DirectionalLight" type="DirectionalLight" parent="." index="4"]
+transform = Transform( -0.534249, 0.360203, -0.764743, 0.252323, 0.93138, 0.262419, 0.806791, -0.0527649, -0.588477, -0.602833, 0, 0 )
+light_energy = 1.98
+light_bake_mode = 0

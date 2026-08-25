@@ -1,0 +1,10 @@
+[gd_resource type="Environment" load_steps=2 format=2]
+
+[ext_resource path="res://Materials/SmallStadiumSky.tres" type="ProceduralSky" id=1]
+
+[resource]
+background_mode = 2
+background_sky = ExtResource( 1 )
+background_color = Color( 0.101961, 0.627451, 0.211765, 1 )
+ambient_light_color = Color( 0.694118, 0.792157, 0.847059, 1 )
+fog_depth_end = 50.0

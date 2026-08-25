@@ -1,0 +1,804 @@
+[gd_scene load_steps=136 format=2]
+
+[ext_resource path="res://GK.dae" type="PackedScene" id=1]
+[ext_resource path="res://Images/numkeepr.png" type="Texture" id=2]
+[ext_resource path="res://Scenes/KeeperMesh.gd" type="Script" id=3]
+[ext_resource path="res://Images/playertrim.png" type="Texture" id=4]
+[ext_resource path="res://Images/number2.png" type="Texture" id=5]
+[ext_resource path="res://Images/player2.png" type="Texture" id=6]
+[ext_resource path="res://Images/player.png" type="Texture" id=7]
+[ext_resource path="res://Images/bibs.png" type="Texture" id=8]
+[ext_resource path="res://Scenes/KeeperAnimationTree.tscn" type="PackedScene" id=9]
+
+[sub_resource type="Shader" id=114]
+code = "shader_type spatial;
+render_mode blend_mix,depth_draw_opaque,cull_back,diffuse_burley,specular_blinn;
+uniform vec4 albedo_color : hint_color;
+uniform vec4 Skin : hint_color;
+uniform vec4 Shirt : hint_color;
+uniform vec4 Shirt2 : hint_color;
+uniform vec4 Shirt3 : hint_color;
+uniform vec4 Shorts : hint_color;
+uniform vec4 Shoes : hint_color;
+uniform vec4 Numbers : hint_color;
+uniform vec4 Gloves : hint_color;
+uniform vec4 BibColor : hint_color;
+uniform int kit;
+uniform sampler2D texture_albedo ;
+uniform sampler2D texture_albedo2 ;
+uniform sampler2D texture_albedo_trim ;
+uniform sampler2D texture_albedo2_trim ;
+
+uniform sampler2D texture_numbers  ;
+uniform sampler2D texture_numbers2 ;
+//uniform sampler2D texture_names ;
+uniform sampler2D texture_bibs ;
+
+uniform float specular;
+uniform float metallic;
+uniform float roughness : hint_range(0,1);
+uniform float point_size : hint_range(0,128);
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+uniform vec3 uv2_scale;
+uniform vec3 uv2_offset;
+uniform vec3 numChannelMult;
+uniform bool nameOff=false;
+uniform float numUVOff=0.0;
+//uniform float nameOffMult=0.1;
+uniform bool isKeeper=false;
+uniform bool isSimple=false;
+uniform bool doBibs=false;
+
+void vertex() {
+	UV=UV*uv1_scale.xy+uv1_offset.xy;
+}
+
+
+
+
+void fragment() {
+	if (!isSimple) {
+	vec2 base_uv = UV;
+	vec4 albedo_tex;
+	vec4 trim_tex;
+	vec3 al=vec3(0.0);
+	if  (kit==0){
+		albedo_tex = texture(texture_albedo,base_uv);
+		trim_tex= texture(texture_albedo_trim,base_uv);
+		}
+	else {
+		albedo_tex = texture(texture_albedo2,base_uv);
+		trim_tex= texture(texture_albedo2_trim,base_uv);
+	
+	}
+	//albedo_tex *= COLOR;
+	al=Skin.rgb;
+	//float a=smoothstep(0.49,.5,albedo_tex.r)-smoothstep(0.51,.55,albedo_tex.r);
+	
+	
+	float a=albedo_tex.r;
+	al=mix(al,Shirt.rgb*a,a);
+	a=albedo_tex.g;
+	al=mix(al,Shorts.rgb*a,a);
+	a=albedo_tex.b;
+	al=mix(al,Shirt2.rgb*a,a);
+	a=trim_tex.r; // shoes
+	al=mix(al,a*Shoes.rgb,a);
+	a=trim_tex.g; // third kit color 
+	al=mix(al,a*Shirt3.rgb,a);
+	
+	if (isKeeper ){
+		al = mix(al,Gloves.rgb,smoothstep(0.5,.70,albedo_tex.g)*(1.0-smoothstep(0.8,.9,albedo_tex.g)));
+	}
+	
+	vec3 numt=texture(texture_numbers,base_uv+vec2(0.0,numUVOff),0).rgb;
+	vec3 mask=texture(texture_numbers2,base_uv,0).rgb;
+	numt*=numChannelMult;
+	numt*=mask.r;
+	
+	ALBEDO=mix(al,Numbers.rgb,max(max(numt.r,numt.g),numt.b));
+	//if (nameOff){
+	//	vec3 sa=texture(texture_names,base_uv).rgb;
+	//	ALBEDO = mix(ALBEDO,Numbers.rgb,sa.g);
+	//}
+	if (doBibs){
+		vec3 bib=texture(texture_bibs,base_uv).rgb;
+		ALBEDO=mix(ALBEDO,BibColor.rgb,bib.r);
+	}
+	}
+	else {
+		ALBEDO=albedo_color.rgb;
+		
+	}
+	METALLIC = 0.0;
+	ROUGHNESS = roughness;
+	SPECULAR = 0.0;
+	//SSS_STRENGTH=0.50;
+}
+"
+
+[sub_resource type="ShaderMaterial" id=138]
+resource_local_to_scene = true
+shader = SubResource( 114 )
+shader_param/albedo_color = Color( 0.447059, 0.447059, 0.447059, 1 )
+shader_param/Skin = Color( 0.807843, 0.603922, 0.603922, 1 )
+shader_param/Shirt = Color( 0.890196, 0.137255, 0.137255, 1 )
+shader_param/Shirt2 = Color( 0.815686, 0.811765, 0.811765, 1 )
+shader_param/Shirt3 = Color( 0.227451, 0.0901961, 0.0901961, 1 )
+shader_param/Shorts = Color( 0.980392, 0.960784, 0.960784, 1 )
+shader_param/Shoes = Color( 0.0352941, 0.0431373, 0.0352941, 1 )
+shader_param/Numbers = Color( 0.0705882, 0.0705882, 0.0666667, 1 )
+shader_param/Gloves = Color( 0.882353, 0.878431, 0.862745, 1 )
+shader_param/BibColor = Color( 0.65098, 0.933333, 0.109804, 1 )
+shader_param/kit = null
+shader_param/specular = 0.5
+shader_param/metallic = 0.0
+shader_param/roughness = 1.0
+shader_param/point_size = 1.0
+shader_param/uv1_scale = Vector3( 1, 1, 1 )
+shader_param/uv1_offset = Vector3( 0, 0, 0 )
+shader_param/uv2_scale = Vector3( 1, 1, 1 )
+shader_param/uv2_offset = Vector3( 0, 0, 0 )
+shader_param/numChannelMult = Vector3( 1, 0, 0 )
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = true
+shader_param/isSimple = false
+shader_param/doBibs = false
+shader_param/texture_albedo = ExtResource( 7 )
+shader_param/texture_albedo2 = ExtResource( 6 )
+shader_param/texture_albedo_trim = ExtResource( 4 )
+shader_param/texture_albedo2_trim = ExtResource( 4 )
+shader_param/texture_numbers = ExtResource( 2 )
+shader_param/texture_numbers2 = ExtResource( 5 )
+shader_param/texture_bibs = ExtResource( 8 )
+
+[sub_resource type="BoxShape" id=104]
+margin = 0.1
+extents = Vector3( 1.25, 0.4, 0.6 )
+
+[sub_resource type="AnimationNodeAnimation" id=2]
+animation = "catch"
+
+[sub_resource type="AnimationNodeBlend2" id=3]
+filter_enabled = true
+filters = [ "QuickRigCharacter_Reference:QuickRigCharacter_LeftArm", "QuickRigCharacter_Reference:QuickRigCharacter_LeftForeArm", "QuickRigCharacter_Reference:QuickRigCharacter_LeftHand", "QuickRigCharacter_Reference:QuickRigCharacter_LeftShoulder", "QuickRigCharacter_Reference:QuickRigCharacter_RightArm", "QuickRigCharacter_Reference:QuickRigCharacter_RightForeArm", "QuickRigCharacter_Reference:QuickRigCharacter_RightHand", "QuickRigCharacter_Reference:QuickRigCharacter_RightShoulder" ]
+
+[sub_resource type="AnimationNodeAnimation" id=4]
+animation = "closeleft"
+
+[sub_resource type="AnimationNodeAnimation" id=5]
+animation = "closeright"
+
+[sub_resource type="AnimationNodeAnimation" id=6]
+animation = "collect"
+
+[sub_resource type="AnimationNodeTimeScale" id=7]
+
+[sub_resource type="AnimationNodeBlendTree" id=8]
+graph_offset = Vector2( -274, 44 )
+nodes/Animation/node = SubResource( 6 )
+nodes/Animation/position = Vector2( -60, 140 )
+nodes/TimeScale/node = SubResource( 7 )
+nodes/TimeScale/position = Vector2( 120, 120 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=94]
+animation = "collectL"
+
+[sub_resource type="AnimationNodeTimeScale" id=95]
+
+[sub_resource type="AnimationNodeBlendTree" id=96]
+graph_offset = Vector2( -210, 4 )
+nodes/Animation/node = SubResource( 94 )
+nodes/Animation/position = Vector2( 112, 110 )
+nodes/TimeScale/node = SubResource( 95 )
+nodes/TimeScale/position = Vector2( 280, 100 )
+nodes/output/position = Vector2( 440, 140 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=97]
+animation = "collectR"
+
+[sub_resource type="AnimationNodeTimeScale" id=98]
+
+[sub_resource type="AnimationNodeBlendTree" id=99]
+graph_offset = Vector2( -133, 1 )
+nodes/Animation/node = SubResource( 97 )
+nodes/Animation/position = Vector2( 211, 107 )
+nodes/TimeScale/node = SubResource( 98 )
+nodes/TimeScale/position = Vector2( 380, 100 )
+nodes/output/position = Vector2( 540, 140 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=9]
+animation = "DiveHF"
+
+[sub_resource type="AnimationNodeTimeScale" id=10]
+
+[sub_resource type="AnimationNodeBlendTree" id=11]
+graph_offset = Vector2( -354, 55 )
+nodes/Animation/node = SubResource( 9 )
+nodes/Animation/position = Vector2( -61, 109 )
+nodes/TimeScale/node = SubResource( 10 )
+nodes/TimeScale/position = Vector2( 112, 133 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=12]
+animation = "DiveHFR"
+
+[sub_resource type="AnimationNodeTimeScale" id=13]
+
+[sub_resource type="AnimationNodeBlendTree" id=14]
+graph_offset = Vector2( -245, 138.592 )
+nodes/Animation/node = SubResource( 12 )
+nodes/Animation/position = Vector2( 64, 154 )
+nodes/TimeScale/node = SubResource( 13 )
+nodes/TimeScale/position = Vector2( 283, 204 )
+nodes/output/position = Vector2( 520, 180 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=15]
+animation = "DiveLF"
+
+[sub_resource type="AnimationNodeTimeScale" id=16]
+
+[sub_resource type="AnimationNodeBlendTree" id=17]
+graph_offset = Vector2( -257, 29 )
+nodes/Animation/node = SubResource( 15 )
+nodes/Animation/position = Vector2( -20, 100 )
+nodes/TimeScale/node = SubResource( 16 )
+nodes/TimeScale/position = Vector2( 226, 132 )
+nodes/output/position = Vector2( 420, 120 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=18]
+animation = "DiveLFR"
+
+[sub_resource type="AnimationNodeTimeScale" id=19]
+
+[sub_resource type="AnimationNodeBlendTree" id=20]
+graph_offset = Vector2( -317, 88 )
+nodes/Animation/node = SubResource( 18 )
+nodes/Animation/position = Vector2( -80, 115 )
+nodes/TimeScale/node = SubResource( 19 )
+nodes/TimeScale/position = Vector2( 90, 149 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=21]
+animation = "DiveMF"
+
+[sub_resource type="AnimationNodeTimeScale" id=22]
+
+[sub_resource type="AnimationNodeBlendTree" id=23]
+graph_offset = Vector2( -325, 55 )
+nodes/Animation/node = SubResource( 21 )
+nodes/Animation/position = Vector2( -40, 140 )
+nodes/TimeScale/node = SubResource( 22 )
+nodes/TimeScale/position = Vector2( 140, 120 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=24]
+animation = "DiveMFR"
+
+[sub_resource type="AnimationNodeTimeScale" id=25]
+
+[sub_resource type="AnimationNodeBlendTree" id=26]
+graph_offset = Vector2( -278, 85 )
+nodes/Animation/node = SubResource( 24 )
+nodes/Animation/position = Vector2( -100, 100 )
+nodes/TimeScale/node = SubResource( 25 )
+nodes/TimeScale/position = Vector2( 106, 150 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=27]
+animation = "up"
+
+[sub_resource type="AnimationNodeTimeScale" id=28]
+
+[sub_resource type="AnimationNodeBlendTree" id=29]
+graph_offset = Vector2( -268, 54 )
+nodes/Animation/node = SubResource( 27 )
+nodes/Animation/position = Vector2( -60, 120 )
+nodes/TimeScale/node = SubResource( 28 )
+nodes/TimeScale/position = Vector2( 120, 140 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=81]
+animation = "gkthrow"
+
+[sub_resource type="AnimationNodeTimeScale" id=82]
+
+[sub_resource type="AnimationNodeBlendTree" id=83]
+graph_offset = Vector2( -313, 17 )
+nodes/Animation/node = SubResource( 81 )
+nodes/Animation/position = Vector2( -20, 80 )
+nodes/TimeScale/node = SubResource( 82 )
+nodes/TimeScale/position = Vector2( 140, 100 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=139]
+resource_local_to_scene = true
+animation = "idle"
+
+[sub_resource type="AnimationNodeAnimation" id=32]
+animation = "kick"
+
+[sub_resource type="AnimationNodeTimeScale" id=33]
+
+[sub_resource type="AnimationNodeBlendTree" id=34]
+nodes/Animation/node = SubResource( 32 )
+nodes/Animation/position = Vector2( 120, 100 )
+nodes/TimeScale/node = SubResource( 33 )
+nodes/TimeScale/position = Vector2( 364, 110 )
+nodes/output/position = Vector2( 560, 120 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=119]
+animation = "newidleclap"
+
+[sub_resource type="AnimationNodeAnimation" id=120]
+animation = "newidlepoint"
+
+[sub_resource type="AnimationNodeAnimation" id=121]
+animation = "newidlepointR"
+
+[sub_resource type="AnimationNodeAnimation" id=35]
+animation = "sprint"
+
+[sub_resource type="AnimationNodeTimeScale" id=36]
+
+[sub_resource type="AnimationNodeBlendTree" id=37]
+graph_offset = Vector2( -209, 30 )
+nodes/Animation/node = SubResource( 35 )
+nodes/Animation/position = Vector2( -100, 100 )
+nodes/RunSpeed/node = SubResource( 36 )
+nodes/RunSpeed/position = Vector2( 101, 100 )
+nodes/output/position = Vector2( 300, 160 )
+node_connections = [ "output", 0, "RunSpeed", "RunSpeed", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=38]
+animation = "Traverse"
+
+[sub_resource type="AnimationNodeAnimation" id=87]
+animation = "walk"
+
+[sub_resource type="AnimationNodeTimeScale" id=89]
+
+[sub_resource type="AnimationNodeBlendTree" id=88]
+graph_offset = Vector2( -393, 62 )
+nodes/Animation/node = SubResource( 87 )
+nodes/Animation/position = Vector2( -29, 107 )
+nodes/WalkSpeed/node = SubResource( 89 )
+nodes/WalkSpeed/position = Vector2( 140, 120 )
+node_connections = [ "output", 0, "WalkSpeed", "WalkSpeed", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=39]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=40]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=41]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=42]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=43]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=44]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=45]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=46]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=47]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=48]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=49]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=50]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=51]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=52]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=53]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=54]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=55]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=56]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=57]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=58]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=59]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=60]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=61]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=62]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=63]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=64]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=65]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=66]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=67]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=68]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.03
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=69]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=70]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.03
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=71]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=72]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=73]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=74]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=84]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=85]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=86]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=90]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=91]
+switch_mode = 1
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=92]
+switch_mode = 1
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=93]
+xfade_time = 0.03
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=100]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=101]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=102]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=103]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=105]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=106]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=107]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=108]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=109]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=110]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=111]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=112]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=116]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=117]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=126]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=127]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=128]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=129]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=130]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=131]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=132]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=133]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=134]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=135]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=136]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=137]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachine" id=140]
+resource_local_to_scene = true
+states/closeleft/node = SubResource( 4 )
+states/closeleft/position = Vector2( -7.439, 185 )
+states/closeright/node = SubResource( 5 )
+states/closeright/position = Vector2( 943.561, -73.097 )
+states/collect/node = SubResource( 8 )
+states/collect/position = Vector2( 266, 462 )
+states/collectL/node = SubResource( 96 )
+states/collectL/position = Vector2( -174.439, 88.903 )
+states/collectR/node = SubResource( 99 )
+states/collectR/position = Vector2( 1000, 42.38 )
+states/diveHF/node = SubResource( 11 )
+states/diveHF/position = Vector2( 1056, 179 )
+states/diveHFR/node = SubResource( 14 )
+states/diveHFR/position = Vector2( 70, 223 )
+states/diveLF/node = SubResource( 17 )
+states/diveLF/position = Vector2( 1061, 319 )
+states/diveLFR/node = SubResource( 20 )
+states/diveLFR/position = Vector2( 148, 388 )
+states/diveMF/node = SubResource( 23 )
+states/diveMF/position = Vector2( 1061, 244 )
+states/diveMFR/node = SubResource( 26 )
+states/diveMFR/position = Vector2( 112, 286 )
+states/diveUp/node = SubResource( 29 )
+states/diveUp/position = Vector2( 732, -24 )
+states/gkthrow/node = SubResource( 83 )
+states/gkthrow/position = Vector2( 877, 375.951 )
+states/idle/node = SubResource( 139 )
+states/idle/position = Vector2( 491, 200 )
+states/kick/node = SubResource( 34 )
+states/kick/position = Vector2( -21, -24 )
+states/newidleclap/node = SubResource( 119 )
+states/newidleclap/position = Vector2( 452.561, 440.951 )
+states/newidlepoint/node = SubResource( 120 )
+states/newidlepoint/position = Vector2( 638.561, 451.04 )
+states/newidlepointR/node = SubResource( 121 )
+states/newidlepointR/position = Vector2( 829.561, 451.04 )
+states/sprint/node = SubResource( 37 )
+states/sprint/position = Vector2( 154, -38 )
+states/traverse/node = SubResource( 38 )
+states/traverse/position = Vector2( 1076, 102 )
+states/walk/node = SubResource( 88 )
+states/walk/position = Vector2( 527.561, -1 )
+transitions = [ "idle", "traverse", SubResource( 39 ), "traverse", "idle", SubResource( 40 ), "idle", "sprint", SubResource( 41 ), "sprint", "idle", SubResource( 42 ), "diveLF", "idle", SubResource( 43 ), "idle", "diveLF", SubResource( 44 ), "idle", "diveHF", SubResource( 45 ), "diveHF", "idle", SubResource( 46 ), "idle", "diveMF", SubResource( 47 ), "diveMF", "idle", SubResource( 48 ), "idle", "diveUp", SubResource( 49 ), "diveUp", "idle", SubResource( 50 ), "idle", "diveHFR", SubResource( 51 ), "diveHFR", "idle", SubResource( 52 ), "idle", "diveMFR", SubResource( 53 ), "diveMFR", "idle", SubResource( 54 ), "idle", "diveLFR", SubResource( 55 ), "diveLFR", "idle", SubResource( 56 ), "idle", "collect", SubResource( 57 ), "collect", "idle", SubResource( 58 ), "sprint", "diveHFR", SubResource( 59 ), "sprint", "diveHF", SubResource( 60 ), "sprint", "diveMFR", SubResource( 61 ), "sprint", "diveMF", SubResource( 62 ), "sprint", "diveUp", SubResource( 63 ), "sprint", "diveLFR", SubResource( 64 ), "sprint", "diveLF", SubResource( 65 ), "sprint", "collect", SubResource( 66 ), "idle", "closeleft", SubResource( 67 ), "closeleft", "idle", SubResource( 68 ), "idle", "closeright", SubResource( 69 ), "closeright", "idle", SubResource( 70 ), "sprint", "closeleft", SubResource( 71 ), "sprint", "closeright", SubResource( 72 ), "idle", "kick", SubResource( 73 ), "kick", "idle", SubResource( 74 ), "sprint", "gkthrow", SubResource( 84 ), "gkthrow", "idle", SubResource( 85 ), "idle", "gkthrow", SubResource( 86 ), "idle", "walk", SubResource( 90 ), "walk", "sprint", SubResource( 91 ), "sprint", "walk", SubResource( 92 ), "walk", "idle", SubResource( 93 ), "collectL", "idle", SubResource( 100 ), "idle", "collectL", SubResource( 101 ), "collectR", "idle", SubResource( 102 ), "idle", "collectR", SubResource( 103 ), "walk", "diveHF", SubResource( 105 ), "walk", "diveMF", SubResource( 106 ), "walk", "diveLF", SubResource( 107 ), "walk", "diveHFR", SubResource( 108 ), "walk", "diveMFR", SubResource( 109 ), "walk", "diveLFR", SubResource( 110 ), "walk", "collectR", SubResource( 111 ), "walk", "collectL", SubResource( 112 ), "sprint", "collectR", SubResource( 116 ), "sprint", "collectL", SubResource( 117 ), "newidlepointR", "idle", SubResource( 126 ), "idle", "newidleclap", SubResource( 127 ), "idle", "newidlepoint", SubResource( 128 ), "idle", "newidlepointR", SubResource( 129 ), "newidleclap", "idle", SubResource( 130 ), "newidlepoint", "idle", SubResource( 131 ), "newidleclap", "walk", SubResource( 132 ), "newidlepoint", "walk", SubResource( 133 ), "newidlepointR", "walk", SubResource( 134 ), "newidleclap", "sprint", SubResource( 135 ), "newidlepoint", "sprint", SubResource( 136 ), "newidlepointR", "sprint", SubResource( 137 ) ]
+start_node = "idle"
+graph_offset = Vector2( -28.8333, -54.8 )
+
+[sub_resource type="AnimationNodeBlendTree" id=141]
+resource_local_to_scene = true
+graph_offset = Vector2( -514, 189 )
+nodes/Animation/node = SubResource( 2 )
+nodes/Animation/position = Vector2( -240, 340 )
+nodes/CaughtBall/node = SubResource( 3 )
+nodes/CaughtBall/position = Vector2( 20, 240 )
+nodes/StateMachine/node = SubResource( 140 )
+nodes/StateMachine/position = Vector2( -240, 220 )
+node_connections = [ "output", 0, "CaughtBall", "CaughtBall", 0, "StateMachine", "CaughtBall", 1, "Animation" ]
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=142]
+
+[node name="GK" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+
+[node name="QuickRigCharacter_Reference" parent="." index="2"]
+transform = Transform( 2.3, 0, 0, 0, 2.3, 0, 0, 0, 2.3, 0, -0.0525334, 0.023411 )
+
+[node name="PlayerM" parent="QuickRigCharacter_Reference" index="0"]
+layers = 2
+material/0 = SubResource( 138 )
+
+[node name="BoneAttachment" type="BoneAttachment" parent="QuickRigCharacter_Reference" index="1"]
+transform = Transform( 0.0102068, -0.000523132, 0.999948, 0.98769, -0.156095, -0.0101634, 0.156093, 0.987742, -0.00107655, -0.0127147, 2.07605, 0.349832 )
+bone_name = "QuickRigCharacter_Neck"
+
+[node name="BoneAttachment2" type="BoneAttachment" parent="QuickRigCharacter_Reference" index="2"]
+transform = Transform( -0.0471109, -0.64287, -0.764525, -0.921997, 0.322461, -0.214335, 0.38432, 0.694791, -0.607915, 0.778406, 0.951262, 0.231183 )
+bone_name = "QuickRigCharacter_LeftHand"
+
+[node name="CatchPoint" type="Spatial" parent="QuickRigCharacter_Reference/BoneAttachment2" index="0"]
+transform = Transform( 0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0.2, 0.2, 0.2 )
+
+[node name="BoneAttachment3" type="BoneAttachment" parent="QuickRigCharacter_Reference" index="3"]
+transform = Transform( 0.00559807, -0.000295565, 0.999984, 0.989178, -0.146611, -0.00558091, 0.14661, 0.989194, -0.000528372, -0.0213073, 1.11759, 0.181326 )
+bone_name = "QuickRigCharacter_Spine"
+
+[node name="AreaTest" type="Area" parent="QuickRigCharacter_Reference/BoneAttachment3" index="0"]
+collision_layer = 131072
+collision_mask = 524288
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/BoneAttachment3/AreaTest" index="0"]
+transform = Transform( 0.999955, 0.00748418, -0.00581837, -0.00749441, 0.999971, -0.00171316, 0.00580534, 0.00175661, 0.999982, 0.45, 0, 0 )
+shape = SubResource( 104 )
+
+[node name="QuickRigCharacter_Ctrl_Reference" parent="." index="3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0378169, 0.00253977 )
+
+[node name="QuickRigCharacter_Ctrl_HipsEffector" parent="QuickRigCharacter_Ctrl_Reference" index="0"]
+transform = Transform( 1, 9.53837e-05, 2.45553e-05, -9.50001e-05, 0.999885, -0.015176, -2.6e-05, 0.015176, 0.999885, -0.0213464, 0.707573, 0.148917 )
+
+[node name="QuickRigCharacter_Ctrl_LeftAnkleEffector" parent="QuickRigCharacter_Ctrl_Reference" index="1"]
+transform = Transform( 0.999218, -0.00170779, 0.0395032, 0.001711, 0.999999, -4.74389e-05, -0.039503, 0.000114992, 0.999219, 0.393477, 0.0768977, 0.195387 )
+
+[node name="QuickRigCharacter_Ctrl_RightAnkleEffector" parent="QuickRigCharacter_Ctrl_Reference" index="2"]
+transform = Transform( 0.998015, 0.0446536, -0.0444141, -0.0447639, 0.998996, -0.00149179, 0.0443029, 0.00347698, 0.999012, -0.412527, 0.0593245, 0.140926 )
+
+[node name="QuickRigCharacter_Ctrl_LeftWristEffector" parent="QuickRigCharacter_Ctrl_Reference" index="3"]
+transform = Transform( -0.0473226, 0.763476, -0.6441, -0.922139, 0.214469, 0.321968, 0.383954, 0.609185, 0.693882, 0.777476, 0.962131, 0.25277 )
+
+[node name="QuickRigCharacter_Ctrl_RightWristEffector" parent="QuickRigCharacter_Ctrl_Reference" index="4"]
+transform = Transform( -0.0525123, -0.51052, 0.858261, 0.99862, -0.0267318, 0.0451992, -0.000132173, 0.85945, 0.511219, -0.840026, 0.940962, 0.0734461 )
+
+[node name="QuickRigCharacter_Ctrl_LeftKneeEffector" parent="QuickRigCharacter_Ctrl_Reference" index="5"]
+transform = Transform( 0.978034, -0.175824, 0.111964, 0.204959, 0.909009, -0.362896, -0.0379701, 0.377873, 0.925079, 0.325215, 0.429811, 0.342093 )
+
+[node name="QuickRigCharacter_Ctrl_RightKneeEffector" parent="QuickRigCharacter_Ctrl_Reference" index="6"]
+transform = Transform( 0.983899, 0.125567, -0.127182, -0.166298, 0.903906, -0.394079, 0.0654771, 0.408884, 0.910234, -0.363777, 0.410257, 0.299672 )
+
+[node name="QuickRigCharacter_Ctrl_LeftElbowEffector" parent="QuickRigCharacter_Ctrl_Reference" index="7"]
+transform = Transform( -0.0473225, 0.763489, -0.644084, -0.922138, 0.214462, 0.321973, 0.383955, 0.609171, 0.693894, 0.797123, 1.32154, 0.101126 )
+
+[node name="QuickRigCharacter_Ctrl_RightElbowEffector" parent="QuickRigCharacter_Ctrl_Reference" index="8"]
+transform = Transform( -0.0525126, -0.510525, 0.858258, 0.99862, -0.0267315, 0.0451998, -0.000133038, 0.859447, 0.511224, -0.858842, 1.33423, 0.07013 )
+
+[node name="QuickRigCharacter_Ctrl_ChestOriginEffector" parent="QuickRigCharacter_Ctrl_Reference" index="9"]
+transform = Transform( 0.999996, 0.00284443, 0.000186212, -0.00283058, 0.998592, -0.0529677, -0.000336613, 0.052967, 0.998596, -0.00953464, 1.27059, 0.162296 )
+
+[node name="QuickRigCharacter_Ctrl_ChestEndEffector" parent="QuickRigCharacter_Ctrl_Reference" index="10"]
+transform = Transform( 0.999987, 0.00514683, 0.000364074, -0.0050976, 0.996404, -0.0845778, -0.000798073, 0.0845748, 0.996417, -0.0166655, 1.92041, 0.220325 )
+
+[node name="QuickRigCharacter_Ctrl_LeftFootEffector" parent="QuickRigCharacter_Ctrl_Reference" index="11"]
+transform = Transform( 0.999218, -0.00170779, 0.0395032, 0.001711, 0.999999, -4.74389e-05, -0.039503, 0.000114992, 0.999219, 0.401038, 0.0686162, 0.386278 )
+
+[node name="QuickRigCharacter_Ctrl_RightFootEffector" parent="QuickRigCharacter_Ctrl_Reference" index="12"]
+transform = Transform( 0.998015, 0.0446536, -0.0444141, -0.0447639, 0.998996, -0.00149179, 0.0443029, 0.00347698, 0.999012, -0.421398, 0.0507761, 0.331749 )
+
+[node name="QuickRigCharacter_Ctrl_LeftShoulderEffector" parent="QuickRigCharacter_Ctrl_Reference" index="13"]
+transform = Transform( 0.532019, 0.764587, -0.363816, -0.742666, 0.214984, -0.634215, -0.406698, 0.607608, 0.682209, 0.513179, 1.71599, 0.315976 )
+
+[node name="QuickRigCharacter_Ctrl_RightShoulderEffector" parent="QuickRigCharacter_Ctrl_Reference" index="14"]
+transform = Transform( 0.631955, -0.511687, 0.582073, 0.66979, -0.0172454, -0.74235, 0.389889, 0.858999, 0.331825, -0.522629, 1.6923, 0.27691 )
+
+[node name="QuickRigCharacter_Ctrl_HeadEffector" parent="QuickRigCharacter_Ctrl_Reference" index="15"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0117099, 2.86131, -0.00448965 )
+
+[node name="QuickRigCharacter_Ctrl_LeftHipEffector" parent="QuickRigCharacter_Ctrl_Reference" index="16"]
+transform = Transform( 0.970684, -0.239346, -0.0220544, 0.224003, 0.867541, 0.444066, -0.0871523, -0.435988, 0.895722, 0.219163, 0.814211, 0.14891 )
+
+[node name="QuickRigCharacter_Ctrl_RightHipEffector" parent="QuickRigCharacter_Ctrl_Reference" index="17"]
+transform = Transform( 0.971619, 0.23002, -0.0552061, -0.195329, 0.911781, 0.361251, 0.133431, -0.340215, 0.930833, -0.261857, 0.814257, 0.148923 )
+
+[node name="QuickRigCharacter_Ctrl_Hips" parent="QuickRigCharacter_Ctrl_Reference" index="18"]
+transform = Transform( 1, 0.000191521, 4.72092e-05, -0.00019, 0.999539, -0.0303501, -5.30001e-05, 0.0303501, 0.999539, -0.0213155, 0.869098, 0.15385 )
+
+[node name="QuickRigCharacter_Ctrl_LeftUpLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips" index="0"]
+transform = Transform( 0.970665, -0.239415, -0.0221199, 0.222746, 0.860803, 0.457606, -0.090517, -0.449109, 0.88888, 0.24051, -0.203769, -0.005529 )
+
+[node name="QuickRigCharacter_Ctrl_LeftLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_LeftUpLeg" index="0"]
+transform = Transform( 0.998582, 1.77119e-05, -0.0532303, -0.039722, 0.665938, -0.744949, 0.0354349, 0.746007, 0.664995, 0, -0.44309, 0 )
+
+[node name="QuickRigCharacter_Ctrl_LeftFoot" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_LeftUpLeg/QuickRigCharacter_Ctrl_LeftLeg" index="0"]
+transform = Transform( 0.979119, 0.203284, 0.000685409, -0.189059, 0.90935, 0.37059, 0.0747119, -0.362981, 0.928796, 0, -0.38824, 0 )
+
+[node name="QuickRigCharacter_Ctrl_LeftToeBase" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_LeftUpLeg/QuickRigCharacter_Ctrl_LeftLeg/QuickRigCharacter_Ctrl_LeftFoot" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1e-07, -0.00827242, 0.191041 )
+
+[node name="QuickRigCharacter_Ctrl_RightUpLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips" index="1"]
+transform = Transform( 0.971634, 0.229942, -0.0552648, -0.193188, 0.906535, 0.37533, 0.136404, -0.354007, 0.925242, -0.24051, -0.203769, -0.005529 )
+
+[node name="QuickRigCharacter_Ctrl_RightLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_RightUpLeg" index="0"]
+transform = Transform( 0.997194, 1.65217e-06, 0.0748564, 0.0524139, 0.713938, -0.698244, -0.053444, 0.700209, 0.711935, -2e-08, -0.44309, 4.33e-06 )
+
+[node name="QuickRigCharacter_Ctrl_RightFoot" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_RightUpLeg/QuickRigCharacter_Ctrl_RightLeg" index="0"]
+transform = Transform( 0.992291, -0.121969, 0.0219607, 0.10297, 0.910027, 0.401556, -0.0689621, -0.396199, 0.915571, 0, -0.38824, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightToeBase" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_RightUpLeg/QuickRigCharacter_Ctrl_RightLeg/QuickRigCharacter_Ctrl_RightFoot" index="0"]
+transform = Transform( 1, 0, 9.89009e-09, 0, 1, 0, -9.89009e-09, 0, 1, -1.6e-05, -0.00827242, 0.191041 )
+
+[node name="QuickRigCharacter_Ctrl_Spine" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips" index="2"]
+transform = Transform( 0.999985, 0.00550851, 1.75087e-06, -0.0054926, 0.997122, -0.0756152, -0.000418273, 0.075614, 0.997137, 0, 0.192296, 0.0417463 )
+
+[node name="QuickRigCharacter_Ctrl_Spine1" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine" index="0"]
+transform = Transform( 0.999997, 0.00230729, -0.000166017, -0.0023114, 0.999492, -0.0317753, 9.26172e-05, 0.0317756, 0.999495, 0, 0.192147, 0.0108251 )
+
+[node name="QuickRigCharacter_Ctrl_Spine2" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1" index="0"]
+transform = Transform( 0.999997, 0.00231237, 7.58677e-05, -0.00230879, 0.999492, -0.0317748, -0.000149304, 0.0317746, 0.999495, 0, 0.192147, -0.0074383 )
+
+[node name="QuickRigCharacter_Ctrl_LeftShoulder" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2" index="0"]
+transform = Transform( 0.993705, 0.108513, -0.0278498, -0.105905, 0.990958, 0.0823761, 0.0365369, -0.0789081, 0.996212, 0.184929, 0.332068, 0.103836 )
+
+[node name="QuickRigCharacter_Ctrl_LeftArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_LeftShoulder" index="0"]
+transform = Transform( 0.61033, 0.743973, -0.272033, -0.701816, 0.348589, -0.621241, -0.367358, 0.570079, 0.734887, 0.351652, -0.0643187, -0.0846822 )
+
+[node name="QuickRigCharacter_Ctrl_LeftForeArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_LeftShoulder/QuickRigCharacter_Ctrl_LeftArm" index="0"]
+transform = Transform( 0.500435, 0.000692345, -0.865774, -0.000299311, 1, 0.000626676, 0.865774, -5.44751e-05, 0.500435, 0.532647, 0, 0 )
+
+[node name="QuickRigCharacter_Ctrl_LeftHand" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_LeftShoulder/QuickRigCharacter_Ctrl_LeftArm/QuickRigCharacter_Ctrl_LeftForeArm" index="0"]
+transform = Transform( 1, -1.00005e-06, 1.99997e-06, 1e-06, 1, 2.68014e-05, -2e-06, -2.68014e-05, 1, 0.394082, 0, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightShoulder" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2" index="1"]
+transform = Transform( 0.97072, -0.230549, -0.0674591, 0.233359, 0.971681, 0.0371496, 0.0569839, -0.051804, 0.99703, -0.184929, 0.332068, 0.103836 )
+
+[node name="QuickRigCharacter_Ctrl_RightArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_RightShoulder" index="0"]
+transform = Transform( 0.793026, -0.421853, 0.439488, 0.54853, 0.180651, -0.816382, 0.264999, 0.888485, 0.37466, -0.351652, -0.0643187, -0.0846822 )
+
+[node name="QuickRigCharacter_Ctrl_RightForeArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_RightShoulder/QuickRigCharacter_Ctrl_RightArm" index="0"]
+transform = Transform( 0.634363, -5.33141e-06, 0.773035, 2.99707e-06, 1, 4.43729e-06, -0.773035, -4.98014e-07, 0.634363, -0.532647, 0, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightHand" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_RightShoulder/QuickRigCharacter_Ctrl_RightArm/QuickRigCharacter_Ctrl_RightForeArm" index="0"]
+transform = Transform( 1, -7.17571e-07, -8.47003e-07, 7.17613e-07, 1, 5.03601e-05, 8.46967e-07, -5.03601e-05, 1, -0.394082, -1.5e-07, 0 )
+
+[node name="QuickRigCharacter_Ctrl_Neck" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2" index="2"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.588745, 0.034018 )
+
+[node name="QuickRigCharacter_Ctrl_Head" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_Neck" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.547303, 0.0012659 )
+
+[node name="AnimationTree" parent="." index="4" instance=ExtResource( 9 )]
+tree_root = SubResource( 141 )
+parameters/StateMachine/playback = SubResource( 142 )
+
+[node name="AnimationPlayer" parent="." index="5"]
+playback_process_mode = 0
+playback_default_blend_time = 0.1
+method_call_mode = 1
+
+[connection signal="area_entered" from="QuickRigCharacter_Reference/BoneAttachment3/AreaTest" to="." method="_on_AreaTest_area_entered"]
+[connection signal="area_exited" from="QuickRigCharacter_Reference/BoneAttachment3/AreaTest" to="." method="_on_AreaTest_area_exited"]

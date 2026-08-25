@@ -1,0 +1,72 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://Images/flow_trail.png" type="Texture" id=1]
+[ext_resource path="res://Materials/SlideFX.gdshader" type="Shader" id=2]
+
+[sub_resource type="ShaderMaterial" id=8]
+shader = ExtResource( 2 )
+shader_param/albedo = Color( 0.960784, 0.796078, 0.439216, 1 )
+shader_param/specular = 0.0
+shader_param/metallic = 0.0
+shader_param/roughness = 1.0
+shader_param/point_size = 1.0
+shader_param/uv1_scale = Vector3( 1, 1, 1 )
+shader_param/uv1_offset = Vector3( 0, 0, 0 )
+shader_param/uv2_scale = Vector3( 1, 1, 1 )
+shader_param/uv2_offset = Vector3( 0, 0, 0 )
+shader_param/texture_albedo = ExtResource( 1 )
+
+[sub_resource type="Curve" id=2]
+max_value = 100.0
+_data = [ Vector2( 0, 0 ), 0.0, 15.9919, 0, 0, Vector2( 0.520619, 0.405167 ), 45.5132, 45.5132, 0, 0, Vector2( 0.989691, 50.4436 ), 497.699, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=3]
+width = 128
+curve = SubResource( 2 )
+
+[sub_resource type="Curve" id=4]
+_data = [ Vector2( 0, 0.690017 ), 0.0, 2.47862, 0, 0, Vector2( 1, 0 ), -4.94559, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=5]
+width = 64
+curve = SubResource( 4 )
+
+[sub_resource type="ParticlesMaterial" id=6]
+flag_rotate_y = true
+flag_disable_z = true
+direction = Vector3( 0, 1, 0 )
+spread = 180.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 25.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+damping = 60.0
+damping_curve = SubResource( 3 )
+angle = 323.0
+angle_random = 1.0
+scale = 1.25
+scale_random = 1.0
+scale_curve = SubResource( 5 )
+color = Color( 0.760784, 0.756863, 0.756863, 1 )
+
+[sub_resource type="SphereMesh" id=7]
+radius = 0.3
+height = 0.5
+radial_segments = 4
+rings = 4
+
+[node name="HitFX" type="Spatial"]
+
+[node name="Particles" type="Particles" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.53674e-07, 0 )
+material_override = SubResource( 8 )
+cast_shadow = 0
+emitting = false
+amount = 32
+lifetime = 0.59
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+visibility_aabb = AABB( -9.19248, -9.67964, -2.38709, 18.3846, 19.3592, 4.77419 )
+process_material = SubResource( 6 )
+draw_pass_1 = SubResource( 7 )

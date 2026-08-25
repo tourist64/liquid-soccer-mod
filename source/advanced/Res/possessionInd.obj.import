@@ -1,0 +1,20 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/possessionInd.obj-75c05f05398b034e78b1e83a50fdd811.mesh"
+
+[deps]
+
+files=[ "res://.import/possessionInd.obj-75c05f05398b034e78b1e83a50fdd811.mesh" ]
+
+source_file="res://Res/possessionInd.obj"
+dest_files=[ "res://.import/possessionInd.obj-75c05f05398b034e78b1e83a50fdd811.mesh", "res://.import/possessionInd.obj-75c05f05398b034e78b1e83a50fdd811.mesh" ]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )
+offset_mesh=Vector3( 0, 0, 0 )
+octahedral_compression=true
+optimize_mesh_flags=4286

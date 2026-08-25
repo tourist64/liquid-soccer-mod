@@ -1,0 +1,99 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Scenes/Team.gd" type="Script" id=2]
+[ext_resource path="res://Res/OLDBLEND.ttf" type="DynamicFontData" id=4]
+
+[sub_resource type="ViewportTexture" id=1]
+flags = 4
+viewport_path = NodePath("Viewport")
+
+[sub_resource type="DynamicFont" id=2]
+size = 28
+use_mipmaps = true
+use_filter = true
+font_data = ExtResource( 4 )
+
+[node name="Team" type="Spatial"]
+script = ExtResource( 2 )
+hairColor1 = Color( 0.741176, 0.623529, 0.14902, 1 )
+hairColor2 = Color( 0.403922, 0.211765, 0.0705882, 1 )
+hairColor3 = Color( 0.0823529, 0.0470588, 0.0509804, 1 )
+
+[node name="Players" type="Spatial" parent="."]
+
+[node name="AITimer" type="Timer" parent="."]
+
+[node name="Viewport" type="Viewport" parent="."]
+size = Vector2( 512, 512 )
+handle_input_locally = false
+disable_3d = true
+usage = 0
+render_target_v_flip = true
+render_target_update_mode = 0
+
+[node name="TextureRect" type="TextureRect" parent="Viewport"]
+margin_right = 512.0
+margin_bottom = 512.0
+texture = SubResource( 1 )
+
+[node name="p0" type="Label" parent="Viewport/TextureRect"]
+visible = false
+margin_left = 90.0
+margin_top = 300.0
+margin_right = 249.0
+margin_bottom = 330.0
+custom_fonts/font = SubResource( 2 )
+text = "A Testplayer"
+align = 1
+
+[node name="p1" type="Label" parent="Viewport/TextureRect"]
+visible = false
+margin_left = 290.0
+margin_top = 120.0
+margin_right = 449.0
+margin_bottom = 150.0
+custom_fonts/font = SubResource( 2 )
+text = "Testplayer"
+align = 1
+
+[node name="p2" type="Label" parent="Viewport/TextureRect"]
+visible = false
+margin_left = 290.0
+margin_top = 180.0
+margin_right = 449.0
+margin_bottom = 210.0
+custom_fonts/font = SubResource( 2 )
+text = "Testplayer"
+align = 1
+
+[node name="p3" type="Label" parent="Viewport/TextureRect"]
+visible = false
+margin_left = 290.0
+margin_top = 240.0
+margin_right = 449.0
+margin_bottom = 270.0
+custom_fonts/font = SubResource( 2 )
+text = "Testplayer"
+align = 1
+
+[node name="p4" type="Label" parent="Viewport/TextureRect"]
+visible = false
+margin_left = 290.0
+margin_top = 300.0
+margin_right = 449.0
+margin_bottom = 330.0
+custom_fonts/font = SubResource( 2 )
+text = "Testplayer"
+align = 1
+
+[node name="p5" type="Label" parent="Viewport/TextureRect"]
+visible = false
+margin_left = 290.0
+margin_top = 360.0
+margin_right = 449.0
+margin_bottom = 390.0
+custom_fonts/font = SubResource( 2 )
+text = "Testplayer"
+align = 1
+
+[connection signal="timeout" from="AITimer" to="." method="_on_AITimer_timeout"]

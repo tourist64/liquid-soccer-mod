@@ -1,0 +1,23 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/winner.wav-783437a6d69b2bd860b95c01cdf2bdea.sample"
+
+[deps]
+
+source_file="res://SoundFX/winner.wav"
+dest_files=[ "res://.import/winner.wav-783437a6d69b2bd860b95c01cdf2bdea.sample" ]
+
+[params]
+
+force/8_bit=true
+force/mono=true
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=1

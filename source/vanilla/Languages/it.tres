@@ -1,0 +1,29 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://Languages/default.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+menus = [ "Una Partita!", "i Rigori!", "Coppa", "Coppa del Mondo", "settings", "?", "tutorial" ]
+setmenus = [ "Grafica", "audio", "Gioco", "Controlli" ]
+gamemenus = [ "time", "camera", "difficulty", "move assist", "switch" ]
+controls = [ "Muovi su", "Muovi giù", "Muovi a sinistra", "Muovi a destra", "passa la palla", "tira/dirigere la palla", "passo soppalcato/scivolata", "attraverso passa", "lo sprint", "switch" ]
+tut = [ "o tasti freccia per muovere il giocatore", "prendi la palla!", "per una raffica di velocità", "per passare la palla", "per il passaggio alto palla", "per tirare o colpire di testa la ", "segnare un gol per uscire!", "modificare i pulsanti nelle impostazioni!" ]
+toexit = " per uscire"
+ingame = [ "il calcio di rinvio", "il calcio d'angolo", "il rigore!", "rimessa laterale", "il cartellino giallo!", "il cartellino rosso!", "cannoniere :", "fallo d'", "il fallo!", "tiri di rigore", "a colpire vince!", "minuti di recupero" ]
+commentary = [ "bellissimo gol!", "angolo superiore!", "scarica tonante!", "che gol!", "hai visto che?!?!", "colpo magistrato" ]
+spcommentary = [ "perfect placement", "ice in his veins", "textbook kick!", "keeper had no chance!", "one off the training ground!", "what technique!" ]
+headcommentary = [ "bullet header", "i think he meant that!", "glancing header!", "textbook header!", "what a cross!", "diving header!" ]
+deflcommentary = [ "grande deviazione!", "spiazza il portiere!", "non ci credo!", "uovo sulla sua faccia!", "quali sono le probabilità!?", "disastro!" ]
+longcommentary = [ "golaso!", "Impossigoal!", "butta la palla dentro!", "oh mia parola!", "di classe mondiale!", "gooooooooaaaaallll!" ]
+achievements1 = [ "score a goal", "win a game", "concede a goal", "score 10 goals", "score with a header", "score 10 headers", "win a cup" ]
+achievements2 = [ "win 10 games", "score 10 goals", "score 10 headers", "score a bicycle kick", "score 3 goals in a game", "win the world cup" ]
+achievements3 = [ "win 50 games", "score 50 goals", "score 5 goals in a game", "win the cup", "win the cup with Canada", "score from your own half", "beat brazil", "beat argentina", "beat england" ]
+fouls = [ "non l'ho toccato arbitro", "andiamo arbitro!", "è stato un tuffo!", "arbitro!", "ho preso la palla!", "se l'è meritato" ]
+fouled = [ "Ahia!", "non sento la mia gamba", "aaaaaargh!", "è un cartellino giallo!", "tutto fa male!", "il dolore!" ]
+recovered = [ "sto bene!", "adesso mi sento molto meglio!", "lo scapperò", "qualcuno la pagherà", "magic sponge ftw", "penso di stare bene", "guarigione miracolosa" ]
+remorse = [ "mi sento male", "scusa arbitro", "è stato un incidente", "scusami", "Oh caro", "è solo un graffio" ]
+toplay = " to play"
+lostfocus = "concentrazione persa: fai clic sulla finestra di gioco per continuare"
+unlockteam = "hai sbloccato una squadra di club! :"
+unlockask = "guardare un video per sbloccare un top team? :"

@@ -1,0 +1,346 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://Scenes/Transition.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/newPlay.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scenes/femplayer.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Scenes/TeamSelect.gd" type="Script" id=4]
+[ext_resource path="res://Images/controllericon.png" type="Texture" id=6]
+[ext_resource path="res://Res/UI.tres" type="Theme" id=9]
+
+[sub_resource type="DynamicFontData" id=2]
+font_path = "res://Res/OLDBLEND.ttf"
+
+[sub_resource type="DynamicFont" id=3]
+size = 48
+use_filter = true
+font_data = SubResource( 2 )
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[node name="TeamSelect" type="Control"]
+theme = ExtResource( 9 )
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_horizontal_guides_": [ 847.193, 400.0, 330.0, 80.0 ],
+"_edit_vertical_guides_": [ 516.0, 258.0, 773.0 ]
+}
+
+[node name="TextureRect" type="ColorRect" parent="."]
+margin_top = 1.41422
+margin_right = 1031.0
+margin_bottom = 581.414
+color = Color( 0.0941176, 0.215686, 0.321569, 1 )
+
+[node name="Team2Container" type="ViewportContainer" parent="TextureRect"]
+margin_left = 581.0
+margin_top = 87.5858
+margin_right = 709.0
+margin_bottom = 343.586
+
+[node name="Viewport" type="Viewport" parent="TextureRect/Team2Container"]
+size = Vector2( 127, 256 )
+transparent_bg = true
+handle_input_locally = false
+msaa = 2
+render_target_update_mode = 3
+
+[node name="Camera" type="Camera" parent="TextureRect/Team2Container/Viewport"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 4, 3.174 )
+cull_mask = 1047553
+current = true
+
+[node name="Player" parent="TextureRect/Team2Container/Viewport" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -4 )
+
+[node name="femplayer" parent="TextureRect/Team2Container/Viewport" instance=ExtResource( 3 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8.001, 0, -4 )
+visible = false
+
+[node name="Team1Container" type="ViewportContainer" parent="TextureRect"]
+margin_left = 313.0
+margin_top = 86.5858
+margin_right = 441.0
+margin_bottom = 342.586
+
+[node name="Viewport" type="Viewport" parent="TextureRect/Team1Container"]
+size = Vector2( 128, 256 )
+transparent_bg = true
+handle_input_locally = false
+msaa = 2
+render_target_update_mode = 3
+
+[node name="Camera" type="Camera" parent="TextureRect/Team1Container/Viewport"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.052, 4, 3.126 )
+current = true
+
+[node name="Player" parent="TextureRect/Team1Container/Viewport" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="TextureRect/Team1Container/Viewport"]
+transform = Transform( 0.266907, -0.45157, 0.851379, 0.0259213, 0.886472, 0.462057, -0.963374, -0.101257, 0.24831, -0.22082, -0.0217186, 3.0212 )
+
+[node name="femplayer" parent="TextureRect/Team1Container/Viewport" instance=ExtResource( 3 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4 )
+visible = false
+
+[node name="HomeTeams" type="ItemList" parent="TextureRect"]
+margin_left = 71.0
+margin_top = 86.0
+margin_right = 425.0
+margin_bottom = 701.0
+rect_scale = Vector2( 0.5, 0.5 )
+focus_neighbour_left = NodePath("../GoGame")
+theme = ExtResource( 9 )
+custom_colors/guide_color = Color( 0, 0, 0, 0 )
+custom_colors/font_color_selected = Color( 1, 1, 1, 1 )
+custom_colors/font_color = Color( 0.678431, 0.678431, 0.678431, 1 )
+custom_constants/vseparation = 0
+custom_constants/line_separation = 0
+custom_constants/icon_margin = 0
+custom_constants/hseparation = 0
+custom_fonts/font = SubResource( 3 )
+custom_styles/bg = SubResource( 1 )
+same_column_width = true
+fixed_column_width = 256
+icon_mode = 0
+
+[node name="AwayTeams" type="ItemList" parent="TextureRect"]
+margin_left = 813.0
+margin_top = 85.0
+margin_right = 1183.0
+margin_bottom = 698.0
+rect_scale = Vector2( 0.5, 0.5 )
+focus_neighbour_left = NodePath("../T2Alt")
+focus_next = NodePath("../GoGame")
+custom_colors/guide_color = Color( 0, 0, 0, 0 )
+custom_colors/font_color_selected = Color( 1, 1, 1, 1 )
+custom_colors/font_color = Color( 0.678431, 0.678431, 0.678431, 1 )
+custom_constants/vseparation = 0
+custom_constants/line_separation = 0
+custom_constants/icon_margin = 0
+custom_constants/hseparation = 0
+custom_fonts/font = SubResource( 3 )
+custom_styles/bg = SubResource( 4 )
+same_column_width = true
+fixed_column_width = 256
+icon_mode = 0
+
+[node name="GoGame" type="Button" parent="TextureRect"]
+margin_left = 423.0
+margin_top = 475.586
+margin_right = 607.0
+margin_bottom = 536.586
+focus_neighbour_left = NodePath("../Tactics")
+focus_neighbour_top = NodePath("../HomeTeams")
+text = "play!"
+
+[node name="Tactics" type="Button" parent="TextureRect"]
+visible = false
+anchor_left = 0.214
+anchor_top = 0.834
+anchor_right = 0.333
+anchor_bottom = 0.834
+margin_left = 0.273987
+margin_top = 19.68
+margin_right = 6.56
+margin_bottom = 50.68
+focus_neighbour_top = NodePath("../HomeTeams")
+focus_neighbour_right = NodePath("../GoGame")
+text = "tactics"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="T1Alt" type="Button" parent="TextureRect"]
+anchor_left = 0.313
+anchor_top = 0.642
+anchor_right = 0.402
+anchor_bottom = 0.642
+margin_left = 2.297
+margin_top = -9.77423
+margin_right = 8.41098
+margin_bottom = 24.2258
+focus_neighbour_bottom = NodePath("../GoGame")
+toggle_mode = true
+text = "alt"
+
+[node name="T2Alt" type="Button" parent="TextureRect"]
+anchor_left = 0.615
+anchor_top = 0.642
+anchor_right = 0.699
+anchor_bottom = 0.642
+margin_left = -33.065
+margin_top = -9.77423
+margin_right = -26.951
+margin_bottom = 24.2258
+focus_neighbour_bottom = NodePath("../GoGame")
+toggle_mode = true
+text = "alt"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="T1Levels" type="Control" parent="TextureRect"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="T1Level" type="OptionButton" parent="TextureRect/T1Levels"]
+anchor_left = 1.325
+anchor_top = 10.315
+anchor_right = 5.625
+anchor_bottom = 11.165
+margin_top = -0.0142212
+margin_right = -1.52588e-05
+margin_bottom = -0.0142212
+text = "National"
+align = 1
+
+[node name="T2Levels" type="Control" parent="TextureRect"]
+anchor_left = 0.633
+anchor_right = 0.633
+margin_right = 40.0
+margin_bottom = 40.0
+rect_pivot_offset = Vector2( 5, 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="T2Level" type="OptionButton" parent="TextureRect/T2Levels"]
+anchor_top = 1.0
+anchor_right = 0.18
+anchor_bottom = 1.0
+margin_left = 154.377
+margin_top = 370.586
+margin_right = 318.177
+margin_bottom = 404.586
+text = "National"
+align = 1
+
+[node name="ButtonBack" type="Button" parent="TextureRect"]
+anchor_left = 0.273
+anchor_top = 0.779
+anchor_right = 0.382
+anchor_bottom = 0.806
+margin_left = -82.463
+margin_top = 31.7658
+margin_right = -76.177
+margin_bottom = 56.1258
+text = "back"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="P1Controller" type="TextureRect" parent="TextureRect"]
+visible = false
+anchor_left = 0.005
+anchor_right = 0.015
+margin_left = 259.735
+margin_top = 38.5858
+margin_right = 515.735
+margin_bottom = 294.586
+rect_scale = Vector2( 0.3, 0.3 )
+texture = ExtResource( 6 )
+
+[node name="T1C" type="Label" parent="TextureRect/P1Controller"]
+margin_left = -40.0
+margin_top = -3.0
+margin_right = 301.0
+margin_bottom = 41.0
+text = "playstation"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="P2Controller" type="TextureRect" parent="TextureRect"]
+visible = false
+margin_left = 521.0
+margin_top = 37.5858
+margin_right = 777.0
+margin_bottom = 293.586
+rect_scale = Vector2( 0.3, 0.3 )
+texture = ExtResource( 6 )
+
+[node name="T2C" type="Label" parent="TextureRect/P2Controller"]
+margin_right = 258.0
+margin_bottom = 44.0
+text = "cpu"
+align = 1
+
+[node name="RandomButton" type="Button" parent="TextureRect"]
+anchor_left = 0.424
+anchor_top = 0.651
+anchor_right = 0.589
+anchor_bottom = 0.651
+margin_left = -9.14395
+margin_top = 39.0057
+margin_right = -3.44397
+margin_bottom = 74.0057
+text = "random"
+
+[node name="LabelHome" type="Label" parent="TextureRect"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.078
+anchor_top = 0.1
+anchor_right = 0.078
+anchor_bottom = 0.101
+margin_left = 0.582001
+margin_top = -10.4142
+margin_right = 122.582
+margin_bottom = 19.5858
+text = "home team"
+
+[node name="LabelAway" type="Label" parent="TextureRect"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.748
+anchor_top = 0.1
+anchor_right = 0.748
+anchor_bottom = 0.1
+margin_left = 51.812
+margin_top = -11.4142
+margin_right = 173.812
+margin_bottom = 18.5858
+text = "away team"
+
+[node name="Label" type="Label" parent="TextureRect"]
+anchor_left = 0.342
+anchor_top = 0.152
+anchor_right = 0.351
+anchor_bottom = 0.152
+margin_left = 10.3979
+margin_top = 0.425781
+margin_right = 50.3979
+margin_bottom = 26.4258
+text = "P1"
+
+[node name="Label2" type="Label" parent="TextureRect"]
+anchor_left = 0.628
+anchor_top = 0.152
+anchor_right = 0.628
+anchor_bottom = 0.152
+margin_left = -26.468
+margin_top = -1.57422
+margin_right = 14.532
+margin_bottom = 24.4258
+text = "CPU"
+
+[node name="Transition" parent="." instance=ExtResource( 1 )]
+margin_right = 1031.0
+margin_bottom = 580.0
+color = Color( 0.0941176, 0.215686, 0.321569, 1 )
+
+[connection signal="item_selected" from="TextureRect/HomeTeams" to="." method="_on_HomeTeams_item_selected"]
+[connection signal="item_selected" from="TextureRect/AwayTeams" to="." method="_on_AwayTeams_item_selected"]
+[connection signal="pressed" from="TextureRect/GoGame" to="." method="_on_TextureButton_pressed"]
+[connection signal="pressed" from="TextureRect/Tactics" to="." method="_on_Tactics_pressed"]
+[connection signal="toggled" from="TextureRect/T1Alt" to="." method="_on_T1Alt_toggled"]
+[connection signal="toggled" from="TextureRect/T2Alt" to="." method="_on_T2Alt_toggled"]
+[connection signal="item_selected" from="TextureRect/T1Levels/T1Level" to="." method="_on_T1Level_item_selected"]
+[connection signal="item_selected" from="TextureRect/T2Levels/T2Level" to="." method="_on_T2Level_item_selected"]
+[connection signal="pressed" from="TextureRect/ButtonBack" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="TextureRect/RandomButton" to="." method="_on_RandomButton_pressed"]

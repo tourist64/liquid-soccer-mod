@@ -1,0 +1,29 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://Languages/default.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+menus = [ "Play Game!", "Penalties", "Chumps League!", "Womens World Cup!", "settings", "?", "tutorial" ]
+setmenus = [ "graphics", "audio", "game", "keys" ]
+gamemenus = [ "time", "camera", "difficulty", "move assist", "switch" ]
+controls = [ "up", "down", "left", "right", "pass", "shoot/header", "chip pass/cross/slide", "through pass", "sprint", "switch" ]
+tut = [ "or arrow keys to move the player", "pick up the ball!", "for a burst of speed", "to pass the ball", "to chip / cross the ball", "to shoot or head the ball", "score to exit tutorial!", "you can change keys in settings!" ]
+toexit = " to exit"
+ingame = [ "goalkick", "corner", "penalty!", "throw-in", "yellow card!", "they're off!", "goal scored by :", "foul by ", "Cynical foul!", "Penalty Shootout", "Sudden Death!", "injury time" ]
+commentary = [ "lovely finish", "top bins!", "thunderous volley!", "what a goal!", "did you see that?!?!", "magisterial strike" ]
+spcommentary = [ "perfect placement", "ice in their veins", "textbook kick!", "keeper had no chance!", "one off the training ground!", "what technique!" ]
+headcommentary = [ "bullet header", "i think they meant that!", "glancing header!", "textbook header!", "what a cross!", "diving header!" ]
+deflcommentary = [ "big deflection!", "wrong footed the keeper!", "oh no!", "football pie on their face!", "what are the chances!?", "disaster!" ]
+longcommentary = [ "golaso!", "Impossigoal!", "thunderous strike!", "oh my word!", "that's a worldie!", "gooooooooaaaaallll!" ]
+achievements1 = [ "score a goal", "win a game", "concede a goal", "score 10 goals", "score with a header", "score 10 headers", "win a cup" ]
+achievements2 = [ "win 10 games", "score 10 goals", "score 10 headers", "score a bicycle kick", "score 3 goals in a game", "win the world cup" ]
+achievements3 = [ "win 50 games", "score 50 goals", "score 5 goals in a game", "win the cup", "win the cup with Canada", "score from your own half", "beat brazil", "beat argentina", "beat england" ]
+fouls = [ "never touched them ref", "cmon ref!", "that was a dive", "referee!", "i got the ball!", "they had it coming" ]
+fouled = [ "ouch!", "i can't feel my leg", "aaaaaargh!", "that's a yellow!", "everything hurts!", "the pain!!" ]
+recovered = [ "i'm ok!", "i feel much better now", "i'll run it off", "someone will pay for that", "magic sponge ftw", "i think i'm ok", "miraculous recovery" ]
+remorse = [ "i feel bad", "sorry ref", "it was an accident", "i'm sorry", "oh dear", "twas just a scratch" ]
+toplay = " to play"
+lostfocus = "lost focus - click in game window to continue!"
+unlockteam = "you unlocked a club team! : "
+unlockask = "watch a video to unlock a champion club team?"

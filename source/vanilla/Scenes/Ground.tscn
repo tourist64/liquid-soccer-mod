@@ -1,0 +1,47 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Res/Ground.fbx" type="PackedScene" id=1]
+[ext_resource path="res://Res/field.jpg" type="Texture" id=2]
+
+[sub_resource type="SpatialMaterial" id=1]
+albedo_color = Color( 0.85098, 0.831373, 0.788235, 1 )
+albedo_texture = ExtResource( 2 )
+
+[node name="Ground" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 127.5, 0, 0 )
+
+[node name="Ground" parent="RootNode" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.38419e-07, 0, 0 )
+
+[node name="Pitch" parent="RootNode/Ground" index="0"]
+material/0 = SubResource( 1 )
+
+[node name="shape0" parent="RootNode/Ground/Pitch/static_collision" index="0"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0 )
+
+[node name="Wall3" parent="RootNode/Ground" index="1"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
+
+[node name="shape0" parent="RootNode/Ground/Wall3" index="0"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0 )
+
+[node name="Wall4" parent="RootNode/Ground" index="2"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
+
+[node name="shape0" parent="RootNode/Ground/Wall4" index="0"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0 )
+
+[node name="shape0" parent="RootNode/Ground/Wall5" index="0"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0 )
+
+[node name="Wall6" parent="RootNode/Ground" index="4"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
+
+[node name="shape0" parent="RootNode/Ground/Wall6" index="0"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0 )
+
+[node name="Wall1" parent="RootNode/Ground" index="5"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0 )
+
+[node name="Wall2" parent="RootNode/Ground" index="6"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0 )

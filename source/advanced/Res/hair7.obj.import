@@ -1,0 +1,20 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/hair7.obj-94f88a3a021a8b806b17c2e3c8b0e597.mesh"
+
+[deps]
+
+files=[ "res://.import/hair7.obj-94f88a3a021a8b806b17c2e3c8b0e597.mesh" ]
+
+source_file="res://Res/hair7.obj"
+dest_files=[ "res://.import/hair7.obj-94f88a3a021a8b806b17c2e3c8b0e597.mesh", "res://.import/hair7.obj-94f88a3a021a8b806b17c2e3c8b0e597.mesh" ]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )
+offset_mesh=Vector3( 0, 0, 0 )
+octahedral_compression=true
+optimize_mesh_flags=4286

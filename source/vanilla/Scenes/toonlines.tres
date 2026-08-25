@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[ext_resource path="res://Materials/toonlines.gdshader" type="Shader" id=1]
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/siz = 0.5
+shader_param/ysiz = 0.5
+shader_param/linedepth = 0.726
+shader_param/thresh = 0.849
+shader_param/soften = 1.0
+shader_param/linecolor = Color( 0.141176, 0.129412, 0.129412, 1 )

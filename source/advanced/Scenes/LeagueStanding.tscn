@@ -1,0 +1,130 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Res/UI.tres" type="Theme" id=1]
+[ext_resource path="res://Scenes/LeagueStanding.gd" type="Script" id=2]
+
+[node name="TeamEntry" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_scale = Vector2( 0.9, 0.9 )
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 0.75
+anchor_bottom = 0.05
+margin_right = -380.75
+margin_bottom = 10.0
+color = Color( 0.6, 0.0980392, 0.0980392, 1 )
+
+[node name="ColorRect" type="ColorRect" parent="ColorRect"]
+margin_left = -47.0
+margin_top = -4.0
+margin_right = 537.0
+margin_bottom = 29.0
+color = Color( 0.214844, 0.274523, 0.429688, 1 )
+
+[node name="Name" type="Label" parent="ColorRect"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.023
+anchor_top = 0.123
+anchor_right = 0.023
+anchor_bottom = 0.123
+margin_left = 16.2652
+margin_top = -0.848667
+margin_right = 119.265
+margin_bottom = 25.1513
+rect_scale = Vector2( 0.9, 0.9 )
+rect_pivot_offset = Vector2( 0, 12 )
+text = "Lolerpool"
+
+[node name="Played" type="Label" parent="ColorRect"]
+anchor_left = 0.35
+anchor_top = 0.123
+anchor_right = 0.35
+anchor_bottom = 0.123
+margin_left = 182.35
+margin_top = -0.182
+margin_right = 211.35
+margin_bottom = 43.818
+text = "0"
+
+[node name="Won" type="Label" parent="ColorRect"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.45
+anchor_top = 0.123
+anchor_right = 0.45
+anchor_bottom = 0.123
+margin_left = 239.45
+margin_top = -0.182
+margin_right = 262.45
+margin_bottom = 43.818
+text = "0"
+
+[node name="Drawn" type="Label" parent="ColorRect"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.55
+anchor_top = 0.123
+anchor_right = 0.55
+anchor_bottom = 0.123
+margin_left = 290.55
+margin_top = -0.182
+margin_right = 313.55
+margin_bottom = 43.818
+text = "0"
+
+[node name="Lost" type="Label" parent="ColorRect"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.65
+anchor_top = 0.123
+anchor_right = 0.65
+anchor_bottom = 0.123
+margin_left = 342.65
+margin_top = -0.182
+margin_right = 376.65
+margin_bottom = 43.818
+text = "0"
+
+[node name="For" type="Label" parent="ColorRect"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.74
+anchor_top = 0.123
+anchor_right = 0.74
+anchor_bottom = 0.123
+margin_left = 396.34
+margin_top = -0.182
+margin_right = 431.34
+margin_bottom = 45.818
+text = "0"
+
+[node name="Against" type="Label" parent="ColorRect"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.84
+anchor_top = 0.123
+anchor_right = 0.84
+anchor_bottom = 0.123
+margin_left = 448.44
+margin_top = -0.182
+margin_right = 473.44
+margin_bottom = 43.818
+text = "0"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Points" type="Label" parent="ColorRect"]
+anchor_left = 0.93
+anchor_top = 0.123
+anchor_right = 0.95
+anchor_bottom = 0.123
+margin_left = 497.13
+margin_top = -0.182
+margin_right = 525.95
+margin_bottom = 43.818
+text = "0"
+__meta__ = {
+"_edit_use_anchors_": false
+}

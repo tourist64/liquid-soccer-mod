@@ -1,0 +1,50 @@
+GDRE Tools v2.6.4
+Windows 10.0.26200, headless
+Opening file: C:/Users/nicolasoliveira-ieg/Downloads/index.pck
+Multiple passing candidates for bytecode version 13:
+3.5.0-stable (a7aad78), 3.2.0-stable (5565f55)
+Choosing only one that matches engine version: 3.5.0-stable (a7aad78).
+Loaded 208 imported files
+Detected Engine Version: 3.5.1
+Detected Bytecode Revision: 3.5.0-stable (a7aad78)
+Successfully loaded PCK!
+Version: 3.5.1
+Verified 827 files, no errors detected!
+Extracted 827 files, no errors detected!
+Recreating plugin configs...
+WARNING: Mesh uses old surface format, which is deprecated (and loads slower). Consider re-importing or re-saving the scene. Path: ""
+   at: FakeMesh::_set (modules\gdsdecomp\compat\fake_mesh.cpp:458)
+WARNING: Animation uses old 'transform' track types, which is deprecated (and loads slower). Consider re-importing or re-saving the resource.
+   at: Animation::_set (scene\resources\animation.cpp:113)
+ERROR: Parameter "_image_compress_etc2_func" is null.
+   at: Image::_compress_from_channels (core\io\image.cpp:2998)
+WARNING: Mesh uses old surface format, which is deprecated (and loads slower). Consider re-importing or re-saving the scene. Path: "res://.import/GK.dae-a610c964af8791f00472c2b5c31da788.scn::1"
+   at: ArrayMesh::_set (scene\resources\mesh.cpp:1369)
+WARNING: Skeleton uses old pose format, which is deprecated (and loads slower). Consider re-importing or re-saving the scene.
+   at: Skeleton3D::_set (scene\3d\skeleton_3d.cpp:113)
+Saved project config.
+
+
+********************************EXPORT REPORT********************************
+
+Totals:                                 
+Decompiled scripts:                     71
+Scripts not decompiled:                 0
+Imported resources for export session:  208
+Successfully converted:                 208
+Lossy:                                  26
+Rewrote metadata:                       20
+Non-importable conversions:             0
+Not converted:                          0
+Failed conversions:                     0
+-------------
+
+
+
+------------------------------------------------------------------------------------
+
+Use Godot editor version 3.5.1 to edit the project.
+
+*******************************************************************************
+
+Recovery finished in 00m35s

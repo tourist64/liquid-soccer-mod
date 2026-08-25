@@ -1,0 +1,108 @@
+extends Camera
+
+class_name InterpolatedCamera3D
+
+
+
+export var translate_min: = 1
+export var translate_max: = 15
+
+var target_node = null
+var game = null
+
+
+export var target: NodePath
+var shake = 0
+var limitX = 100
+var limitZ = 65
+export var mlimitx = 120
+export var mlimitz = 65
+export var mfov = 45
+export var zoffset = 70
+export var xoffset = 0
+func _ready():
+	
+	target_node = get_node(target) as Spatial
+	_setLimits()
+	set_process(false)
+	
+	_setupCamera()
+	
+
+func _setupCamera():
+	match Global.config.get_value("gfx", "camtype"):
+		0:
+			zoffset = Global.config.get_value("gfx", "camoffset")
+			xoffset = 0
+			mfov = Global.config.get_value("gfx", "camfov")
+			fov = mfov
+			rotation_degrees.x = Global.config.get_value("gfx", "camtilt")
+			translation.y = Global.config.get_value("gfx", "camheight")
+		1:
+			xoffset = Global.config.get_value("gfx", "camUDoffset")
+			zoffset = 0
+			mfov = Global.config.get_value("gfx", "camUDfov")
+			fov = mfov
+			rotation_degrees.x = Global.config.get_value("gfx", "camUDtilt")
+			translation.y = Global.config.get_value("gfx", "camUDheight")
+		2:
+			xoffset = 0
+			zoffset = Global.config.get_value("gfx", "camLRoffset")
+			mfov = Global.config.get_value("gfx", "camLRfov")
+			fov = mfov
+			rotation_degrees.x = Global.config.get_value("gfx", "camLRtilt")
+			translation.y = Global.config.get_value("gfx", "camLRheight")
+
+func _setTarget( var t):
+	target_node = t as Spatial
+	
+func _setGame( var g):
+	game = g
+	set_process(true)
+	mfov = fov
+func _setCelebrate():
+	limitX = min(limitX + 50, 150)
+	limitZ = min(limitZ + 40, 85)
+	fov = max(fov - 20, 40)
+	
+func _setLimits():
+	limitX = mlimitx
+	limitZ = mlimitz
+	fov = mfov
+	
+func _physics_process(delta: float) -> void :
+	
+	
+	if target == null:
+		return
+	var lpos = target_node.translation + Global.ballvel * delta * 4.0
+	
+	var nx = xoffset + min(max( - limitX, lpos.x), limitX) + (shake * (rand_range( - 6, 6)) * delta)
+	var nz = zoffset + min(max( - limitZ, lpos.z), limitZ) + (shake * (rand_range( - 6, 6)) * delta)
+	var updatedt = Vector3(nx, translation.y, nz)
+	var updated = updatedt - translation
+	var speed = 1.0
+	if updated.length_squared() > 1.0:
+		speed = lerp(0.1, 5, smoothstep(4, 10, updated.length()))
+	
+	translation = translation.linear_interpolate(updatedt, delta * speed)
+	
+	shake *= 0.95
+
+
+func _updateCam( var delta):
+	var lpos = target_node.translation + Global.ballvel * delta * 4.0
+	
+	var nx = xoffset + min(max( - limitX, lpos.x), limitX) + (shake * (rand_range( - 6, 6)) * delta)
+	var nz = zoffset + min(max( - limitZ, lpos.z), limitZ) + (shake * (rand_range( - 6, 6)) * delta)
+	var updatedt = Vector3(nx, translation.y, nz)
+	var updated = updatedt - translation
+	var speed = 1.0
+	if updated.length_squared() > 1.0:
+		speed = lerp(0.1, 5, smoothstep(4, 10, updated.length()))
+	
+	translation = translation.linear_interpolate(updatedt, delta * speed)
+	
+		
+func set_target_node(node):
+	target_node = node as Spatial

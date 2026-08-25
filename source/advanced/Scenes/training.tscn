@@ -1,0 +1,223 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://Res/training.dae" type="PackedScene" id=1]
+[ext_resource path="res://Materials/Ground.tres" type="Material" id=2]
+[ext_resource path="res://Materials/IndoorGround.tres" type="Material" id=3]
+[ext_resource path="res://Scenes/Goal.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Scenes/Player.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Scenes/training.gd" type="Script" id=6]
+[ext_resource path="res://Scenes/SmartBall.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Scenes/Hud.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Scenes/PracticePlayers.gd" type="Script" id=9]
+[ext_resource path="res://Scenes/Trailz.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Scenes/Camera.gd" type="Script" id=11]
+[ext_resource path="res://Res/UI.tres" type="Theme" id=12]
+[ext_resource path="res://SoundFX/applause.wav" type="AudioStream" id=13]
+
+[sub_resource type="PhysicsMaterial" id=2]
+friction = 0.3
+rough = true
+bounce = 0.4
+
+[sub_resource type="Environment" id=1]
+background_mode = 1
+background_color = Color( 0.521569, 0.603922, 0.67451, 1 )
+ambient_light_color = Color( 0.521569, 0.603922, 0.67451, 1 )
+ambient_light_energy = 0.54
+fog_enabled = true
+fog_color = Color( 0.521569, 0.603922, 0.67451, 1 )
+fog_depth_begin = 86.0
+fog_depth_end = 300.0
+
+[node name="training" instance=ExtResource( 1 )]
+script = ExtResource( 6 )
+
+[node name="LargeStadium" parent="." index="0"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0.02 )
+
+[node name="pPlane1" parent="LargeStadium" index="0"]
+material/0 = ExtResource( 3 )
+
+[node name="Pitch1" parent="LargeStadium" index="1"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.001, 0 )
+cast_shadow = 0
+material/0 = ExtResource( 3 )
+
+[node name="StaticBody" parent="LargeStadium/Pitch1" index="0"]
+collision_mask = 4
+physics_material_override = SubResource( 2 )
+
+[node name="CollisionShape" parent="LargeStadium/Pitch1/StaticBody" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0 )
+
+[node name="Decoration" parent="LargeStadium" index="2"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.001, 0 )
+
+[node name="Surround" parent="LargeStadium/Decoration" index="0"]
+cast_shadow = 0
+material/0 = ExtResource( 2 )
+
+[node name="pPlane2" parent="LargeStadium" index="3"]
+cast_shadow = 0
+material/0 = ExtResource( 3 )
+
+[node name="Wall23" parent="LargeStadium" index="4"]
+collision_mask = 36
+
+[node name="Wall33" parent="LargeStadium" index="5"]
+collision_mask = 36
+
+[node name="Wall41" parent="LargeStadium" index="6"]
+collision_layer = 0
+collision_mask = 36
+
+[node name="Wall24" parent="LargeStadium" index="7"]
+collision_layer = 0
+collision_mask = 36
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." index="2"]
+environment = SubResource( 1 )
+
+[node name="Players" type="Spatial" parent="." index="3"]
+script = ExtResource( 9 )
+
+[node name="PlayerRoot" parent="Players" index="0" instance=ExtResource( 5 )]
+
+[node name="PlayerRoot2" parent="Players" index="1" instance=ExtResource( 5 )]
+
+[node name="Goal" parent="." index="4" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -138.753, 0, 0 )
+
+[node name="Goal2" parent="." index="5" instance=ExtResource( 4 )]
+transform = Transform( -1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 138.785, 0, 0 )
+
+[node name="Camera" type="Camera" parent="." index="6"]
+transform = Transform( 1, 0, 0, 0, 0.815845, 0.578271, 0, -0.578271, 0.815845, 0, 52.5036, 77.0021 )
+current = true
+fov = 40.0
+far = 500.0
+script = ExtResource( 11 )
+target = NodePath("../Ball")
+mfov = 40
+
+[node name="Ball" parent="." index="7" instance=ExtResource( 7 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 20.173, 0 )
+
+[node name="Trailz" parent="." index="8" instance=ExtResource( 10 )]
+
+[node name="exit" type="Label" parent="." index="9"]
+anchor_left = 0.494
+anchor_top = 0.1
+anchor_right = 0.494
+anchor_bottom = 0.1
+margin_right = 133.0
+margin_bottom = 26.0
+theme = ExtResource( 12 )
+text = "<Esc> / Pause "
+
+[node name="Timer" type="Timer" parent="." index="10"]
+one_shot = true
+
+[node name="Info" type="Control" parent="." index="11"]
+margin_right = 853.0
+margin_bottom = 480.0
+theme = ExtResource( 12 )
+
+[node name="Label" type="Label" parent="Info" index="0"]
+visible = false
+anchor_left = 0.102
+anchor_top = 0.208
+anchor_right = 0.226
+anchor_bottom = 0.213
+margin_right = 40.0
+margin_bottom = 26.0
+text = "<WASD> keys to move the player"
+
+[node name="Label2" type="Label" parent="Info" index="1"]
+visible = false
+anchor_left = 0.102
+anchor_top = 0.283
+anchor_right = 0.226
+anchor_bottom = 0.292
+margin_right = 40.0
+margin_bottom = 26.0
+text = "<P> for a burst of speed"
+
+[node name="Label3" type="Label" parent="Info" index="2"]
+visible = false
+anchor_left = 0.102
+anchor_top = 0.354
+anchor_right = 0.226
+anchor_bottom = 0.363
+margin_right = 40.0
+margin_bottom = 26.0
+text = "<M> to pass the ball"
+
+[node name="Label4" type="Label" parent="Info" index="3"]
+visible = false
+anchor_left = 0.102
+anchor_top = 0.42
+anchor_right = 0.226
+anchor_bottom = 0.425
+margin_right = 40.0
+margin_bottom = 26.0
+text = "<L> to chip/long pass/ cross the ball"
+
+[node name="Label5" type="Label" parent="Info" index="4"]
+visible = false
+anchor_left = 0.102
+anchor_top = 0.491
+anchor_right = 0.226
+anchor_bottom = 0.496
+margin_right = 40.0
+margin_bottom = 26.0
+text = "<J> to Shoot or Head the ball"
+
+[node name="Label6" type="Label" parent="Info" index="5"]
+visible = false
+anchor_left = 0.102
+anchor_top = 0.571
+anchor_right = 0.226
+anchor_bottom = 0.571
+margin_right = 40.0
+margin_bottom = 26.0
+text = "<W,S> Changes the shot direction and curl"
+
+[node name="Label7" type="Label" parent="Info" index="6"]
+visible = false
+anchor_left = 0.102
+anchor_top = 0.646
+anchor_right = 0.226
+anchor_bottom = 0.646
+margin_right = 40.0
+margin_bottom = 26.0
+text = "<I> for through pass"
+
+[node name="Label8" type="Label" parent="Info" index="7"]
+visible = false
+anchor_left = 0.102
+anchor_top = 0.726
+anchor_right = 0.226
+anchor_bottom = 0.73
+margin_right = 40.0
+margin_bottom = 26.0
+text = "let's go!"
+
+[node name="Hud" parent="." index="12" instance=ExtResource( 8 )]
+
+[node name="DirectionalLight" type="DirectionalLight" parent="." index="13"]
+transform = Transform( 0.109884, -0.649563, -0.752326, 0.766692, -0.426302, 0.480053, -0.632542, -0.629552, 0.451171, 0, 8.61588, 0 )
+light_color = Color( 0.913725, 0.784314, 0.501961, 1 )
+light_energy = 2.0
+light_indirect_energy = 0.646
+light_specular = 0.0
+shadow_enabled = true
+shadow_color = Color( 0.282353, 0.458824, 0.588235, 1 )
+shadow_bias = 0.01
+directional_shadow_mode = 0
+directional_shadow_max_distance = 200.0
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="." index="14"]
+stream = ExtResource( 13 )
+
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

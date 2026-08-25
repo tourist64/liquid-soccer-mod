@@ -1,0 +1,1711 @@
+[gd_scene load_steps=163 format=2]
+
+[ext_resource path="res://newrig.dae" type="PackedScene" id=1]
+[ext_resource path="res://Materials/newPlayer.tres" type="Material" id=2]
+[ext_resource path="res://Materials/player.shader" type="Shader" id=3]
+[ext_resource path="res://Scenes/newPlay.gd" type="Script" id=6]
+[ext_resource path="res://Res/beard1.obj" type="ArrayMesh" id=7]
+[ext_resource path="res://Res/beard2.obj" type="ArrayMesh" id=8]
+[ext_resource path="res://Res/beard3.obj" type="ArrayMesh" id=9]
+[ext_resource path="res://Res/hair2.obj" type="ArrayMesh" id=10]
+[ext_resource path="res://Res/hair3.obj" type="ArrayMesh" id=11]
+[ext_resource path="res://Res/hat.tres" type="ArrayMesh" id=13]
+[ext_resource path="res://Res/hair5.obj" type="ArrayMesh" id=14]
+[ext_resource path="res://Res/hair7.obj" type="ArrayMesh" id=15]
+[ext_resource path="res://Res/hair6.obj" type="ArrayMesh" id=16]
+
+[sub_resource type="SpatialMaterial" id=176]
+flags_unshaded = true
+albedo_color = Color( 0.996078, 0.4, 0.4, 1 )
+
+[sub_resource type="ShaderMaterial" id=72]
+resource_local_to_scene = true
+shader = ExtResource( 3 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/kit = null
+shader_param/specular = null
+shader_param/metallic = null
+shader_param/roughness = 1.0
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false
+
+[sub_resource type="ShaderMaterial" id=73]
+resource_local_to_scene = true
+shader = ExtResource( 3 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/kit = null
+shader_param/specular = null
+shader_param/metallic = null
+shader_param/roughness = 1.0
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false
+
+[sub_resource type="ShaderMaterial" id=83]
+resource_local_to_scene = true
+shader = ExtResource( 3 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/kit = null
+shader_param/specular = null
+shader_param/metallic = null
+shader_param/roughness = 1.0
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false
+
+[sub_resource type="ArrayMesh" id=75]
+surfaces/0 = {
+"aabb": AABB( -29.5454, -19.8081, -19.1278, 59.0905, 53.2411, 38.7497 ),
+"array_data": PoolByteArray( 129, 18, 218, 193, 82, 100, 148, 192, 8, 129, 239, 192, 144, 232, 203, 0, 201, 6, 113, 127, 6, 55, 27, 51, 176, 90, 213, 193, 169, 136, 52, 193, 106, 205, 204, 192, 139, 247, 210, 0, 209, 6, 117, 127, 20, 55, 178, 51, 213, 195, 101, 193, 137, 178, 45, 193, 102, 195, 140, 193, 208, 241, 140, 0, 140, 253, 49, 127, 97, 54, 174, 51, 124, 20, 100, 193, 165, 75, 117, 192, 35, 182, 143, 193, 208, 252, 139, 0, 139, 251, 48, 127, 93, 54, 26, 51, 108, 20, 205, 193, 246, 221, 69, 65, 25, 144, 215, 192, 154, 50, 200, 0, 187, 232, 103, 127, 230, 54, 166, 49, 27, 45, 91, 193, 215, 112, 76, 65, 218, 62, 144, 193, 209, 8, 139, 0, 139, 245, 46, 127, 76, 54, 192, 49, 245, 253, 182, 193, 107, 169, 169, 65, 46, 73, 200, 64, 139, 35, 33, 0, 46, 56, 103, 127, 105, 45, 252, 48, 34, 56, 203, 193, 247, 229, 5, 65, 182, 116, 250, 64, 156, 44, 63, 0, 49, 214, 108, 127, 232, 44, 4, 50, 108, 20, 205, 193, 246, 221, 69, 65, 25, 144, 215, 192, 154, 50, 200, 0, 232, 67, 104, 127, 67, 42, 70, 49, 117, 35, 186, 193, 43, 70, 196, 65, 53, 12, 2, 193, 147, 44, 211, 0, 249, 80, 97, 127, 46, 44, 49, 48, 117, 35, 186, 193, 43, 70, 196, 65, 53, 12, 2, 193, 147, 44, 211, 0, 195, 204, 97, 127, 173, 54, 168, 48, 10, 234, 50, 193, 251, 212, 180, 65, 154, 251, 140, 193, 213, 33, 142, 0, 137, 238, 40, 127, 46, 54, 14, 49, 164, 183, 145, 193, 235, 133, 250, 65, 55, 221, 145, 64, 185, 102, 20, 0, 84, 42, 84, 127, 57, 46, 74, 48, 255, 34, 145, 193, 11, 93, 252, 65, 8, 85, 177, 192, 200, 110, 231, 0, 69, 56, 90, 127, 107, 45, 144, 47, 204, 22, 140, 193, 107, 196, 232, 65, 95, 236, 65, 65, 190, 98, 44, 0, 98, 32, 73, 127, 199, 46, 191, 48, 105, 180, 157, 193, 235, 124, 152, 65, 171, 189, 107, 65, 160, 20, 80, 0, 79, 57, 80, 127, 115, 46, 109, 49, 196, 216, 49, 193, 76, 124, 244, 65, 28, 165, 95, 193, 233, 103, 186, 0, 133, 246, 25, 127, 45, 54, 143, 48, 255, 34, 145, 193, 11, 93, 252, 65, 8, 85, 177, 192, 200, 110, 231, 0, 148, 212, 49, 127, 123, 54, 28, 48, 123, 133, 212, 193, 82, 243, 202, 192, 28, 110, 6, 65, 141, 240, 50, 0, 47, 21, 115, 127, 95, 44, 70, 51, 147, 98, 220, 193, 210, 9, 137, 192, 175, 218, 176, 64, 169, 190, 64, 0, 60, 26, 108, 127, 2, 44, 13, 51, 147, 135, 200, 193, 54, 236, 55, 65, 47, 5, 136, 64, 193, 85, 68, 0, 208, 163, 71, 129, 75, 44, 220, 49, 249, 92, 236, 193, 82, 98, 148, 192, 164, 223, 44, 192, 173, 176, 204, 0, 191, 253, 108, 127, 118, 41, 226, 50, 129, 18, 218, 193, 82, 100, 148, 192, 8, 129, 239, 192, 144, 232, 203, 0, 202, 254, 114, 127, 17, 40, 228, 50, 251, 236, 201, 193, 119, 191, 72, 65, 225, 210, 227, 191, 199, 96, 198, 0, 143, 209, 32, 129, 6, 43, 144, 49, 66, 130, 212, 193, 117, 70, 155, 193, 88, 226, 137, 192, 138, 249, 212, 0, 212, 13, 118, 127, 63, 55, 71, 52, 219, 62, 99, 193, 100, 140, 156, 193, 186, 250, 130, 193, 208, 240, 140, 0, 139, 0, 48, 127, 101, 54, 58, 52, 56, 158, 207, 184, 22, 105, 1, 66, 166, 249, 156, 65, 0, 100, 77, 0, 126, 254, 3, 127, 144, 48, 219, 48, 36, 210, 55, 192, 142, 159, 1, 66, 60, 93, 152, 65, 229, 102, 69, 0, 121, 8, 35, 127, 101, 48, 216, 48, 65, 215, 190, 184, 110, 187, 5, 66, 107, 240, 81, 65, 0, 126, 14, 0, 126, 0, 4, 127, 140, 48, 105, 48, 82, 73, 157, 184, 78, 26, 4, 66, 142, 147, 219, 64, 0, 126, 7, 0, 126, 0, 5, 127, 134, 48, 226, 47, 205, 172, 165, 184, 230, 100, 5, 66, 151, 64, 23, 65, 0, 126, 0, 0, 126, 0, 4, 127, 137, 48, 40, 48, 150, 38, 187, 192, 174, 119, 1, 66, 240, 119, 136, 65, 205, 100, 57, 0, 113, 31, 47, 127, 52, 48, 202, 48, 214, 229, 148, 184, 126, 73, 3, 66, 247, 19, 148, 64, 0, 126, 9, 0, 126, 0, 5, 127, 132, 48, 144, 47, 156, 80, 136, 184, 254, 37, 2, 66, 74, 181, 39, 191, 0, 126, 251, 0, 126, 0, 6, 127, 128, 48, 203, 46, 156, 80, 136, 184, 254, 37, 2, 66, 74, 181, 39, 191, 0, 126, 251, 0, 130, 0, 255, 127, 203, 53, 46, 47, 147, 26, 90, 184, 38, 171, 1, 66, 170, 144, 218, 192, 0, 125, 238, 0, 130, 0, 0, 127, 203, 53, 18, 48, 172, 197, 39, 184, 201, 157, 38, 193, 102, 122, 149, 193, 0, 244, 130, 0, 130, 0, 0, 127, 207, 53, 172, 51, 139, 225, 106, 183, 38, 27, 59, 192, 186, 5, 153, 193, 0, 253, 130, 0, 130, 0, 0, 127, 206, 53, 13, 51, 48, 98, 159, 183, 119, 63, 89, 65, 218, 251, 152, 193, 0, 5, 130, 0, 130, 0, 0, 127, 205, 53, 185, 49, 15, 126, 226, 183, 203, 32, 180, 65, 62, 14, 144, 193, 0, 28, 133, 0, 130, 0, 0, 127, 205, 53, 20, 49, 48, 98, 31, 184, 92, 122, 242, 65, 52, 59, 112, 193, 0, 96, 174, 0, 130, 0, 0, 127, 204, 53, 151, 48, 6, 185, 11, 186, 245, 118, 158, 193, 142, 115, 137, 193, 0, 239, 131, 0, 130, 0, 0, 127, 207, 53, 63, 52, 37, 18, 218, 65, 147, 100, 148, 192, 250, 127, 239, 192, 112, 232, 203, 0, 201, 249, 143, 127, 151, 52, 31, 51, 78, 20, 100, 65, 35, 76, 117, 192, 22, 182, 143, 193, 48, 252, 139, 0, 139, 4, 208, 127, 64, 53, 28, 51, 180, 195, 101, 65, 201, 179, 45, 193, 42, 195, 140, 193, 48, 241, 140, 0, 139, 2, 207, 127, 60, 53, 176, 51, 201, 89, 213, 65, 233, 138, 52, 193, 201, 201, 204, 192, 117, 247, 210, 0, 209, 251, 139, 127, 137, 52, 182, 51, 42, 20, 205, 65, 246, 221, 69, 65, 153, 143, 215, 192, 102, 50, 200, 0, 187, 24, 153, 127, 181, 52, 171, 49, 236, 44, 91, 65, 215, 112, 76, 65, 211, 62, 144, 193, 47, 8, 139, 0, 139, 10, 210, 127, 79, 53, 195, 49, 172, 253, 182, 65, 123, 169, 169, 65, 102, 73, 200, 64, 117, 35, 33, 0, 47, 192, 158, 127, 110, 50, 209, 48, 65, 35, 186, 65, 59, 70, 196, 65, 20, 12, 2, 193, 109, 44, 211, 0, 254, 169, 164, 127, 249, 50, 243, 47, 42, 20, 205, 65, 246, 221, 69, 65, 153, 143, 215, 192, 102, 50, 200, 0, 236, 184, 154, 127, 151, 51, 2, 49, 182, 55, 203, 65, 23, 230, 5, 65, 222, 116, 250, 64, 100, 44, 63, 0, 55, 31, 147, 127, 197, 50, 210, 49, 65, 35, 186, 65, 59, 70, 196, 65, 20, 12, 2, 193, 109, 44, 211, 0, 195, 51, 158, 127, 236, 52, 175, 48, 207, 233, 50, 65, 251, 212, 180, 65, 146, 251, 140, 193, 43, 33, 142, 0, 137, 16, 216, 127, 108, 53, 17, 49, 89, 183, 145, 65, 251, 133, 250, 65, 127, 221, 145, 64, 71, 102, 20, 0, 90, 208, 182, 127, 247, 49, 42, 48, 191, 34, 145, 65, 27, 93, 252, 65, 216, 84, 177, 192, 56, 110, 231, 0, 78, 198, 176, 127, 82, 50, 62, 47, 126, 22, 140, 65, 123, 196, 232, 65, 99, 236, 65, 65, 66, 98, 44, 0, 101, 218, 192, 127, 186, 49, 165, 48, 31, 180, 157, 65, 251, 124, 152, 65, 187, 189, 107, 65, 96, 20, 80, 0, 77, 190, 181, 127, 243, 49, 78, 49, 96, 216, 49, 65, 76, 124, 244, 65, 21, 165, 95, 193, 23, 103, 186, 0, 133, 9, 229, 127, 107, 53, 146, 48, 191, 34, 145, 65, 27, 93, 252, 65, 216, 84, 177, 192, 56, 110, 231, 0, 149, 43, 205, 127, 29, 53, 34, 48, 225, 97, 220, 65, 83, 9, 137, 192, 16, 219, 176, 64, 87, 190, 64, 0, 55, 223, 147, 127, 79, 51, 208, 50, 187, 132, 212, 65, 19, 243, 202, 192, 63, 110, 6, 65, 115, 240, 50, 0, 45, 225, 142, 127, 38, 51, 12, 51, 221, 134, 200, 65, 54, 236, 55, 65, 110, 5, 136, 64, 63, 85, 68, 0, 205, 93, 188, 129, 16, 51, 163, 49, 87, 92, 236, 65, 147, 97, 148, 192, 1, 220, 44, 192, 83, 176, 204, 0, 188, 0, 149, 127, 238, 51, 150, 50, 58, 236, 201, 65, 119, 191, 72, 65, 3, 207, 227, 191, 57, 96, 198, 0, 145, 58, 244, 129, 109, 51, 79, 49, 37, 18, 218, 65, 147, 100, 148, 192, 250, 127, 239, 192, 112, 232, 203, 0, 201, 251, 142, 127, 35, 52, 145, 50, 41, 60, 99, 65, 181, 141, 156, 193, 90, 250, 130, 193, 48, 240, 140, 0, 139, 1, 207, 127, 57, 53, 58, 52, 12, 113, 212, 65, 37, 71, 155, 193, 250, 212, 137, 192, 118, 249, 212, 0, 212, 249, 138, 127, 122, 52, 61, 52, 20, 207, 55, 64, 150, 159, 1, 66, 60, 93, 152, 65, 27, 102, 69, 0, 122, 243, 228, 127, 187, 48, 213, 48, 51, 37, 187, 64, 182, 119, 1, 66, 234, 119, 136, 65, 51, 100, 57, 0, 115, 220, 217, 127, 235, 48, 194, 48, 209, 66, 199, 193, 18, 159, 148, 192, 218, 214, 185, 192, 112, 24, 53, 0, 201, 5, 114, 129, 6, 55, 27, 51, 127, 225, 81, 193, 35, 161, 111, 192, 132, 7, 115, 193, 48, 4, 117, 0, 139, 250, 48, 129, 93, 54, 26, 51, 22, 102, 83, 193, 41, 231, 39, 193, 61, 143, 109, 193, 48, 15, 116, 0, 140, 253, 49, 129, 97, 54, 174, 51, 152, 86, 197, 193, 137, 67, 46, 193, 168, 125, 134, 192, 117, 9, 46, 0, 209, 6, 117, 129, 20, 55, 178, 51, 230, 7, 184, 193, 119, 19, 60, 65, 89, 206, 173, 192, 102, 206, 56, 0, 186, 228, 101, 129, 230, 54, 166, 49, 6, 121, 72, 193, 55, 109, 73, 65, 68, 99, 116, 193, 47, 248, 117, 0, 139, 242, 46, 129, 76, 54, 192, 49, 42, 108, 160, 193, 235, 142, 163, 65, 134, 143, 181, 64, 117, 221, 223, 0, 46, 54, 104, 129, 105, 45, 252, 48, 192, 165, 165, 193, 43, 253, 187, 65, 41, 175, 222, 192, 109, 212, 45, 0, 249, 81, 97, 129, 46, 44, 49, 48, 230, 7, 184, 193, 119, 19, 60, 65, 89, 206, 173, 192, 102, 206, 56, 0, 234, 69, 103, 129, 67, 42, 70, 49, 102, 163, 180, 193, 110, 123, 254, 64, 168, 242, 225, 64, 100, 212, 193, 0, 69, 7, 105, 129, 232, 44, 4, 50, 192, 165, 165, 193, 43, 253, 187, 65, 41, 175, 222, 192, 109, 212, 45, 0, 195, 202, 96, 129, 173, 54, 168, 48, 165, 212, 35, 193, 43, 228, 174, 65, 45, 249, 109, 193, 43, 223, 114, 0, 138, 237, 39, 129, 46, 54, 14, 49, 65, 108, 132, 193, 187, 217, 230, 65, 87, 222, 131, 64, 71, 154, 236, 0, 81, 39, 89, 129, 57, 46, 74, 48, 215, 109, 132, 193, 252, 168, 232, 65, 122, 210, 156, 192, 56, 146, 25, 0, 68, 56, 91, 129, 107, 45, 144, 47, 229, 140, 125, 193, 107, 100, 217, 65, 132, 1, 60, 65, 66, 158, 212, 0, 94, 26, 80, 129, 199, 46, 191, 48, 105, 239, 135, 193, 43, 55, 145, 65, 116, 182, 93, 65, 96, 236, 176, 0, 80, 49, 84, 129, 115, 46, 109, 49, 172, 30, 38, 193, 60, 80, 226, 65, 228, 144, 66, 193, 23, 153, 70, 0, 133, 247, 27, 129, 45, 54, 143, 48, 215, 109, 132, 193, 252, 168, 232, 65, 122, 210, 156, 192, 56, 146, 25, 0, 149, 213, 50, 129, 123, 54, 28, 48, 177, 151, 198, 193, 210, 237, 143, 192, 111, 59, 137, 64, 87, 66, 192, 0, 61, 24, 108, 129, 2, 44, 13, 51, 153, 186, 190, 193, 82, 215, 209, 192, 247, 60, 229, 64, 115, 16, 206, 0, 48, 20, 115, 129, 95, 44, 70, 51, 149, 85, 194, 193, 183, 212, 32, 65, 221, 40, 82, 64, 63, 171, 188, 0, 68, 225, 102, 129, 75, 44, 220, 49, 109, 139, 195, 193, 55, 96, 48, 65, 166, 184, 202, 191, 57, 160, 58, 0, 67, 82, 69, 129, 6, 43, 144, 49, 209, 66, 199, 193, 18, 159, 148, 192, 218, 214, 185, 192, 112, 24, 53, 0, 202, 254, 114, 129, 17, 40, 228, 50, 247, 50, 214, 193, 82, 101, 160, 192, 195, 129, 206, 191, 83, 80, 52, 0, 201, 240, 113, 129, 118, 41, 226, 50, 143, 145, 81, 193, 85, 49, 153, 193, 205, 48, 93, 193, 48, 16, 116, 0, 139, 0, 48, 129, 101, 54, 58, 52, 112, 239, 195, 193, 181, 228, 151, 193, 163, 143, 11, 192, 118, 7, 44, 0, 212, 13, 118, 129, 63, 55, 71, 52, 106, 247, 171, 184, 75, 134, 243, 65, 123, 138, 78, 65, 0, 130, 242, 0, 126, 0, 5, 129, 140, 48, 105, 48, 23, 17, 41, 192, 220, 143, 235, 65, 92, 182, 149, 65, 27, 154, 187, 0, 122, 11, 31, 129, 101, 48, 216, 48, 106, 247, 171, 184, 139, 39, 235, 65, 186, 253, 152, 65, 0, 156, 179, 0, 126, 254, 3, 129, 144, 48, 219, 48, 48, 98, 159, 184, 220, 203, 242, 65, 19, 127, 24, 65, 0, 130, 0, 0, 126, 0, 5, 129, 137, 48, 40, 48, 181, 254, 150, 184, 75, 69, 240, 65, 199, 129, 212, 64, 0, 130, 249, 0, 126, 0, 5, 129, 134, 48, 226, 47, 124, 97, 170, 192, 76, 88, 235, 65, 102, 91, 136, 65, 51, 156, 199, 0, 113, 29, 49, 129, 52, 48, 202, 48, 24, 180, 144, 184, 220, 164, 238, 65, 38, 195, 140, 64, 0, 130, 247, 0, 126, 0, 5, 129, 132, 48, 144, 47, 222, 30, 132, 184, 28, 80, 236, 65, 76, 138, 11, 191, 0, 130, 5, 0, 126, 0, 6, 129, 128, 48, 203, 46, 222, 30, 132, 184, 28, 80, 236, 65, 76, 138, 11, 191, 0, 130, 5, 0, 130, 0, 255, 129, 203, 53, 46, 47, 23, 183, 81, 184, 235, 132, 235, 65, 169, 194, 206, 192, 0, 131, 18, 0, 130, 0, 0, 129, 203, 53, 18, 48, 189, 55, 134, 183, 164, 250, 53, 192, 234, 7, 129, 193, 0, 3, 126, 0, 130, 0, 0, 129, 206, 53, 13, 51, 106, 247, 43, 184, 169, 3, 34, 193, 100, 45, 123, 193, 0, 12, 126, 0, 130, 0, 0, 129, 207, 53, 172, 51, 172, 197, 167, 183, 119, 20, 87, 65, 30, 2, 129, 193, 0, 251, 126, 0, 130, 0, 0, 129, 205, 53, 185, 49, 15, 126, 226, 183, 92, 204, 174, 65, 85, 79, 113, 193, 0, 228, 123, 0, 130, 0, 0, 129, 205, 53, 20, 49, 48, 98, 31, 184, 123, 153, 224, 65, 93, 53, 80, 193, 0, 160, 82, 0, 130, 0, 0, 129, 204, 53, 151, 48, 151, 172, 10, 186, 149, 34, 155, 193, 13, 107, 99, 193, 0, 17, 125, 0, 130, 0, 0, 129, 207, 53, 63, 52, 99, 66, 199, 65, 209, 158, 148, 192, 90, 214, 185, 192, 144, 24, 53, 0, 201, 250, 143, 129, 151, 52, 31, 51, 81, 85, 197, 65, 42, 67, 46, 193, 105, 124, 134, 192, 139, 9, 46, 0, 209, 252, 139, 129, 137, 52, 182, 51, 101, 101, 83, 65, 41, 231, 39, 193, 37, 143, 109, 193, 208, 15, 116, 0, 139, 2, 207, 129, 60, 53, 176, 51, 61, 225, 81, 65, 35, 161, 111, 192, 125, 7, 115, 193, 208, 4, 117, 0, 139, 5, 208, 129, 64, 53, 28, 51, 153, 7, 184, 65, 150, 19, 60, 65, 24, 206, 173, 192, 154, 206, 56, 0, 186, 27, 154, 129, 181, 52, 171, 49, 205, 120, 72, 65, 55, 109, 73, 65, 61, 99, 116, 193, 209, 248, 117, 0, 139, 13, 210, 129, 79, 53, 195, 49, 225, 107, 160, 65, 251, 142, 163, 65, 182, 143, 181, 64, 139, 221, 223, 0, 47, 194, 157, 129, 110, 50, 209, 48, 246, 162, 180, 65, 173, 123, 254, 64, 231, 242, 225, 64, 156, 212, 193, 0, 72, 239, 154, 129, 197, 50, 210, 49, 153, 7, 184, 65, 150, 19, 60, 65, 24, 206, 173, 192, 154, 206, 56, 0, 239, 180, 156, 129, 151, 51, 2, 49, 138, 165, 165, 65, 59, 253, 187, 65, 249, 174, 222, 192, 147, 212, 45, 0, 255, 169, 165, 129, 249, 50, 243, 47, 138, 165, 165, 65, 59, 253, 187, 65, 249, 174, 222, 192, 147, 212, 45, 0, 195, 52, 159, 129, 236, 52, 175, 48, 100, 212, 35, 65, 43, 228, 174, 65, 37, 249, 109, 193, 213, 223, 114, 0, 137, 17, 216, 129, 108, 53, 17, 49, 248, 107, 132, 65, 203, 217, 230, 65, 135, 222, 131, 64, 185, 154, 236, 0, 87, 211, 177, 129, 247, 49, 42, 48, 152, 109, 132, 65, 11, 169, 232, 65, 89, 210, 156, 192, 200, 146, 25, 0, 77, 198, 175, 129, 82, 50, 62, 47, 75, 140, 125, 65, 123, 100, 217, 65, 152, 1, 60, 65, 190, 158, 212, 0, 98, 223, 184, 129, 186, 49, 165, 48, 31, 239, 135, 65, 60, 55, 145, 65, 131, 182, 93, 65, 160, 236, 176, 0, 78, 197, 177, 129, 243, 49, 78, 49, 74, 30, 38, 65, 60, 80, 226, 65, 221, 144, 66, 193, 233, 153, 70, 0, 133, 8, 228, 129, 107, 53, 146, 48, 152, 109, 132, 65, 11, 169, 232, 65, 89, 210, 156, 192, 200, 146, 25, 0, 149, 43, 204, 129, 29, 53, 34, 48, 209, 185, 190, 65, 19, 215, 209, 192, 127, 61, 229, 64, 141, 16, 206, 0, 46, 228, 142, 129, 38, 51, 12, 51, 247, 150, 198, 65, 82, 237, 143, 192, 14, 60, 137, 64, 169, 66, 192, 0, 57, 226, 147, 129, 79, 51, 208, 50, 246, 84, 194, 65, 215, 212, 32, 65, 191, 41, 82, 64, 193, 171, 188, 0, 72, 27, 156, 129, 16, 51, 163, 49, 99, 66, 199, 65, 209, 158, 148, 192, 90, 214, 185, 192, 144, 24, 53, 0, 201, 250, 143, 129, 35, 52, 145, 50, 187, 138, 195, 65, 87, 96, 48, 65, 99, 182, 202, 191, 199, 160, 58, 0, 78, 175, 198, 129, 109, 51, 79, 49, 61, 50, 214, 65, 147, 100, 160, 192, 65, 126, 206, 191, 173, 80, 52, 0, 197, 11, 145, 129, 238, 51, 150, 50, 134, 221, 195, 65, 5, 227, 151, 193, 19, 126, 11, 192, 138, 7, 44, 0, 212, 250, 138, 129, 122, 52, 61, 52, 45, 142, 81, 65, 117, 49, 153, 193, 44, 49, 93, 193, 208, 16, 116, 0, 139, 0, 208, 129, 57, 53, 58, 52, 107, 14, 41, 64, 235, 143, 235, 65, 94, 182, 149, 65, 229, 154, 187, 0, 123, 239, 233, 129, 187, 48, 213, 48, 49, 96, 170, 64, 91, 88, 235, 65, 106, 91, 136, 65, 205, 156, 199, 0, 114, 221, 215, 129, 235, 48, 194, 48, 209, 66, 199, 193, 18, 159, 148, 192, 218, 214, 185, 192, 177, 12, 98, 0, 127, 0, 0, 129, 6, 55, 27, 51, 152, 86, 197, 193, 137, 67, 46, 193, 168, 125, 134, 192, 162, 18, 83, 0, 127, 0, 0, 129, 20, 55, 178, 51, 42, 108, 160, 193, 235, 142, 163, 65, 134, 143, 181, 64, 27, 8, 123, 0, 127, 0, 0, 129, 105, 45, 252, 48, 102, 163, 180, 193, 110, 123, 254, 64, 168, 242, 225, 64, 34, 4, 122, 0, 127, 0, 0, 129, 232, 44, 4, 50, 105, 239, 135, 193, 43, 55, 145, 65, 116, 182, 93, 65, 212, 139, 240, 0, 127, 0, 0, 127, 115, 46, 109, 49, 42, 108, 160, 193, 235, 142, 163, 65, 134, 143, 181, 64, 219, 136, 240, 0, 127, 0, 0, 127, 105, 45, 252, 48, 229, 140, 125, 193, 107, 100, 217, 65, 132, 1, 60, 65, 47, 19, 115, 0, 127, 0, 0, 129, 199, 46, 191, 48, 105, 239, 135, 193, 43, 55, 145, 65, 116, 182, 93, 65, 44, 21, 116, 0, 127, 0, 0, 129, 115, 46, 109, 49, 153, 186, 190, 193, 82, 215, 209, 192, 247, 60, 229, 64, 52, 253, 115, 0, 127, 0, 0, 129, 95, 44, 70, 51, 177, 151, 198, 193, 210, 237, 143, 192, 111, 59, 137, 64, 204, 250, 141, 0, 127, 0, 0, 127, 2, 44, 13, 51, 149, 85, 194, 193, 183, 212, 32, 65, 221, 40, 82, 64, 168, 5, 165, 0, 127, 0, 0, 127, 75, 44, 220, 49, 153, 186, 190, 193, 82, 215, 209, 192, 247, 60, 229, 64, 220, 152, 194, 0, 127, 0, 0, 127, 95, 44, 70, 51, 177, 151, 198, 193, 210, 237, 143, 192, 111, 59, 137, 64, 220, 152, 194, 0, 127, 0, 0, 127, 2, 44, 13, 51, 247, 50, 214, 193, 82, 101, 160, 192, 195, 129, 206, 191, 246, 131, 241, 0, 127, 0, 0, 127, 118, 41, 226, 50, 209, 66, 199, 193, 18, 159, 148, 192, 218, 214, 185, 192, 253, 130, 252, 0, 127, 0, 0, 127, 17, 40, 228, 50, 109, 139, 195, 193, 55, 96, 48, 65, 166, 184, 202, 191, 225, 1, 122, 0, 127, 0, 0, 129, 6, 43, 144, 49, 247, 50, 214, 193, 82, 101, 160, 192, 195, 129, 206, 191, 211, 6, 118, 0, 127, 0, 0, 129, 118, 41, 226, 50, 149, 85, 194, 193, 183, 212, 32, 65, 221, 40, 82, 64, 143, 200, 250, 0, 127, 0, 0, 127, 75, 44, 220, 49, 109, 139, 195, 193, 55, 96, 48, 65, 166, 184, 202, 191, 145, 197, 248, 0, 127, 0, 0, 127, 6, 43, 144, 49, 112, 239, 195, 193, 181, 228, 151, 193, 163, 143, 11, 192, 11, 131, 13, 0, 127, 0, 0, 129, 63, 55, 71, 52, 143, 145, 81, 193, 85, 49, 153, 193, 205, 48, 93, 193, 6, 131, 17, 0, 127, 0, 0, 129, 101, 54, 58, 52, 112, 239, 195, 193, 181, 228, 151, 193, 163, 143, 11, 192, 165, 19, 85, 0, 127, 0, 0, 129, 63, 55, 71, 52, 106, 247, 171, 184, 139, 39, 235, 65, 186, 253, 152, 65, 0, 235, 125, 0, 127, 0, 0, 129, 144, 48, 219, 48, 23, 17, 41, 192, 220, 143, 235, 65, 92, 182, 149, 65, 211, 239, 117, 0, 127, 0, 0, 129, 101, 48, 216, 48, 124, 97, 170, 192, 76, 88, 235, 65, 102, 91, 136, 65, 198, 245, 112, 0, 127, 0, 0, 129, 52, 48, 202, 48, 229, 140, 125, 193, 107, 100, 217, 65, 132, 1, 60, 65, 220, 211, 112, 0, 127, 0, 0, 129, 199, 46, 191, 48, 151, 172, 10, 186, 149, 34, 155, 193, 13, 107, 99, 193, 0, 131, 17, 0, 127, 0, 0, 129, 207, 53, 63, 52, 81, 85, 197, 65, 42, 67, 46, 193, 105, 124, 134, 192, 94, 18, 83, 0, 127, 0, 0, 129, 137, 52, 182, 51, 99, 66, 199, 65, 209, 158, 148, 192, 90, 214, 185, 192, 79, 12, 98, 0, 127, 0, 0, 129, 151, 52, 31, 51, 246, 162, 180, 65, 173, 123, 254, 64, 231, 242, 225, 64, 222, 4, 122, 0, 127, 0, 0, 129, 197, 50, 210, 49, 225, 107, 160, 65, 251, 142, 163, 65, 182, 143, 181, 64, 229, 8, 123, 0, 127, 0, 0, 129, 110, 50, 209, 48, 31, 239, 135, 65, 60, 55, 145, 65, 131, 182, 93, 65, 212, 21, 116, 0, 127, 0, 0, 129, 243, 49, 78, 49, 75, 140, 125, 65, 123, 100, 217, 65, 152, 1, 60, 65, 209, 19, 115, 0, 127, 0, 0, 129, 186, 49, 165, 48, 225, 107, 160, 65, 251, 142, 163, 65, 182, 143, 181, 64, 37, 136, 240, 0, 127, 0, 0, 127, 110, 50, 209, 48, 31, 239, 135, 65, 60, 55, 145, 65, 131, 182, 93, 65, 44, 139, 240, 0, 127, 0, 0, 127, 243, 49, 78, 49, 247, 150, 198, 65, 82, 237, 143, 192, 14, 60, 137, 64, 36, 152, 194, 0, 127, 0, 0, 127, 79, 51, 208, 50, 209, 185, 190, 65, 19, 215, 209, 192, 127, 61, 229, 64, 36, 152, 194, 0, 127, 0, 0, 127, 38, 51, 12, 51, 246, 84, 194, 65, 215, 212, 32, 65, 191, 41, 82, 64, 88, 5, 165, 0, 127, 0, 0, 127, 16, 51, 163, 49, 247, 150, 198, 65, 82, 237, 143, 192, 14, 60, 137, 64, 52, 250, 141, 0, 127, 0, 0, 127, 79, 51, 208, 50, 209, 185, 190, 65, 19, 215, 209, 192, 127, 61, 229, 64, 204, 253, 115, 0, 127, 0, 0, 129, 38, 51, 12, 51, 61, 50, 214, 65, 147, 100, 160, 192, 65, 126, 206, 191, 45, 6, 118, 0, 127, 0, 0, 129, 238, 51, 150, 50, 187, 138, 195, 65, 87, 96, 48, 65, 99, 182, 202, 191, 31, 1, 122, 0, 127, 0, 0, 129, 109, 51, 79, 49, 99, 66, 199, 65, 209, 158, 148, 192, 90, 214, 185, 192, 3, 130, 252, 0, 127, 0, 0, 127, 35, 52, 145, 50, 61, 50, 214, 65, 147, 100, 160, 192, 65, 126, 206, 191, 10, 131, 241, 0, 127, 0, 0, 127, 238, 51, 150, 50, 187, 138, 195, 65, 87, 96, 48, 65, 99, 182, 202, 191, 111, 197, 248, 0, 127, 0, 0, 127, 109, 51, 79, 49, 246, 84, 194, 65, 215, 212, 32, 65, 191, 41, 82, 64, 113, 200, 250, 0, 127, 0, 0, 127, 16, 51, 163, 49, 134, 221, 195, 65, 5, 227, 151, 193, 19, 126, 11, 192, 91, 19, 85, 0, 127, 0, 0, 129, 122, 52, 61, 52, 45, 142, 81, 65, 117, 49, 153, 193, 44, 49, 93, 193, 250, 131, 17, 0, 127, 0, 0, 129, 57, 53, 58, 52, 134, 221, 195, 65, 5, 227, 151, 193, 19, 126, 11, 192, 245, 131, 13, 0, 127, 0, 0, 129, 122, 52, 61, 52, 107, 14, 41, 64, 235, 143, 235, 65, 94, 182, 149, 65, 45, 239, 117, 0, 127, 0, 0, 129, 187, 48, 213, 48, 75, 140, 125, 65, 123, 100, 217, 65, 152, 1, 60, 65, 36, 211, 112, 0, 127, 0, 0, 129, 186, 49, 165, 48, 49, 96, 170, 64, 91, 88, 235, 65, 106, 91, 136, 65, 58, 245, 112, 0, 127, 0, 0, 129, 235, 48, 194, 48 ),
+"array_index_data": PoolByteArray( 0, 0, 1, 0, 2, 0, 0, 0, 2, 0, 3, 0, 4, 0, 0, 0, 3, 0, 4, 0, 3, 0, 5, 0, 6, 0, 7, 0, 8, 0, 6, 0, 8, 0, 9, 0, 10, 0, 4, 0, 5, 0, 10, 0, 5, 0, 11, 0, 12, 0, 6, 0, 9, 0, 12, 0, 9, 0, 13, 0, 14, 0, 15, 0, 6, 0, 14, 0, 6, 0, 12, 0, 10, 0, 11, 0, 16, 0, 10, 0, 16, 0, 17, 0, 7, 0, 18, 0, 19, 0, 7, 0, 19, 0, 20, 0, 21, 0, 22, 0, 8, 0, 21, 0, 8, 0, 23, 0, 23, 0, 8, 0, 7, 0, 23, 0, 7, 0, 20, 0, 1, 0, 24, 0, 25, 0, 1, 0, 25, 0, 2, 0, 26, 0, 27, 0, 28, 0, 14, 0, 29, 0, 30, 0, 31, 0, 14, 0, 30, 0, 29, 0, 14, 0, 12, 0, 29, 0, 12, 0, 32, 0, 12, 0, 13, 0, 33, 0, 12, 0, 33, 0, 32, 0, 34, 0, 17, 0, 16, 0, 34, 0, 16, 0, 35, 0, 36, 0, 37, 0, 3, 0, 36, 0, 3, 0, 2, 0, 37, 0, 38, 0, 5, 0, 37, 0, 5, 0, 3, 0, 38, 0, 39, 0, 11, 0, 38, 0, 11, 0, 5, 0, 11, 0, 39, 0, 40, 0, 11, 0, 40, 0, 16, 0, 41, 0, 36, 0, 2, 0, 41, 0, 2, 0, 25, 0, 31, 0, 30, 0, 28, 0, 31, 0, 28, 0, 27, 0, 40, 0, 35, 0, 16, 0, 42, 0, 43, 0, 44, 0, 42, 0, 44, 0, 45, 0, 46, 0, 47, 0, 43, 0, 46, 0, 43, 0, 42, 0, 48, 0, 49, 0, 50, 0, 48, 0, 50, 0, 51, 0, 52, 0, 53, 0, 47, 0, 52, 0, 47, 0, 46, 0, 54, 0, 55, 0, 49, 0, 54, 0, 49, 0, 48, 0, 56, 0, 54, 0, 48, 0, 56, 0, 48, 0, 57, 0, 58, 0, 53, 0, 52, 0, 58, 0, 52, 0, 59, 0, 60, 0, 61, 0, 51, 0, 60, 0, 51, 0, 62, 0, 63, 0, 64, 0, 50, 0, 63, 0, 50, 0, 65, 0, 64, 0, 62, 0, 51, 0, 64, 0, 51, 0, 50, 0, 45, 0, 44, 0, 66, 0, 45, 0, 66, 0, 67, 0, 28, 0, 68, 0, 26, 0, 30, 0, 29, 0, 56, 0, 30, 0, 56, 0, 69, 0, 29, 0, 32, 0, 54, 0, 29, 0, 54, 0, 56, 0, 33, 0, 55, 0, 54, 0, 33, 0, 54, 0, 32, 0, 34, 0, 35, 0, 58, 0, 34, 0, 58, 0, 59, 0, 43, 0, 37, 0, 36, 0, 43, 0, 36, 0, 44, 0, 47, 0, 38, 0, 37, 0, 47, 0, 37, 0, 43, 0, 53, 0, 39, 0, 38, 0, 53, 0, 38, 0, 47, 0, 53, 0, 58, 0, 40, 0, 53, 0, 40, 0, 39, 0, 44, 0, 36, 0, 41, 0, 44, 0, 41, 0, 66, 0, 69, 0, 68, 0, 28, 0, 69, 0, 28, 0, 30, 0, 58, 0, 35, 0, 40, 0, 70, 0, 71, 0, 72, 0, 70, 0, 72, 0, 73, 0, 74, 0, 75, 0, 71, 0, 74, 0, 71, 0, 70, 0, 76, 0, 77, 0, 78, 0, 76, 0, 78, 0, 79, 0, 80, 0, 81, 0, 75, 0, 80, 0, 75, 0, 74, 0, 82, 0, 83, 0, 77, 0, 82, 0, 77, 0, 76, 0, 84, 0, 82, 0, 76, 0, 84, 0, 76, 0, 85, 0, 86, 0, 81, 0, 80, 0, 86, 0, 80, 0, 87, 0, 88, 0, 89, 0, 79, 0, 88, 0, 79, 0, 90, 0, 91, 0, 78, 0, 92, 0, 91, 0, 92, 0, 93, 0, 90, 0, 79, 0, 78, 0, 90, 0, 78, 0, 91, 0, 73, 0, 72, 0, 94, 0, 73, 0, 94, 0, 95, 0, 96, 0, 97, 0, 98, 0, 99, 0, 100, 0, 84, 0, 99, 0, 84, 0, 101, 0, 100, 0, 102, 0, 82, 0, 100, 0, 82, 0, 84, 0, 103, 0, 83, 0, 82, 0, 103, 0, 82, 0, 102, 0, 104, 0, 105, 0, 86, 0, 104, 0, 86, 0, 87, 0, 71, 0, 106, 0, 107, 0, 71, 0, 107, 0, 72, 0, 75, 0, 108, 0, 106, 0, 75, 0, 106, 0, 71, 0, 81, 0, 109, 0, 108, 0, 81, 0, 108, 0, 75, 0, 81, 0, 86, 0, 110, 0, 81, 0, 110, 0, 109, 0, 72, 0, 107, 0, 111, 0, 72, 0, 111, 0, 94, 0, 101, 0, 97, 0, 96, 0, 101, 0, 96, 0, 99, 0, 86, 0, 105, 0, 110, 0, 112, 0, 113, 0, 114, 0, 112, 0, 114, 0, 115, 0, 116, 0, 112, 0, 115, 0, 116, 0, 115, 0, 117, 0, 118, 0, 119, 0, 120, 0, 118, 0, 120, 0, 121, 0, 122, 0, 116, 0, 117, 0, 122, 0, 117, 0, 123, 0, 124, 0, 118, 0, 121, 0, 124, 0, 121, 0, 125, 0, 126, 0, 127, 0, 118, 0, 126, 0, 118, 0, 124, 0, 122, 0, 123, 0, 128, 0, 122, 0, 128, 0, 129, 0, 119, 0, 130, 0, 131, 0, 119, 0, 131, 0, 132, 0, 133, 0, 120, 0, 134, 0, 133, 0, 134, 0, 135, 0, 120, 0, 119, 0, 132, 0, 120, 0, 132, 0, 134, 0, 113, 0, 136, 0, 137, 0, 113, 0, 137, 0, 114, 0, 98, 0, 138, 0, 96, 0, 126, 0, 100, 0, 99, 0, 139, 0, 126, 0, 99, 0, 100, 0, 126, 0, 124, 0, 100, 0, 124, 0, 102, 0, 124, 0, 125, 0, 103, 0, 124, 0, 103, 0, 102, 0, 104, 0, 129, 0, 128, 0, 104, 0, 128, 0, 105, 0, 107, 0, 106, 0, 115, 0, 107, 0, 115, 0, 114, 0, 106, 0, 108, 0, 117, 0, 106, 0, 117, 0, 115, 0, 108, 0, 109, 0, 123, 0, 108, 0, 123, 0, 117, 0, 123, 0, 109, 0, 110, 0, 123, 0, 110, 0, 128, 0, 111, 0, 107, 0, 114, 0, 111, 0, 114, 0, 137, 0, 139, 0, 99, 0, 96, 0, 139, 0, 96, 0, 138, 0, 110, 0, 105, 0, 128, 0, 140, 0, 141, 0, 1, 0, 140, 0, 1, 0, 0, 0, 6, 0, 142, 0, 143, 0, 6, 0, 143, 0, 7, 0, 15, 0, 144, 0, 145, 0, 15, 0, 145, 0, 6, 0, 146, 0, 147, 0, 15, 0, 146, 0, 15, 0, 14, 0, 143, 0, 148, 0, 18, 0, 143, 0, 18, 0, 7, 0, 19, 0, 149, 0, 150, 0, 19, 0, 150, 0, 20, 0, 151, 0, 152, 0, 19, 0, 151, 0, 19, 0, 18, 0, 21, 0, 153, 0, 154, 0, 21, 0, 154, 0, 22, 0, 155, 0, 156, 0, 21, 0, 155, 0, 21, 0, 23, 0, 157, 0, 158, 0, 23, 0, 157, 0, 23, 0, 20, 0, 24, 0, 159, 0, 160, 0, 24, 0, 160, 0, 25, 0, 141, 0, 161, 0, 24, 0, 141, 0, 24, 0, 1, 0, 26, 0, 162, 0, 163, 0, 26, 0, 163, 0, 27, 0, 31, 0, 164, 0, 165, 0, 31, 0, 165, 0, 14, 0, 160, 0, 166, 0, 41, 0, 160, 0, 41, 0, 25, 0, 27, 0, 163, 0, 164, 0, 27, 0, 164, 0, 31, 0, 45, 0, 167, 0, 168, 0, 45, 0, 168, 0, 42, 0, 169, 0, 170, 0, 48, 0, 169, 0, 48, 0, 51, 0, 57, 0, 171, 0, 172, 0, 57, 0, 172, 0, 56, 0, 173, 0, 174, 0, 57, 0, 173, 0, 57, 0, 48, 0, 60, 0, 175, 0, 176, 0, 60, 0, 176, 0, 61, 0, 177, 0, 178, 0, 60, 0, 177, 0, 60, 0, 62, 0, 61, 0, 179, 0, 169, 0, 61, 0, 169, 0, 51, 0, 63, 0, 180, 0, 181, 0, 63, 0, 181, 0, 64, 0, 182, 0, 183, 0, 63, 0, 182, 0, 63, 0, 65, 0, 64, 0, 184, 0, 185, 0, 64, 0, 185, 0, 62, 0, 67, 0, 186, 0, 167, 0, 67, 0, 167, 0, 45, 0, 187, 0, 188, 0, 67, 0, 187, 0, 67, 0, 66, 0, 189, 0, 162, 0, 26, 0, 189, 0, 26, 0, 68, 0, 190, 0, 191, 0, 69, 0, 190, 0, 69, 0, 56, 0, 41, 0, 166, 0, 187, 0, 41, 0, 187, 0, 66, 0, 191, 0, 189, 0, 68, 0, 191, 0, 68, 0, 69, 0 ),
+"blend_shape_data": [  ],
+"format": 97559,
+"index_count": 720,
+"primitive": 4,
+"skeleton_aabb": [  ],
+"vertex_count": 192
+}
+
+[sub_resource type="ShaderMaterial" id=84]
+resource_local_to_scene = true
+shader = ExtResource( 3 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/kit = null
+shader_param/specular = null
+shader_param/metallic = null
+shader_param/roughness = 1.0
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false
+
+[sub_resource type="ShaderMaterial" id=85]
+resource_local_to_scene = true
+shader = ExtResource( 3 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/kit = null
+shader_param/specular = null
+shader_param/metallic = null
+shader_param/roughness = 1.0
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false
+
+[sub_resource type="ShaderMaterial" id=78]
+resource_local_to_scene = true
+shader = ExtResource( 3 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/kit = null
+shader_param/specular = 0.0
+shader_param/metallic = null
+shader_param/roughness = 1.0
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false
+
+[sub_resource type="ShaderMaterial" id=79]
+shader = ExtResource( 3 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/kit = null
+shader_param/specular = null
+shader_param/metallic = null
+shader_param/roughness = null
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false
+
+[sub_resource type="ShaderMaterial" id=80]
+resource_local_to_scene = true
+shader = ExtResource( 3 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/kit = null
+shader_param/specular = null
+shader_param/metallic = null
+shader_param/roughness = 1.0
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false
+
+[sub_resource type="ShaderMaterial" id=81]
+resource_local_to_scene = true
+shader = ExtResource( 3 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/kit = null
+shader_param/specular = null
+shader_param/metallic = null
+shader_param/roughness = 1.0
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false
+
+[sub_resource type="ShaderMaterial" id=82]
+resource_local_to_scene = true
+shader = ExtResource( 3 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/kit = null
+shader_param/specular = null
+shader_param/metallic = null
+shader_param/roughness = 1.0
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false
+
+[sub_resource type="CapsuleShape" id=142]
+radius = 0.328658
+height = 0.0286517
+
+[sub_resource type="CapsuleShape" id=115]
+radius = 0.0853522
+height = 0.230704
+
+[sub_resource type="CapsuleShape" id=116]
+radius = 0.0664849
+height = 0.257542
+
+[sub_resource type="CapsuleShape" id=117]
+radius = 0.056794
+height = 0.195616
+
+[sub_resource type="CapsuleShape" id=118]
+radius = 0.0921184
+height = 0.163571
+
+[sub_resource type="CapsuleShape" id=119]
+radius = 0.0884458
+height = 0.164439
+
+[sub_resource type="CapsuleShape" id=120]
+radius = 0.0536285
+height = 0.152976
+
+[sub_resource type="CapsuleShape" id=121]
+radius = 0.112527
+height = 0.002
+
+[sub_resource type="CapsuleShape" id=122]
+radius = 0.171164
+height = 0.002
+
+[sub_resource type="CapsuleShape" id=123]
+radius = 0.300491
+height = 0.066752
+
+[sub_resource type="CapsuleShape" id=124]
+radius = 0.0794566
+height = 0.067038
+
+[sub_resource type="CapsuleShape" id=125]
+radius = 0.0926732
+height = 0.29095
+
+[sub_resource type="CapsuleShape" id=126]
+radius = 0.0760147
+height = 0.315266
+
+[sub_resource type="CapsuleShape" id=127]
+radius = 0.071996
+height = 0.135851
+
+[sub_resource type="CapsuleShape" id=128]
+radius = 0.09628
+height = 0.206977
+
+[sub_resource type="CapsuleShape" id=129]
+radius = 0.0911023
+height = 0.216763
+
+[sub_resource type="CapsuleShape" id=130]
+radius = 0.290414
+height = 0.219029
+
+[sub_resource type="AnimationNodeBlend3" id=173]
+
+[sub_resource type="AnimationNodeAnimation" id=174]
+animation = "celebtrate2"
+
+[sub_resource type="AnimationNodeAnimation" id=10]
+animation = "celebwave"
+
+[sub_resource type="AnimationNodeAnimation" id=165]
+animation = "celebplane"
+
+[sub_resource type="AnimationNodeBlend2" id=175]
+filter_enabled = true
+filters = [ "QuickRigCharacter_Reference:QuickRigCharacter_LeftArm", "QuickRigCharacter_Reference:QuickRigCharacter_LeftForeArm", "QuickRigCharacter_Reference:QuickRigCharacter_LeftHand", "QuickRigCharacter_Reference:QuickRigCharacter_LeftShoulder", "QuickRigCharacter_Reference:QuickRigCharacter_RightArm", "QuickRigCharacter_Reference:QuickRigCharacter_RightForeArm", "QuickRigCharacter_Reference:QuickRigCharacter_RightHand", "QuickRigCharacter_Reference:QuickRigCharacter_RightShoulder" ]
+
+[sub_resource type="AnimationNodeAnimation" id=167]
+animation = "archer"
+
+[sub_resource type="AnimationNodeAnimation" id=101]
+animation = "bench"
+
+[sub_resource type="AnimationNodeTimeScale" id=102]
+
+[sub_resource type="AnimationNodeBlendTree" id=103]
+graph_offset = Vector2( -353, 39 )
+nodes/Animation/node = SubResource( 101 )
+nodes/Animation/position = Vector2( -100, 100 )
+nodes/TimeScale/node = SubResource( 102 )
+nodes/TimeScale/position = Vector2( 100, 120 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=13]
+animation = "bike"
+
+[sub_resource type="AnimationNodeTimeScale" id=14]
+
+[sub_resource type="AnimationNodeBlendTree" id=15]
+graph_offset = Vector2( -301, 50 )
+nodes/Animation/node = SubResource( 13 )
+nodes/Animation/position = Vector2( -20, 120 )
+nodes/TimeScale/node = SubResource( 14 )
+nodes/TimeScale/position = Vector2( 140, 120 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=106]
+animation = "celebslide"
+
+[sub_resource type="AnimationNodeAnimation" id=91]
+resource_local_to_scene = true
+animation = "ohno"
+
+[sub_resource type="AnimationNodeTimeScale" id=92]
+
+[sub_resource type="AnimationNodeTimeSeek" id=96]
+resource_local_to_scene = true
+
+[sub_resource type="AnimationNodeBlendTree" id=93]
+graph_offset = Vector2( -440, 27 )
+nodes/Animation/node = SubResource( 91 )
+nodes/Animation/position = Vector2( -300, 160 )
+nodes/TimeScale/node = SubResource( 92 )
+nodes/TimeScale/position = Vector2( 100, 100 )
+nodes/concedeSeek/node = SubResource( 96 )
+nodes/concedeSeek/position = Vector2( -100, 60 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "concedeSeek", "concedeSeek", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=16]
+animation = "divingH"
+
+[sub_resource type="AnimationNodeTimeScale" id=17]
+
+[sub_resource type="AnimationNodeBlendTree" id=18]
+graph_offset = Vector2( -99, 11 )
+nodes/Animation/node = SubResource( 16 )
+nodes/Animation/position = Vector2( 114, 84 )
+nodes/TimeScale/node = SubResource( 17 )
+nodes/TimeScale/position = Vector2( 280, 80 )
+nodes/output/position = Vector2( 440, 120 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=19]
+animation = "fouled"
+
+[sub_resource type="AnimationNodeAnimation" id=20]
+animation = "header"
+
+[sub_resource type="AnimationNodeTimeScale" id=21]
+
+[sub_resource type="AnimationNodeBlendTree" id=22]
+graph_offset = Vector2( -398, 54 )
+nodes/Animation/node = SubResource( 20 )
+nodes/Animation/position = Vector2( -100, 100 )
+nodes/TimeScale/node = SubResource( 21 )
+nodes/TimeScale/position = Vector2( 80, 120 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=23]
+animation = "newidle"
+
+[sub_resource type="AnimationNodeAnimation" id=151]
+animation = "idlepoint"
+
+[sub_resource type="AnimationNodeAnimation" id=152]
+animation = "idlepointR"
+
+[sub_resource type="AnimationNodeAnimation" id=146]
+animation = "newidleclap"
+
+[sub_resource type="AnimationNodeAnimation" id=24]
+animation = "pickup"
+
+[sub_resource type="AnimationNodeAnimation" id=97]
+animation = "scissor"
+
+[sub_resource type="AnimationNodeAnimation" id=25]
+animation = "newshoot"
+
+[sub_resource type="AnimationNodeAnimation" id=26]
+animation = "slide"
+
+[sub_resource type="AnimationNodeTimeScale" id=27]
+
+[sub_resource type="AnimationNodeBlendTree" id=28]
+graph_offset = Vector2( -325, 2 )
+nodes/Animation/node = SubResource( 26 )
+nodes/Animation/position = Vector2( -80, 80 )
+nodes/TimeScale/node = SubResource( 27 )
+nodes/TimeScale/position = Vector2( 140, 80 )
+nodes/output/position = Vector2( 380, 120 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=168]
+animation = "somersault"
+
+[sub_resource type="AnimationNodeAnimation" id=68]
+animation = "sprinthard"
+
+[sub_resource type="AnimationNodeAnimation" id=30]
+animation = "sprint"
+
+[sub_resource type="AnimationNodeTimeScale" id=31]
+
+[sub_resource type="AnimationNodeBlend2" id=69]
+sync = true
+
+[sub_resource type="AnimationNodeTimeScale" id=71]
+
+[sub_resource type="AnimationNodeBlendTree" id=34]
+graph_offset = Vector2( -526.691, 97.952 )
+nodes/Animation/node = SubResource( 30 )
+nodes/Animation/position = Vector2( -260, 80 )
+"nodes/Animation 3/node" = SubResource( 68 )
+"nodes/Animation 3/position" = Vector2( -264, 244 )
+nodes/RunSpeed/node = SubResource( 31 )
+nodes/RunSpeed/position = Vector2( -80, 80 )
+nodes/RunSprint/node = SubResource( 69 )
+nodes/RunSprint/position = Vector2( 128, 211 )
+nodes/SprintSpeed/node = SubResource( 71 )
+nodes/SprintSpeed/position = Vector2( -96, 284 )
+nodes/output/position = Vector2( 620, 140 )
+node_connections = [ "output", 0, "RunSprint", "RunSpeed", 0, "Animation", "SprintSpeed", 0, "Animation 3", "RunSprint", 0, "RunSpeed", "RunSprint", 1, "SprintSpeed" ]
+
+[sub_resource type="AnimationNodeAnimation" id=109]
+animation = "sprinthard"
+
+[sub_resource type="AnimationNodeTimeScale" id=110]
+
+[sub_resource type="AnimationNodeBlendTree" id=111]
+graph_offset = Vector2( -431, 25 )
+nodes/Animation/node = SubResource( 109 )
+nodes/Animation/position = Vector2( -63, 115 )
+nodes/sprintspeed/node = SubResource( 110 )
+nodes/sprintspeed/position = Vector2( 120, 100 )
+node_connections = [ "output", 0, "sprintspeed", "sprintspeed", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=63]
+animation = "throw"
+
+[sub_resource type="AnimationNodeTimeScale" id=64]
+
+[sub_resource type="AnimationNodeBlendTree" id=65]
+graph_offset = Vector2( -328, 8 )
+nodes/Animation/node = SubResource( 63 )
+nodes/Animation/position = Vector2( -53, 109 )
+nodes/TimeScale/node = SubResource( 64 )
+nodes/TimeScale/position = Vector2( 120, 80 )
+node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
+
+[sub_resource type="AnimationNodeAnimation" id=86]
+animation = "walk"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=36]
+xfade_time = 0.07
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=37]
+xfade_time = 0.07
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=38]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=39]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=40]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=41]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=42]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=43]
+xfade_time = 0.04
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=45]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=46]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=47]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=48]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=49]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=52]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=53]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=54]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=55]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=56]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=57]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=58]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=66]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=67]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=87]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=88]
+switch_mode = 1
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=89]
+switch_mode = 1
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=90]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=94]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=95]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=98]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=99]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=100]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=104]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=105]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=107]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=108]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=112]
+switch_mode = 1
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=113]
+switch_mode = 1
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=131]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=132]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=133]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=134]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=135]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=136]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=137]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=138]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=139]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=140]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=144]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=145]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=147]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=148]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=149]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=150]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=153]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=154]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=155]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=156]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=157]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=158]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=159]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=160]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=161]
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=162]
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=163]
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=164]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=169]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=170]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=171]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=172]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachine" id=59]
+states/archer/node = SubResource( 167 )
+states/archer/position = Vector2( 979.291, 200.332 )
+states/bench/node = SubResource( 103 )
+states/bench/position = Vector2( 573, 287.028 )
+states/bike/node = SubResource( 15 )
+states/bike/position = Vector2( 189.791, -121.156 )
+states/celebslide/node = SubResource( 106 )
+states/celebslide/position = Vector2( 747.791, 283.028 )
+states/concede/node = SubResource( 93 )
+states/concede/position = Vector2( 323.791, 243.028 )
+states/divingH/node = SubResource( 18 )
+states/divingH/position = Vector2( 220.791, 169.864 )
+states/fouled/node = SubResource( 19 )
+states/fouled/position = Vector2( 108, 69.864 )
+states/header/node = SubResource( 22 )
+states/header/position = Vector2( 1018.79, -73.136 )
+states/idle/node = SubResource( 23 )
+states/idle/position = Vector2( 587, 96.864 )
+states/idlepoint/node = SubResource( 151 )
+states/idlepoint/position = Vector2( 1093.79, -303.136 )
+states/idlepointR/node = SubResource( 152 )
+states/idlepointR/position = Vector2( 940.791, -359.812 )
+states/newidleclap/node = SubResource( 146 )
+states/newidleclap/position = Vector2( 740.791, -339.136 )
+states/pickup/node = SubResource( 24 )
+states/pickup/position = Vector2( 925.791, 127.864 )
+states/scissor/node = SubResource( 97 )
+states/scissor/position = Vector2( 1018.79, 44.028 )
+states/shot/node = SubResource( 25 )
+states/shot/position = Vector2( 549.773, -339.136 )
+states/slide/node = SubResource( 28 )
+states/slide/position = Vector2( 856.21, -26 )
+states/somersault/node = SubResource( 168 )
+states/somersault/position = Vector2( 931.291, 253.332 )
+states/sprint/node = SubResource( 34 )
+states/sprint/position = Vector2( 436, -179.136 )
+states/sprinthard/node = SubResource( 111 )
+states/sprinthard/position = Vector2( 276.791, -303.136 )
+states/throw/node = SubResource( 65 )
+states/throw/position = Vector2( 1119.79, -179.136 )
+states/walk/node = SubResource( 86 )
+states/walk/position = Vector2( 509, -80.136 )
+transitions = [ "idle", "sprint", SubResource( 36 ), "sprint", "idle", SubResource( 37 ), "slide", "sprint", SubResource( 38 ), "sprint", "slide", SubResource( 39 ), "sprint", "shot", SubResource( 40 ), "shot", "idle", SubResource( 41 ), "sprint", "fouled", SubResource( 42 ), "fouled", "idle", SubResource( 43 ), "idle", "fouled", SubResource( 45 ), "idle", "header", SubResource( 46 ), "header", "idle", SubResource( 47 ), "sprint", "pickup", SubResource( 48 ), "pickup", "idle", SubResource( 49 ), "idle", "divingH", SubResource( 52 ), "divingH", "idle", SubResource( 53 ), "sprint", "divingH", SubResource( 54 ), "idle", "pickup", SubResource( 55 ), "idle", "bike", SubResource( 56 ), "sprint", "bike", SubResource( 57 ), "bike", "idle", SubResource( 58 ), "idle", "throw", SubResource( 66 ), "throw", "idle", SubResource( 67 ), "idle", "walk", SubResource( 87 ), "walk", "sprint", SubResource( 88 ), "sprint", "walk", SubResource( 89 ), "walk", "idle", SubResource( 90 ), "idle", "concede", SubResource( 94 ), "concede", "idle", SubResource( 95 ), "idle", "scissor", SubResource( 98 ), "scissor", "idle", SubResource( 99 ), "sprint", "scissor", SubResource( 100 ), "idle", "bench", SubResource( 104 ), "bench", "idle", SubResource( 105 ), "idle", "celebslide", SubResource( 107 ), "celebslide", "idle", SubResource( 108 ), "sprint", "sprinthard", SubResource( 112 ), "sprinthard", "sprint", SubResource( 113 ), "sprinthard", "header", SubResource( 131 ), "sprint", "header", SubResource( 132 ), "sprinthard", "scissor", SubResource( 133 ), "sprinthard", "slide", SubResource( 134 ), "walk", "header", SubResource( 135 ), "walk", "scissor", SubResource( 136 ), "sprinthard", "bike", SubResource( 137 ), "sprinthard", "shot", SubResource( 138 ), "sprinthard", "divingH", SubResource( 139 ), "sprinthard", "concede", SubResource( 140 ), "sprint", "concede", SubResource( 144 ), "walk", "concede", SubResource( 145 ), "idle", "newidleclap", SubResource( 147 ), "newidleclap", "idle", SubResource( 148 ), "newidleclap", "walk", SubResource( 149 ), "newidleclap", "sprint", SubResource( 150 ), "idle", "idlepointR", SubResource( 153 ), "idlepointR", "idle", SubResource( 154 ), "idle", "idlepoint", SubResource( 155 ), "idlepoint", "idle", SubResource( 156 ), "idlepoint", "sprint", SubResource( 157 ), "idlepointR", "sprint", SubResource( 158 ), "idlepoint", "walk", SubResource( 159 ), "idlepointR", "walk", SubResource( 160 ), "idlepointR", "throw", SubResource( 161 ), "idlepoint", "throw", SubResource( 162 ), "newidleclap", "throw", SubResource( 163 ), "walk", "shot", SubResource( 164 ), "idle", "archer", SubResource( 169 ), "idle", "somersault", SubResource( 170 ), "somersault", "idle", SubResource( 171 ), "archer", "idle", SubResource( 172 ) ]
+start_node = "idle"
+graph_offset = Vector2( 90.541, -26.056 )
+
+[sub_resource type="AnimationNodeBlendTree" id=60]
+resource_local_to_scene = true
+graph_offset = Vector2( -39, 19 )
+nodes/AnimCheer/node = SubResource( 173 )
+nodes/AnimCheer/position = Vector2( 189, 89 )
+nodes/Animation/node = SubResource( 165 )
+nodes/Animation/position = Vector2( -20, 200 )
+"nodes/Animation 2/node" = SubResource( 174 )
+"nodes/Animation 2/position" = Vector2( -20, -20 )
+"nodes/Animation 3/node" = SubResource( 10 )
+"nodes/Animation 3/position" = Vector2( -20, 80 )
+nodes/BlendCelebrate/node = SubResource( 175 )
+nodes/BlendCelebrate/position = Vector2( 560, 40 )
+nodes/StateMachine/node = SubResource( 59 )
+nodes/StateMachine/position = Vector2( 360, -20 )
+nodes/output/position = Vector2( 980, 40 )
+node_connections = [ "output", 0, "BlendCelebrate", "AnimCheer", 0, "Animation 3", "AnimCheer", 1, "Animation 2", "AnimCheer", 2, "Animation", "BlendCelebrate", 0, "StateMachine", "BlendCelebrate", 1, "AnimCheer" ]
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=61]
+
+[node name="Player" instance=ExtResource( 1 )]
+script = ExtResource( 6 )
+
+[node name="PlayerMesh" parent="." index="0"]
+physics_interpolation_mode = 2
+
+[node name="posIndicator" parent="PlayerMesh" index="0"]
+transform = Transform( 67.0076, 0, 0, 0, 67.0076, 0, 0, 0, 67.0076, 0, 0.1, 0 )
+visible = false
+material/0 = SubResource( 176 )
+
+[node name="QuickRigCharacter_Reference" parent="." index="2"]
+transform = Transform( 2.3, 0, 0, 0, 2.3, 0, 0, 0, 2.3, 0, 0, 0 )
+bones/15/bound_children = [ NodePath("BoneAttachmentThrow") ]
+bones/20/bound_children = [ NodePath("HeadAttach") ]
+
+[node name="PlayerM" parent="QuickRigCharacter_Reference" index="0"]
+generate_lightmap = false
+material/0 = ExtResource( 2 )
+
+[node name="HeadAttach" type="BoneAttachment" parent="QuickRigCharacter_Reference" index="1"]
+physics_interpolation_mode = 2
+transform = Transform( -0.00560461, -0.0339202, 0.999409, 0.998514, 0.0539529, 0.0074308, -0.0541732, 0.997966, 0.0335675, -0.0180125, 2.24608, -0.0434574 )
+bone_name = "QuickRigCharacter_Neck"
+
+[node name="FacialHairMesh" type="MeshInstance" parent="QuickRigCharacter_Reference/HeadAttach" index="0"]
+transform = Transform( -4.62023e-10, 0.00999999, 3.49246e-10, -2.91038e-11, -1.39698e-09, 0.01, 0.01, 4.65661e-10, 0, 0.221313, 0.189832, 0.00323018 )
+visible = false
+mesh = ExtResource( 7 )
+material/0 = SubResource( 72 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="FacialHairMesh2" type="MeshInstance" parent="QuickRigCharacter_Reference/HeadAttach" index="1"]
+transform = Transform( -4.62023e-10, 0.00999999, 3.49246e-10, -2.91038e-11, -1.39698e-09, 0.01, 0.01, 4.65661e-10, 0, 0.224464, 0.186196, 0.00314634 )
+visible = false
+mesh = ExtResource( 9 )
+material/0 = SubResource( 73 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="FacialHairMesh3" type="MeshInstance" parent="QuickRigCharacter_Reference/HeadAttach" index="2"]
+transform = Transform( -4.62023e-10, 0.00999999, 3.49246e-10, -2.91038e-11, -1.39698e-09, 0.01, 0.01, 4.65661e-10, 0, 0.219272, 0.19127, 0.00325796 )
+visible = false
+mesh = ExtResource( 8 )
+material/0 = SubResource( 83 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="Hair1" type="MeshInstance" parent="QuickRigCharacter_Reference/HeadAttach" index="3"]
+transform = Transform( -1.50408e-05, 0.00999246, 0.000387991, -2.59848e-06, -0.000387994, 0.00999247, 0.00999999, 1.49282e-05, 3.18684e-06, 0.565074, -0.0263427, -0.0101586 )
+visible = false
+mesh = SubResource( 75 )
+material/0 = SubResource( 84 )
+
+[node name="Hair2" type="MeshInstance" parent="QuickRigCharacter_Reference/HeadAttach" index="4"]
+transform = Transform( -4.51109e-10, 0.00999999, 4.36557e-10, 0, -4.36557e-10, 0.01, 0.01, 4.22006e-10, 2.32831e-10, 0.533887, -0.0288651, 0.00171803 )
+visible = false
+mesh = ExtResource( 10 )
+material/0 = SubResource( 85 )
+
+[node name="Hair3" type="MeshInstance" parent="QuickRigCharacter_Reference/HeadAttach" index="5"]
+transform = Transform( -4.51109e-10, 0.00999999, 4.36557e-10, 0, -4.36557e-10, 0.01, 0.01, 4.22006e-10, 2.32831e-10, 0.588, 0, 0.002 )
+visible = false
+mesh = ExtResource( 11 )
+material/0 = SubResource( 78 )
+
+[node name="Hat" type="MeshInstance" parent="QuickRigCharacter_Reference/HeadAttach" index="6"]
+transform = Transform( 3.29945e-05, 0.00998432, 0.000558689, -2.78258e-07, -0.000558692, 0.00998438, 0.00999994, -3.29585e-05, -1.56556e-06, 22.8307, -4.75274, -0.0800788 )
+visible = false
+mesh = ExtResource( 13 )
+material/0 = SubResource( 79 )
+
+[node name="Hair4" type="MeshInstance" parent="QuickRigCharacter_Reference/HeadAttach" index="7"]
+transform = Transform( -4.37114e-10, 0.01, 4.37114e-10, 0, -4.37114e-10, 0.01, 0.01, 4.37114e-10, 1.91069e-17, 0.34, 0, 0 )
+visible = false
+mesh = ExtResource( 14 )
+material/0 = SubResource( 80 )
+
+[node name="Hair5" type="MeshInstance" parent="QuickRigCharacter_Reference/HeadAttach" index="8"]
+transform = Transform( -4.65661e-10, 0.01, 4.22006e-10, 0, -4.36557e-10, 0.01, 0.01, 4.12911e-10, 4.07454e-10, 0.862812, -0.0193907, 0.00217199 )
+visible = false
+mesh = ExtResource( 16 )
+material/0 = SubResource( 81 )
+
+[node name="Hair6" type="MeshInstance" parent="QuickRigCharacter_Reference/HeadAttach" index="9"]
+transform = Transform( -4.51109e-10, 0.00999999, 4.36557e-10, 0, -4.36557e-10, 0.01, 0.01, 4.22006e-10, 2.32831e-10, 0.853635, -0.0151559, 0.00226468 )
+visible = false
+mesh = ExtResource( 15 )
+material/0 = SubResource( 82 )
+
+[node name="BoneAttachmentThrow" type="BoneAttachment" parent="QuickRigCharacter_Reference" index="2"]
+transform = Transform( 0.215549, -0.468062, -0.857004, -0.948967, 0.1065, -0.296843, 0.230211, 0.877254, -0.42122, 0.853399, 1.14427, -0.0940964 )
+bone_name = "QuickRigCharacter_LeftHand"
+
+[node name="CaughtPos" type="Spatial" parent="QuickRigCharacter_Reference/BoneAttachmentThrow" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0.3 )
+
+[node name="PhysicalHips" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="3"]
+transform = Transform( -0.0259646, -0.58843, 0.80813, 0.93836, 0.264376, 0.222652, -0.344665, 0.764097, 0.5453, -0.663193, 0.823609, 1.03387 )
+visible = false
+collision_layer = 536870912
+joint_type = 5
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.563085, -1.1974, -0.0342094 )
+body_offset = Transform( 0.845662, 0.438121, 0.304787, -0.52768, 0.771953, 0.354448, -0.0799913, -0.460575, 0.884009, 0.058853, 1.23359, -0.476209 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_Hips"
+joint_constraints/x/linear_limit_enabled = true
+joint_constraints/x/linear_limit_upper = 0.0
+joint_constraints/x/linear_limit_lower = 0.0
+joint_constraints/x/linear_limit_softness = 0.7
+joint_constraints/x/linear_spring_enabled = false
+joint_constraints/x/linear_spring_stiffness = 0.0
+joint_constraints/x/linear_spring_damping = 0.0
+joint_constraints/x/linear_equilibrium_point = 0.0
+joint_constraints/x/linear_restitution = 0.5
+joint_constraints/x/linear_damping = 1.0
+joint_constraints/x/angular_limit_enabled = true
+joint_constraints/x/angular_limit_upper = 10.0
+joint_constraints/x/angular_limit_lower = -10.0
+joint_constraints/x/angular_limit_softness = 0.5
+joint_constraints/x/angular_restitution = 0.0
+joint_constraints/x/angular_damping = 1.0
+joint_constraints/x/erp = 0.5
+joint_constraints/x/angular_spring_enabled = false
+joint_constraints/x/angular_spring_stiffness = 0.0
+joint_constraints/x/angular_spring_damping = 0.0
+joint_constraints/x/angular_equilibrium_point = 0.0
+joint_constraints/y/linear_limit_enabled = true
+joint_constraints/y/linear_limit_upper = 0.0
+joint_constraints/y/linear_limit_lower = 0.0
+joint_constraints/y/linear_limit_softness = 0.7
+joint_constraints/y/linear_spring_enabled = false
+joint_constraints/y/linear_spring_stiffness = 0.0
+joint_constraints/y/linear_spring_damping = 0.0
+joint_constraints/y/linear_equilibrium_point = 0.0
+joint_constraints/y/linear_restitution = 0.5
+joint_constraints/y/linear_damping = 1.0
+joint_constraints/y/angular_limit_enabled = true
+joint_constraints/y/angular_limit_upper = 10.0
+joint_constraints/y/angular_limit_lower = -10.0
+joint_constraints/y/angular_limit_softness = 0.5
+joint_constraints/y/angular_restitution = 0.0
+joint_constraints/y/angular_damping = 1.0
+joint_constraints/y/erp = 0.5
+joint_constraints/y/angular_spring_enabled = false
+joint_constraints/y/angular_spring_stiffness = 0.0
+joint_constraints/y/angular_spring_damping = 0.0
+joint_constraints/y/angular_equilibrium_point = 0.0
+joint_constraints/z/linear_limit_enabled = true
+joint_constraints/z/linear_limit_upper = 0.0
+joint_constraints/z/linear_limit_lower = 0.0
+joint_constraints/z/linear_limit_softness = 0.7
+joint_constraints/z/linear_spring_enabled = false
+joint_constraints/z/linear_spring_stiffness = 0.0
+joint_constraints/z/linear_spring_damping = 0.0
+joint_constraints/z/linear_equilibrium_point = 0.0
+joint_constraints/z/linear_restitution = 0.5
+joint_constraints/z/linear_damping = 1.0
+joint_constraints/z/angular_limit_enabled = true
+joint_constraints/z/angular_limit_upper = 10.0
+joint_constraints/z/angular_limit_lower = -10.0
+joint_constraints/z/angular_limit_softness = 0.5
+joint_constraints/z/angular_restitution = 0.0
+joint_constraints/z/angular_damping = 1.0
+joint_constraints/z/erp = 0.5
+joint_constraints/z/angular_spring_enabled = false
+joint_constraints/z/angular_spring_stiffness = 0.0
+joint_constraints/z/angular_spring_damping = 0.0
+joint_constraints/z/angular_equilibrium_point = 0.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/PhysicalHips" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.339787, -1.24208, -0.0600812 )
+shape = SubResource( 142 )
+
+[node name="Physical Bone QuickRigCharacter_LeftUpLeg" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="4"]
+transform = Transform( 0.49333, -0.381066, -0.78193, -0.774954, -0.60082, -0.196131, -0.395057, 0.702715, -0.591714, 1.53873, 1.29018, 0.215588 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0.168, 0, 1, 0, 0, 0, 1, -0.171306, 0.581332, 1.27274 )
+body_offset = Transform( 0.715385, 0.636277, -0.288758, 0.572648, -0.297087, 0.764082, 0.400373, -0.711966, -0.576893, 0.120175, -0.701674, 1.21671 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_LeftUpLeg"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_LeftUpLeg" index="0"]
+transform = Transform( -0.402867, 0.669977, 0.623566, 0.696078, 0.666652, -0.266558, -0.594288, 0.32666, -0.734922, 0.0226893, 0.641048, 1.06586 )
+shape = SubResource( 115 )
+
+[node name="PhysicalBone_LeftLeg" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="5"]
+transform = Transform( -0.895511, -0.285211, 0.341628, -0.0520181, 0.829463, 0.556141, -0.441984, 0.480258, -0.757635, 1.96896, 0.453549, 0.492525 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.59726, 0.240586, -0.2444 )
+body_offset = Transform( 0.187071, -0.973897, -0.128591, 0.589923, 0.00670382, 0.807439, -0.785489, -0.226902, 0.575779, -0.0959228, -0.746535, 1.44994 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_LeftLeg"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/PhysicalBone_LeftLeg" index="0"]
+transform = Transform( 0.999273, 0.0287204, 0.0250503, -0.0286659, 0.133338, 0.990655, 0.0251128, -0.990655, 0.134063, 1.44508, 0.0170309, -0.0607603 )
+visible = false
+shape = SubResource( 116 )
+
+[node name="Physical Bone QuickRigCharacter_LeftFoot" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="6"]
+transform = Transform( -0.392998, 0.225391, 0.891489, 0.423803, 0.904786, -0.0419212, -0.816052, 0.361339, -0.451107, 2.12578, 0.602694, 1.30816 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.59552, -1.35576, -0.875989 )
+body_offset = Transform( -0.887395, 0.340256, -0.311065, -0.376475, -0.924287, 0.0629738, -0.266078, 0.172991, 0.948304, 1.60467, -0.59727, 1.48977 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_LeftFoot"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 20.0
+joint_constraints/angular_limit_lower = -20.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_LeftFoot" index="0"]
+transform = Transform( 0.3526, -0.0844054, -0.931962, 0.922736, 0.196989, 0.331276, 0.155627, -0.976766, 0.147345, 1.3767, -1.26163, -0.515848 )
+visible = false
+shape = SubResource( 117 )
+
+[node name="Physical Bone QuickRigCharacter_RightUpLeg" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="7"]
+transform = Transform( 0.669704, 0.458312, -0.584335, -0.417529, 0.883084, 0.214102, 0.61414, 0.100587, 0.782762, -1.30548, 0.938683, -0.227492 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, -0.643, 0, 0, 1, 0.818563, 0.39731, -0.577905 )
+body_offset = Transform( -0.432517, 0.796068, -0.423336, 0.104498, 0.510618, 0.853436, 0.895551, 0.324884, -0.304038, -0.206891, 0.204793, -1.03785 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_RightUpLeg"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_RightUpLeg" index="0"]
+transform = Transform( 0.969959, 0.0291552, 0.241523, -0.191184, -0.522571, 0.830883, 0.150439, -0.852096, -0.501298, 0.782048, 0.228696, -0.48912 )
+visible = false
+shape = SubResource( 118 )
+
+[node name="Physical Bone QuickRigCharacter_RightLeg" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="8"]
+transform = Transform( -0.803337, -0.114167, 0.584483, -0.350351, -0.703042, -0.618862, 0.481574, -0.701927, 0.524775, -1.3531, 0.0690228, 0.0489693 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.902147, -0.424954, 0.341207 )
+body_offset = Transform( -0.215429, -0.890266, -0.401275, 0.736686, -0.417903, 0.531655, -0.641011, -0.181075, 0.74587, -0.435753, 0.305605, -0.90973 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_RightLeg"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_RightLeg" index="0"]
+transform = Transform( 0.691094, 0.0225878, 0.722409, -0.689019, 0.322434, 0.649069, -0.218269, -0.946325, 0.238399, -0.716077, -0.294569, 0.18716 )
+visible = false
+shape = SubResource( 119 )
+
+[node name="Physical Bone QuickRigCharacter_RightFoot" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="9"]
+transform = Transform( -0.364938, 0.249708, 0.896923, -0.516416, -0.855875, 0.028165, 0.774694, -0.452906, 0.44129, -1.53797, -0.358746, 0.692446 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.21436, 0.215731, 0.719029 )
+body_offset = Transform( -0.84498, 0.429878, -0.318163, -0.46743, -0.882685, 0.0487754, -0.259875, 0.189934, 0.946782, -0.890077, -0.412275, -1.03732 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_RightFoot"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_RightFoot" index="0"]
+transform = Transform( 0.474004, -0.00493781, -0.880507, 0.876517, -0.0926838, 0.472369, -0.0839418, -0.995684, -0.0396048, -0.927098, 0.00910334, 0.458731 )
+visible = false
+shape = SubResource( 120 )
+
+[node name="Physical Bone QuickRigCharacter_Spine" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="10"]
+transform = Transform( 0.104554, -0.607244, 0.787609, 0.970974, 0.233645, 0.0512436, -0.215137, 0.759385, 0.614043, -0.641822, 0.776477, 0.963876 )
+visible = false
+collision_layer = 536870912
+joint_type = 5
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.715745, -1.05344, -0.101778 )
+body_offset = Transform( 0.939767, 0.323198, 0.111299, -0.33604, 0.813865, 0.474027, 0.0626221, -0.482876, 0.87345, -0.320837, 1.14612, -0.464603 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_Spine"
+joint_constraints/x/linear_limit_enabled = true
+joint_constraints/x/linear_limit_upper = 0.0
+joint_constraints/x/linear_limit_lower = 0.0
+joint_constraints/x/linear_limit_softness = 0.7
+joint_constraints/x/linear_spring_enabled = false
+joint_constraints/x/linear_spring_stiffness = 0.0
+joint_constraints/x/linear_spring_damping = 0.0
+joint_constraints/x/linear_equilibrium_point = 0.0
+joint_constraints/x/linear_restitution = 0.5
+joint_constraints/x/linear_damping = 1.0
+joint_constraints/x/angular_limit_enabled = true
+joint_constraints/x/angular_limit_upper = 10.0
+joint_constraints/x/angular_limit_lower = -10.0
+joint_constraints/x/angular_limit_softness = 0.5
+joint_constraints/x/angular_restitution = 0.0
+joint_constraints/x/angular_damping = 1.0
+joint_constraints/x/erp = 0.5
+joint_constraints/x/angular_spring_enabled = false
+joint_constraints/x/angular_spring_stiffness = 0.0
+joint_constraints/x/angular_spring_damping = 0.0
+joint_constraints/x/angular_equilibrium_point = 0.0
+joint_constraints/y/linear_limit_enabled = true
+joint_constraints/y/linear_limit_upper = 0.0
+joint_constraints/y/linear_limit_lower = 0.0
+joint_constraints/y/linear_limit_softness = 0.7
+joint_constraints/y/linear_spring_enabled = false
+joint_constraints/y/linear_spring_stiffness = 0.0
+joint_constraints/y/linear_spring_damping = 0.0
+joint_constraints/y/linear_equilibrium_point = 0.0
+joint_constraints/y/linear_restitution = 0.5
+joint_constraints/y/linear_damping = 1.0
+joint_constraints/y/angular_limit_enabled = true
+joint_constraints/y/angular_limit_upper = 10.0
+joint_constraints/y/angular_limit_lower = -10.0
+joint_constraints/y/angular_limit_softness = 0.5
+joint_constraints/y/angular_restitution = 0.0
+joint_constraints/y/angular_damping = 1.0
+joint_constraints/y/erp = 0.5
+joint_constraints/y/angular_spring_enabled = false
+joint_constraints/y/angular_spring_stiffness = 0.0
+joint_constraints/y/angular_spring_damping = 0.0
+joint_constraints/y/angular_equilibrium_point = 0.0
+joint_constraints/z/linear_limit_enabled = true
+joint_constraints/z/linear_limit_upper = 0.0
+joint_constraints/z/linear_limit_lower = 0.0
+joint_constraints/z/linear_limit_softness = 0.7
+joint_constraints/z/linear_spring_enabled = false
+joint_constraints/z/linear_spring_stiffness = 0.0
+joint_constraints/z/linear_spring_damping = 0.0
+joint_constraints/z/linear_equilibrium_point = 0.0
+joint_constraints/z/linear_restitution = 0.5
+joint_constraints/z/linear_damping = 1.0
+joint_constraints/z/angular_limit_enabled = true
+joint_constraints/z/angular_limit_upper = 10.0
+joint_constraints/z/angular_limit_lower = -10.0
+joint_constraints/z/angular_limit_softness = 0.5
+joint_constraints/z/angular_restitution = 0.0
+joint_constraints/z/angular_damping = 1.0
+joint_constraints/z/erp = 0.5
+joint_constraints/z/angular_spring_enabled = false
+joint_constraints/z/angular_spring_stiffness = 0.0
+joint_constraints/z/angular_spring_damping = 0.0
+joint_constraints/z/angular_equilibrium_point = 0.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_Spine" index="0"]
+transform = Transform( 0.00531942, -0.00386373, 0.999978, -0.99998, -0.00354284, 0.00530583, 0.00352234, -0.999987, -0.00388253, 0.50278, -1.16689, -0.290215 )
+shape = SubResource( 121 )
+
+[node name="Physical Bone QuickRigCharacter_Spine1" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="11"]
+transform = Transform( 0.156608, -0.596319, 0.787324, 0.967504, 0.252854, -0.000937344, -0.198516, 0.761886, 0.616539, -0.578698, 0.977177, 0.866234 )
+visible = false
+collision_layer = 536870912
+joint_type = 5
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.68734, -0.913335, -0.105459 )
+body_offset = Transform( 0.956541, 0.289646, 0.0337064, -0.268952, 0.831677, 0.485778, 0.112671, -0.473732, 0.873433, -0.38937, 0.99569, -0.418008 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_Spine1"
+joint_constraints/x/linear_limit_enabled = true
+joint_constraints/x/linear_limit_upper = 0.0
+joint_constraints/x/linear_limit_lower = 0.0
+joint_constraints/x/linear_limit_softness = 0.7
+joint_constraints/x/linear_spring_enabled = false
+joint_constraints/x/linear_spring_stiffness = 0.0
+joint_constraints/x/linear_spring_damping = 0.0
+joint_constraints/x/linear_equilibrium_point = 0.0
+joint_constraints/x/linear_restitution = 0.5
+joint_constraints/x/linear_damping = 1.0
+joint_constraints/x/angular_limit_enabled = true
+joint_constraints/x/angular_limit_upper = 10.0
+joint_constraints/x/angular_limit_lower = -10.0
+joint_constraints/x/angular_limit_softness = 0.5
+joint_constraints/x/angular_restitution = 0.0
+joint_constraints/x/angular_damping = 1.0
+joint_constraints/x/erp = 0.5
+joint_constraints/x/angular_spring_enabled = false
+joint_constraints/x/angular_spring_stiffness = 0.0
+joint_constraints/x/angular_spring_damping = 0.0
+joint_constraints/x/angular_equilibrium_point = 0.0
+joint_constraints/y/linear_limit_enabled = true
+joint_constraints/y/linear_limit_upper = 0.0
+joint_constraints/y/linear_limit_lower = 0.0
+joint_constraints/y/linear_limit_softness = 0.7
+joint_constraints/y/linear_spring_enabled = false
+joint_constraints/y/linear_spring_stiffness = 0.0
+joint_constraints/y/linear_spring_damping = 0.0
+joint_constraints/y/linear_equilibrium_point = 0.0
+joint_constraints/y/linear_restitution = 0.5
+joint_constraints/y/linear_damping = 1.0
+joint_constraints/y/angular_limit_enabled = true
+joint_constraints/y/angular_limit_upper = 10.0
+joint_constraints/y/angular_limit_lower = -10.0
+joint_constraints/y/angular_limit_softness = 0.5
+joint_constraints/y/angular_restitution = 0.0
+joint_constraints/y/angular_damping = 1.0
+joint_constraints/y/erp = 0.5
+joint_constraints/y/angular_spring_enabled = false
+joint_constraints/y/angular_spring_stiffness = 0.0
+joint_constraints/y/angular_spring_damping = 0.0
+joint_constraints/y/angular_equilibrium_point = 0.0
+joint_constraints/z/linear_limit_enabled = true
+joint_constraints/z/linear_limit_upper = 0.0
+joint_constraints/z/linear_limit_lower = 0.0
+joint_constraints/z/linear_limit_softness = 0.7
+joint_constraints/z/linear_spring_enabled = false
+joint_constraints/z/linear_spring_stiffness = 0.0
+joint_constraints/z/linear_spring_damping = 0.0
+joint_constraints/z/linear_equilibrium_point = 0.0
+joint_constraints/z/linear_restitution = 0.5
+joint_constraints/z/linear_damping = 1.0
+joint_constraints/z/angular_limit_enabled = true
+joint_constraints/z/angular_limit_upper = 10.0
+joint_constraints/z/angular_limit_lower = -10.0
+joint_constraints/z/angular_limit_softness = 0.5
+joint_constraints/z/angular_restitution = 0.0
+joint_constraints/z/angular_damping = 1.0
+joint_constraints/z/erp = 0.5
+joint_constraints/z/angular_spring_enabled = false
+joint_constraints/z/angular_spring_stiffness = 0.0
+joint_constraints/z/angular_spring_damping = 0.0
+joint_constraints/z/angular_equilibrium_point = 0.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_Spine1" index="0"]
+transform = Transform( -0.0404645, -0.00585891, 0.999163, -0.999162, -0.00576171, -0.0404981, 0.0059941, -0.999966, -0.0056209, 0.662484, -0.993737, -0.0983495 )
+shape = SubResource( 122 )
+
+[node name="Physical Bone QuickRigCharacter_Spine2" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="12"]
+transform = Transform( 0.082367, -0.608119, 0.789562, 0.996449, 0.0642244, -0.0544858, -0.0175717, 0.791243, 0.61125, -0.550096, 1.0446, 0.794058 )
+visible = false
+collision_layer = 536870912
+joint_type = 5
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.615703, -0.938366, -0.10133 )
+body_offset = Transform( 0.976054, 0.212523, 0.0464797, -0.208286, 0.851278, 0.481608, 0.0627843, -0.479752, 0.875156, -0.396826, 0.975854, -0.40016 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_Spine2"
+joint_constraints/x/linear_limit_enabled = true
+joint_constraints/x/linear_limit_upper = 0.0
+joint_constraints/x/linear_limit_lower = 0.0
+joint_constraints/x/linear_limit_softness = 0.7
+joint_constraints/x/linear_spring_enabled = false
+joint_constraints/x/linear_spring_stiffness = 0.0
+joint_constraints/x/linear_spring_damping = 0.0
+joint_constraints/x/linear_equilibrium_point = 0.0
+joint_constraints/x/linear_restitution = 0.5
+joint_constraints/x/linear_damping = 1.0
+joint_constraints/x/angular_limit_enabled = true
+joint_constraints/x/angular_limit_upper = 10.0
+joint_constraints/x/angular_limit_lower = -10.0
+joint_constraints/x/angular_limit_softness = 0.5
+joint_constraints/x/angular_restitution = 0.0
+joint_constraints/x/angular_damping = 1.0
+joint_constraints/x/erp = 0.5
+joint_constraints/x/angular_spring_enabled = false
+joint_constraints/x/angular_spring_stiffness = 0.0
+joint_constraints/x/angular_spring_damping = 0.0
+joint_constraints/x/angular_equilibrium_point = 0.0
+joint_constraints/y/linear_limit_enabled = true
+joint_constraints/y/linear_limit_upper = 0.0
+joint_constraints/y/linear_limit_lower = 0.0
+joint_constraints/y/linear_limit_softness = 0.7
+joint_constraints/y/linear_spring_enabled = false
+joint_constraints/y/linear_spring_stiffness = 0.0
+joint_constraints/y/linear_spring_damping = 0.0
+joint_constraints/y/linear_equilibrium_point = 0.0
+joint_constraints/y/linear_restitution = 0.5
+joint_constraints/y/linear_damping = 1.0
+joint_constraints/y/angular_limit_enabled = true
+joint_constraints/y/angular_limit_upper = 10.0
+joint_constraints/y/angular_limit_lower = -10.0
+joint_constraints/y/angular_limit_softness = 0.5
+joint_constraints/y/angular_restitution = 0.0
+joint_constraints/y/angular_damping = 1.0
+joint_constraints/y/erp = 0.5
+joint_constraints/y/angular_spring_enabled = false
+joint_constraints/y/angular_spring_stiffness = 0.0
+joint_constraints/y/angular_spring_damping = 0.0
+joint_constraints/y/angular_equilibrium_point = 0.0
+joint_constraints/z/linear_limit_enabled = true
+joint_constraints/z/linear_limit_upper = 0.0
+joint_constraints/z/linear_limit_lower = 0.0
+joint_constraints/z/linear_limit_softness = 0.7
+joint_constraints/z/linear_spring_enabled = false
+joint_constraints/z/linear_spring_stiffness = 0.0
+joint_constraints/z/linear_spring_damping = 0.0
+joint_constraints/z/linear_equilibrium_point = 0.0
+joint_constraints/z/linear_restitution = 0.5
+joint_constraints/z/linear_damping = 1.0
+joint_constraints/z/angular_limit_enabled = true
+joint_constraints/z/angular_limit_upper = 10.0
+joint_constraints/z/angular_limit_lower = -10.0
+joint_constraints/z/angular_limit_softness = 0.5
+joint_constraints/z/angular_restitution = 0.0
+joint_constraints/z/angular_damping = 1.0
+joint_constraints/z/erp = 0.5
+joint_constraints/z/angular_spring_enabled = false
+joint_constraints/z/angular_spring_stiffness = 0.0
+joint_constraints/z/angular_spring_damping = 0.0
+joint_constraints/z/angular_equilibrium_point = 0.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_Spine2" index="0"]
+transform = Transform( 0.300954, 0.0664225, 0.951321, -0.953405, -0.00106564, 0.301689, 0.0210527, -0.997791, 0.0630062, 0.620183, -0.961033, -0.0774221 )
+shape = SubResource( 123 )
+
+[node name="Physical Bone QuickRigCharacter_LeftShoulder" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="13"]
+transform = Transform( 0.858948, 0.254857, -0.444128, -0.247482, 0.96594, 0.0756588, 0.448282, 0.0449308, 0.892759, 0.339509, 1.31828, 1.30907 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.824788, 0.479965, -0.908294 )
+body_offset = Transform( 0.838441, 0.090382, -0.53744, -0.0242107, 0.991361, 0.128953, 0.544451, -0.0951052, 0.833382, 0.160002, -0.37866, 1.25166 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_LeftShoulder"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_LeftShoulder" index="0"]
+transform = Transform( 0.147429, 0.0960869, -0.984394, 0.895207, -0.436157, 0.0914977, -0.42056, -0.894726, -0.15032, -0.543608, 0.395792, -0.831216 )
+shape = SubResource( 124 )
+
+[node name="Physical Bone QuickRigCharacter_LeftArm" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="14"]
+transform = Transform( 0.557727, 0.684325, 0.469723, -0.427164, 0.721868, -0.54447, -0.711668, 0.103018, 0.694923, 0.802983, 1.42925, 0.901934 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.218794, 0.0330427, -0.915665 )
+body_offset = Transform( 0.844043, -0.303921, 0.441847, -0.536276, -0.477207, 0.696194, -0.000731468, -0.824567, -0.565766, 0.229955, 0.770583, -0.490646 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_LeftArm"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_LeftArm" index="0"]
+transform = Transform( 0.250016, 0.380476, -0.890353, 0.546068, -0.814771, -0.194841, -0.799561, -0.437484, -0.411473, 0.264333, -0.0846993, -0.576828 )
+visible = false
+shape = SubResource( 125 )
+
+[node name="Physical Bone QuickRigCharacter_LeftForeArm" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="15"]
+transform = Transform( 0.564569, -0.212656, 0.797522, -0.822245, -0.0606812, 0.565893, -0.0719486, -0.97524, -0.209114, 0.93814, 1.76287, 0.90127 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.254069, 0.994152, -0.128076 )
+body_offset = Transform( 0.814406, -0.300295, -0.496557, -0.545246, -0.688877, -0.47766, -0.198624, 0.659752, -0.724761, 0.0280262, 0.762202, -0.698254 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_LeftForeArm"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_LeftForeArm" index="0"]
+transform = Transform( 0.792262, 0.188513, -0.580331, 0.296133, 0.712777, 0.635807, 0.533508, -0.675584, 0.508879, 0.36235, 0.705119, -0.208718 )
+shape = SubResource( 126 )
+
+[node name="Physical Bone QuickRigCharacter_RightShoulder" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="16"]
+transform = Transform( 0.0724276, -0.847673, 0.525557, -0.856826, -0.322593, -0.402236, 0.510501, -0.421178, -0.749664, -0.987362, 1.3766, 0.492383 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.615828, -0.668227, 0.488859 )
+body_offset = Transform( 0.155894, -0.979286, 0.129238, 0.804356, 0.201796, 0.55884, -0.57334, 0.0168358, 0.819144, -0.621561, 0.356996, -0.742275 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_RightShoulder"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_RightShoulder" index="0"]
+transform = Transform( 0.885107, -0.00773349, -0.465325, 0.462122, -0.103666, 0.880738, -0.0550497, -0.994584, -0.0881813, -0.689269, -0.394606, 0.646258 )
+shape = SubResource( 127 )
+
+[node name="Physical Bone QuickRigCharacter_RightArm" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="17"]
+transform = Transform( 0.875067, 0.460561, -0.148786, -0.470836, 0.738842, -0.482113, -0.112113, 0.491937, 0.863385, -0.469203, 1.83608, 0.838501 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0171058, -0.443028, -0.776995 )
+body_offset = Transform( -0.239024, 0.969263, -0.058354, -0.150958, -0.0964581, -0.983826, -0.959207, -0.226345, 0.169372, 0.388159, -0.804579, 0.0477322 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_RightArm"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_RightArm" index="0"]
+transform = Transform( 0.758392, -0.573556, -0.309644, 0.437058, 0.0950394, 0.894405, -0.483555, -0.813635, 0.322753, 0.283869, -0.756798, -0.994479 )
+shape = SubResource( 128 )
+
+[node name="Physical Bone QuickRigCharacter_RightForeArm" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="18"]
+transform = Transform( 0.807274, 0.429094, -0.405201, 0.106162, 0.569795, 0.814905, 0.580549, -0.70087, 0.414424, -1.70637, 2.33202, 0.875492 )
+visible = false
+collision_layer = 536870912
+joint_type = 3
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.058021, 0.742244, -1.64704 )
+body_offset = Transform( 0.113074, 0.772295, 0.625127, -0.726413, 0.493518, -0.478298, -0.677893, -0.400015, 0.616809, 0.449818, -1.11194, 1.35215 )
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_RightForeArm"
+joint_constraints/angular_limit_enabled = true
+joint_constraints/angular_limit_upper = 30.0
+joint_constraints/angular_limit_lower = -30.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_RightForeArm" index="0"]
+transform = Transform( 0.840371, -0.475407, 0.260334, -0.089617, 0.351812, 0.931774, -0.534556, -0.80636, 0.253054, -0.0357003, 0.764296, -2.04548 )
+shape = SubResource( 129 )
+
+[node name="Physical Bone QuickRigCharacter_Neck" type="PhysicalBone" parent="QuickRigCharacter_Reference" index="19"]
+transform = Transform( -0.0424775, 0.116023, 0.992337, -0.13893, -0.984274, 0.109131, 0.98939, -0.133234, 0.0579297, -0.107838, 2.32549, 0.216337 )
+visible = false
+collision_layer = 536870912
+joint_type = 5
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.114486, 0.167978, 0.0680957 )
+body_offset = Transform( -0.0555462, -0.992348, 0.11032, 0.998366, -0.0537106, 0.0195727, -0.0134967, 0.111228, 0.993702, 0.152821, 0.121988, -0.0878959 )
+mass = 0.5
+weight = 10.0
+gravity_scale = 2.0
+bone_name = "QuickRigCharacter_Neck"
+joint_constraints/x/linear_limit_enabled = true
+joint_constraints/x/linear_limit_upper = 0.0
+joint_constraints/x/linear_limit_lower = 0.0
+joint_constraints/x/linear_limit_softness = 0.7
+joint_constraints/x/linear_spring_enabled = false
+joint_constraints/x/linear_spring_stiffness = 0.0
+joint_constraints/x/linear_spring_damping = 0.0
+joint_constraints/x/linear_equilibrium_point = 0.0
+joint_constraints/x/linear_restitution = 0.5
+joint_constraints/x/linear_damping = 1.0
+joint_constraints/x/angular_limit_enabled = true
+joint_constraints/x/angular_limit_upper = 10.0
+joint_constraints/x/angular_limit_lower = -10.0
+joint_constraints/x/angular_limit_softness = 0.5
+joint_constraints/x/angular_restitution = 0.0
+joint_constraints/x/angular_damping = 1.0
+joint_constraints/x/erp = 0.5
+joint_constraints/x/angular_spring_enabled = false
+joint_constraints/x/angular_spring_stiffness = 0.0
+joint_constraints/x/angular_spring_damping = 0.0
+joint_constraints/x/angular_equilibrium_point = 0.0
+joint_constraints/y/linear_limit_enabled = true
+joint_constraints/y/linear_limit_upper = 0.0
+joint_constraints/y/linear_limit_lower = 0.0
+joint_constraints/y/linear_limit_softness = 0.7
+joint_constraints/y/linear_spring_enabled = false
+joint_constraints/y/linear_spring_stiffness = 0.0
+joint_constraints/y/linear_spring_damping = 0.0
+joint_constraints/y/linear_equilibrium_point = 0.0
+joint_constraints/y/linear_restitution = 0.5
+joint_constraints/y/linear_damping = 1.0
+joint_constraints/y/angular_limit_enabled = true
+joint_constraints/y/angular_limit_upper = 10.0
+joint_constraints/y/angular_limit_lower = -10.0
+joint_constraints/y/angular_limit_softness = 0.5
+joint_constraints/y/angular_restitution = 0.0
+joint_constraints/y/angular_damping = 1.0
+joint_constraints/y/erp = 0.5
+joint_constraints/y/angular_spring_enabled = false
+joint_constraints/y/angular_spring_stiffness = 0.0
+joint_constraints/y/angular_spring_damping = 0.0
+joint_constraints/y/angular_equilibrium_point = 0.0
+joint_constraints/z/linear_limit_enabled = true
+joint_constraints/z/linear_limit_upper = 0.0
+joint_constraints/z/linear_limit_lower = 0.0
+joint_constraints/z/linear_limit_softness = 0.7
+joint_constraints/z/linear_spring_enabled = false
+joint_constraints/z/linear_spring_stiffness = 0.0
+joint_constraints/z/linear_spring_damping = 0.0
+joint_constraints/z/linear_equilibrium_point = 0.0
+joint_constraints/z/linear_restitution = 0.5
+joint_constraints/z/linear_damping = 1.0
+joint_constraints/z/angular_limit_enabled = true
+joint_constraints/z/angular_limit_upper = 10.0
+joint_constraints/z/angular_limit_lower = -10.0
+joint_constraints/z/angular_limit_softness = 0.5
+joint_constraints/z/angular_restitution = 0.0
+joint_constraints/z/angular_damping = 1.0
+joint_constraints/z/erp = 0.5
+joint_constraints/z/angular_spring_enabled = false
+joint_constraints/z/angular_spring_stiffness = 0.0
+joint_constraints/z/angular_spring_damping = 0.0
+joint_constraints/z/angular_equilibrium_point = 0.0
+
+[node name="CollisionShape" type="CollisionShape" parent="QuickRigCharacter_Reference/Physical Bone QuickRigCharacter_Neck" index="0"]
+transform = Transform( 1, 0, -1.49012e-08, 5.58794e-09, -3.23926e-08, 1, -7.45058e-09, -1, -2.97441e-08, -0.0447085, -0.163967, 0.0501299 )
+shape = SubResource( 130 )
+
+[node name="QuickRigCharacter_Ctrl_Reference" parent="." index="3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0378169, 0.00253971 )
+
+[node name="QuickRigCharacter_Ctrl_HipsEffector" parent="QuickRigCharacter_Ctrl_Reference" index="0"]
+transform = Transform( 0.987488, 0, -0.157694, 0, 1, 0, 0.157694, 0, 0.987488, -2.4852e-07, 0.861596, -0.0783798 )
+
+[node name="QuickRigCharacter_Ctrl_LeftAnkleEffector" parent="QuickRigCharacter_Ctrl_Reference" index="1"]
+transform = Transform( 0.987737, 0.148389, -0.0485494, 0.0953491, -0.819545, -0.565026, -0.123632, 0.553468, -0.823643, 0.379252, 0.659453, -0.499582 )
+
+[node name="QuickRigCharacter_Ctrl_RightAnkleEffector" parent="QuickRigCharacter_Ctrl_Reference" index="2"]
+transform = Transform( 0.999842, 0.00125756, 0.0177378, -0.0105894, 0.84345, 0.537104, -0.0142855, -0.537207, 0.84333, -0.446481, 0.191707, 0.536828 )
+
+[node name="QuickRigCharacter_Ctrl_LeftWristEffector" parent="QuickRigCharacter_Ctrl_Reference" index="3"]
+transform = Transform( 0.216413, 0.859193, -0.463628, -0.962912, 0.266222, 0.043892, 0.16114, 0.436934, 0.884942, 0.845944, 1.08407, -0.0969353 )
+
+[node name="QuickRigCharacter_Ctrl_RightWristEffector" parent="QuickRigCharacter_Ctrl_Reference" index="4"]
+transform = Transform( 0.227432, -0.958462, 0.172122, 0.955633, 0.253654, 0.149753, -0.187192, 0.130426, 0.973626, -0.785838, 1.08048, -0.313 )
+
+[node name="QuickRigCharacter_Ctrl_LeftKneeEffector" parent="QuickRigCharacter_Ctrl_Reference" index="5"]
+transform = Transform( 0.987871, -0.00391155, 0.155229, 0.152996, -0.146267, -0.977343, 0.0265278, 0.989238, -0.143894, 0.379839, 0.625188, -0.222013 )
+
+[node name="QuickRigCharacter_Ctrl_RightKneeEffector" parent="QuickRigCharacter_Ctrl_Reference" index="6"]
+transform = Transform( 0.999179, 0.0405201, 0.000109597, -0.0334201, 0.822565, 0.567688, 0.0229126, -0.567226, 0.823243, -0.429231, 0.485587, 0.327351 )
+
+[node name="QuickRigCharacter_Ctrl_LeftElbowEffector" parent="QuickRigCharacter_Ctrl_Reference" index="7"]
+transform = Transform( 0.216414, 0.8592, -0.463617, -0.962912, 0.266222, 0.0438952, 0.16114, 0.436923, 0.884948, 0.763183, 1.4634, -0.16009 )
+
+[node name="QuickRigCharacter_Ctrl_RightElbowEffector" parent="QuickRigCharacter_Ctrl_Reference" index="8"]
+transform = Transform( 0.227434, -0.958461, 0.172124, 0.955632, 0.253656, 0.149754, -0.187193, 0.130428, 0.973626, -0.693881, 1.45706, -0.383759 )
+
+[node name="QuickRigCharacter_Ctrl_ChestOriginEffector" parent="QuickRigCharacter_Ctrl_Reference" index="9"]
+transform = Transform( 0.987354, -0.00246979, -0.15851, 0.00492051, 0.999874, 0.0150704, 0.158453, -0.0156598, 0.987242, -0.00745527, 1.19645, -0.031696 )
+
+[node name="QuickRigCharacter_Ctrl_ChestEndEffector" parent="QuickRigCharacter_Ctrl_Reference" index="10"]
+transform = Transform( 0.987163, -0.00529023, -0.159626, 0.010647, 0.999408, 0.0327214, 0.159359, -0.0340009, 0.986635, -0.0276208, 1.91557, 0.0548587 )
+
+[node name="QuickRigCharacter_Ctrl_LeftFootEffector" parent="QuickRigCharacter_Ctrl_Reference" index="11"]
+transform = Transform( 0.98731, 0.151186, -0.0486065, 0.0976117, -0.819157, -0.565202, -0.125267, 0.553285, -0.823519, 0.365557, 0.58705, -0.666893 )
+
+[node name="QuickRigCharacter_Ctrl_RightFootEffector" parent="QuickRigCharacter_Ctrl_Reference" index="12"]
+transform = Transform( 0.99984, 0.00103826, 0.0178516, -0.0104657, 0.843447, 0.53711, -0.0144992, -0.537212, 0.843322, -0.444612, 0.299891, 0.795295 )
+
+[node name="QuickRigCharacter_Ctrl_LeftShoulderEffector" parent="QuickRigCharacter_Ctrl_Reference" index="13"]
+transform = Transform( 0.468634, 0.860089, -0.201567, -0.745107, 0.262274, -0.613211, -0.474551, 0.437561, 0.763768, 0.516108, 1.85996, 0.0928133 )
+
+[node name="QuickRigCharacter_Ctrl_RightShoulderEffector" parent="QuickRigCharacter_Ctrl_Reference" index="14"]
+transform = Transform( 0.281961, -0.958098, -0.0504559, 0.770457, 0.257452, -0.583193, 0.571746, 0.125564, 0.810765, -0.543626, 1.86767, -0.0793025 )
+
+[node name="QuickRigCharacter_Ctrl_HeadEffector" parent="QuickRigCharacter_Ctrl_Reference" index="15"]
+transform = Transform( 0.995395, -0.00515201, 0.095717, 0.009727, 0.998829, -0.0473922, -0.0953607, 0.048105, 0.99428, -0.0203401, 2.73944, 0.0975751 )
+
+[node name="QuickRigCharacter_Ctrl_LeftHipEffector" parent="QuickRigCharacter_Ctrl_Reference" index="16"]
+transform = Transform( 0.916485, -0.373008, 0.14464, 0.393811, 0.777425, -0.490431, 0.0704879, 0.506433, 0.859393, 0.224411, 0.975394, 0.0153342 )
+
+[node name="QuickRigCharacter_Ctrl_RightHipEffector" parent="QuickRigCharacter_Ctrl_Reference" index="17"]
+transform = Transform( 0.998508, 0.049087, -0.0239279, -0.0248908, 0.799116, 0.600661, 0.0486059, -0.599169, 0.799146, -0.393075, 0.842828, 0.00743325 )
+
+[node name="QuickRigCharacter_Ctrl_Hips" parent="QuickRigCharacter_Ctrl_Reference" index="18"]
+transform = Transform( 0.987488, 0, -0.157694, 0, 1, 0, 0.157694, 0, 0.987488, -0.000872139, 1.06536, -0.07292 )
+
+[node name="QuickRigCharacter_Ctrl_LeftUpLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips" index="0"]
+transform = Transform( 0.961685, -0.252064, 0.107826, 0.272379, 0.83371, -0.480351, 0.0311839, 0.491316, 0.870423, 0.24051, -0.203769, -0.005529 )
+
+[node name="QuickRigCharacter_Ctrl_LeftLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_LeftUpLeg" index="0"]
+transform = Transform( 0.973989, 0.00157226, -0.226589, -0.180277, 0.611192, -0.770678, 0.137278, 0.791481, 0.595578, 0, -0.44309, 0 )
+
+[node name="QuickRigCharacter_Ctrl_LeftFoot" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_LeftUpLeg/QuickRigCharacter_Ctrl_LeftLeg" index="0"]
+transform = Transform( 0.986159, 0.0498098, -0.158145, -0.149154, 0.683085, -0.714946, 0.0724152, 0.728638, 0.68106, 0, -0.38824, 0 )
+
+[node name="QuickRigCharacter_Ctrl_LeftToeBase" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_LeftUpLeg/QuickRigCharacter_Ctrl_LeftLeg/QuickRigCharacter_Ctrl_LeftFoot" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1e-07, -0.00827242, 0.191041 )
+
+[node name="QuickRigCharacter_Ctrl_RightUpLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips" index="1"]
+transform = Transform( 0.996591, 0.0824879, 0.00143053, -0.0601081, 0.71411, 0.697448, 0.0565095, -0.695156, 0.716634, -0.24051, -0.203769, -0.005529 )
+
+[node name="QuickRigCharacter_Ctrl_RightLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_RightUpLeg" index="0"]
+transform = Transform( 0.999679, 5.76184e-05, 0.0253209, 0.00523824, 0.977895, -0.209033, -0.0247732, 0.209099, 0.977581, -2e-08, -0.44309, 4.33e-06 )
+
+[node name="QuickRigCharacter_Ctrl_RightFoot" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_RightUpLeg/QuickRigCharacter_Ctrl_RightLeg" index="0"]
+transform = Transform( 0.99811, -0.0564178, 0.024364, 0.0568313, 0.998245, -0.016625, -0.0233833, 0.0179782, 0.999565, 0, -0.38824, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightToeBase" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_RightUpLeg/QuickRigCharacter_Ctrl_RightLeg/QuickRigCharacter_Ctrl_RightFoot" index="0"]
+transform = Transform( 1, 0, 1.86809e-08, 0, 1, 0, -1.86809e-08, 0, 1, -1.6e-05, -0.00827242, 0.191041 )
+
+[node name="QuickRigCharacter_Ctrl_Spine" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips" index="2"]
+transform = Transform( 0.999987, -0.00503613, -0.000901912, 0.00504913, 0.999874, 0.0150488, 0.00082601, -0.0150531, 0.999886, 0, 0.192296, 0.0417463 )
+
+[node name="QuickRigCharacter_Ctrl_Spine1" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine" index="0"]
+transform = Transform( 0.999996, -0.00294584, -0.000539595, 0.00295048, 0.999957, 0.00881681, 0.000513598, -0.00881837, 0.999961, 0, 0.192147, 0.0108251 )
+
+[node name="QuickRigCharacter_Ctrl_Spine2" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1" index="0"]
+transform = Transform( 0.999996, -0.00294182, -0.000575077, 0.00294677, 0.999957, 0.00881572, 0.000549118, -0.00881738, 0.999961, 0, 0.192147, -0.0074383 )
+
+[node name="QuickRigCharacter_Ctrl_LeftShoulder" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2" index="0"]
+transform = Transform( 1, 1.94169e-07, 2.55645e-07, -1.94169e-07, 1, 1.01883e-12, -2.55645e-07, -1.06846e-12, 1, 0.184929, 0.332068, 0.103836 )
+
+[node name="QuickRigCharacter_Ctrl_LeftArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_LeftShoulder" index="0"]
+transform = Transform( 0.392869, 0.916356, -0.0771055, -0.762265, 0.277606, -0.584711, -0.514398, 0.28849, 0.807569, 0.351652, -0.0643187, -0.0846822 )
+
+[node name="QuickRigCharacter_Ctrl_LeftForeArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_LeftShoulder/QuickRigCharacter_Ctrl_LeftArm" index="0"]
+transform = Transform( 0.740569, 0.000109878, -0.67198, -6.15906e-05, 1, 9.56365e-05, 0.67198, -2.94379e-05, 0.740569, 0.532647, 0, 0 )
+
+[node name="QuickRigCharacter_Ctrl_LeftHand" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_LeftShoulder/QuickRigCharacter_Ctrl_LeftArm/QuickRigCharacter_Ctrl_LeftForeArm" index="0"]
+transform = Transform( 1, -5.07699e-11, -3.81833e-07, -3.42253e-12, 1, -0.000141927, 3.81833e-07, 0.000141927, 1, 0.394082, 0, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightShoulder" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2" index="1"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.184929, 0.332068, 0.103836 )
+
+[node name="QuickRigCharacter_Ctrl_RightArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_RightShoulder" index="0"]
+transform = Transform( 0.37072, -0.9255, 0.077561, 0.785183, 0.267718, -0.558404, 0.496038, 0.267911, 0.825935, -0.351652, -0.0643187, -0.0846822 )
+
+[node name="QuickRigCharacter_Ctrl_RightForeArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_RightShoulder/QuickRigCharacter_Ctrl_RightArm" index="0"]
+transform = Transform( 0.698409, 6.06555e-06, 0.715699, -5.00001e-06, 1, -3.59579e-06, -0.715699, -1.06717e-06, 0.698409, -0.532647, 0, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightHand" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_RightShoulder/QuickRigCharacter_Ctrl_RightArm/QuickRigCharacter_Ctrl_RightForeArm" index="0"]
+transform = Transform( 1, -1.928e-06, -1.00002e-06, 1.92801e-06, 1, 1.01361e-05, 1e-06, -1.01361e-05, 1, -0.394082, -1.5e-07, 0 )
+
+[node name="QuickRigCharacter_Ctrl_Neck" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2" index="2"]
+transform = Transform( 0.991997, -0.00353116, 0.126209, 0.000691141, 0.999746, 0.0225391, -0.126257, -0.0222715, 0.991747, 0, 0.588745, 0.034018 )
+
+[node name="QuickRigCharacter_Ctrl_Head" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_Neck" index="0"]
+transform = Transform( 1, 0, 0, 0, 0.998941, 0.0460069, 0, -0.0460069, 0.998941, 0, 0.547303, 0.0012659 )
+
+[node name="AnimationPlayer" parent="." index="4"]
+reset_on_save = false
+playback_process_mode = 0
+method_call_mode = 1
+
+[node name="AnimationTree" type="AnimationTree" parent="." index="5"]
+tree_root = SubResource( 60 )
+anim_player = NodePath("../AnimationPlayer")
+active = true
+process_mode = 0
+parameters/AnimCheer/blend_amount = 0.0
+parameters/BlendCelebrate/blend_amount = 0.0
+parameters/StateMachine/playback = SubResource( 61 )
+parameters/StateMachine/bench/TimeScale/scale = 0.5
+parameters/StateMachine/bike/TimeScale/scale = 1.8
+parameters/StateMachine/concede/TimeScale/scale = 0.5
+parameters/StateMachine/concede/concedeSeek/seek_position = -1.0
+parameters/StateMachine/divingH/TimeScale/scale = 1.5
+parameters/StateMachine/header/TimeScale/scale = 1.5
+parameters/StateMachine/slide/TimeScale/scale = 2.4
+parameters/StateMachine/sprint/RunSpeed/scale = 1.0
+parameters/StateMachine/sprint/RunSprint/blend_amount = 0.0
+parameters/StateMachine/sprint/SprintSpeed/scale = 1.0
+parameters/StateMachine/sprinthard/sprintspeed/scale = 1.0
+parameters/StateMachine/throw/TimeScale/scale = 1.66

@@ -1,0 +1,134 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://Res/Goal.fbx" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/Nettest.gd" type="Script" id=2]
+[ext_resource path="res://Res/net.tres" type="ArrayMesh" id=4]
+[ext_resource path="res://Materials/newGoal.tres" type="Material" id=5]
+[ext_resource path="res://Scenes/Nets.gd" type="Script" id=7]
+[ext_resource path="res://Materials/post.tres" type="Material" id=8]
+[ext_resource path="res://Images/score.png" type="Texture" id=9]
+[ext_resource path="res://Scenes/ThreeDLine.tscn" type="PackedScene" id=14]
+
+[sub_resource type="PhysicsMaterial" id=116]
+friction = 0.5
+bounce = 0.5
+
+[sub_resource type="PhysicsMaterial" id=3]
+friction = 0.01
+bounce = 0.02
+absorbent = true
+
+[sub_resource type="BoxShape" id=4]
+extents = Vector3( 3.83565, 4.90455, 15.3655 )
+
+[sub_resource type="PlaneMesh" id=9]
+size = Vector2( 4, 4 )
+
+[sub_resource type="SpatialMaterial" id=10]
+flags_transparent = true
+flags_unshaded = true
+albedo_color = Color( 0.96, 0.75632, 0.3168, 1 )
+albedo_texture = ExtResource( 9 )
+
+[sub_resource type="CubeMesh" id=117]
+material = ExtResource( 8 )
+size = Vector3( 0.33, 12, 0.33 )
+
+[node name="Goal" instance=ExtResource( 1 )]
+
+[node name="Post" parent="RootNode/Goal" index="0"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0 )
+material/0 = ExtResource( 8 )
+__meta__ = {
+"_editor_description_": "
+
+
+"
+}
+
+[node name="StaticBody" parent="RootNode/Goal/Post" index="0"]
+collision_layer = 4194304
+collision_mask = 36
+physics_material_override = SubResource( 116 )
+
+[node name="Net1" parent="RootNode/Goal" index="1"]
+transform = Transform( 106.241, 0, 0, 0, 104.837, 0, 0, 0, 109.869, 0, 0, 0 )
+collision_layer = 8
+collision_mask = 4
+physics_material_override = SubResource( 3 )
+
+[node name="CollisionShape" parent="RootNode/Goal/Net1" index="0"]
+visible = false
+
+[node name="Base" parent="RootNode/Goal" index="2"]
+transform = Transform( 100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0 )
+material/0 = ExtResource( 8 )
+
+[node name="Center" type="Spatial" parent="." index="1"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.19128, 0 )
+
+[node name="Right" type="Spatial" parent="." index="2"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.191, -13.0355 )
+
+[node name="Left" type="Spatial" parent="." index="3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.191, 13.0363 )
+
+[node name="AreaScored" type="Area" parent="." index="4"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8061, 4.20106, 0 )
+collision_layer = 64
+collision_mask = 4
+monitorable = false
+
+[node name="ScoreBox" type="CollisionShape" parent="AreaScored" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.23797, 0.750688, 0 )
+shape = SubResource( 4 )
+
+[node name="Nets" type="Spatial" parent="." index="5"]
+script = ExtResource( 7 )
+
+[node name="Nettest" type="MeshInstance" parent="Nets" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1.1, 0, 0.509838, 0 )
+mesh = ExtResource( 4 )
+material/0 = ExtResource( 5 )
+script = ExtResource( 2 )
+
+[node name="RefPoint" type="Spatial" parent="." index="6"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.75077, 0, 0 )
+
+[node name="Spatial" type="Spatial" parent="." index="7"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.14501, 11.41, -3.81015 )
+
+[node name="Target" type="MeshInstance" parent="." index="8"]
+transform = Transform( -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0 )
+visible = false
+mesh = SubResource( 9 )
+material/0 = SubResource( 10 )
+
+[node name="Stantion1" type="MeshInstance" parent="." index="9"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 6, -19 )
+mesh = SubResource( 117 )
+material/0 = ExtResource( 8 )
+
+[node name="Stantion2" type="MeshInstance" parent="." index="10"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 6, 19 )
+mesh = SubResource( 117 )
+material/0 = ExtResource( 8 )
+
+[node name="ThreeDLine2" parent="." index="11" instance=ExtResource( 14 )]
+material_override = ExtResource( 8 )
+p2 = Vector3( 100, 0, 0 )
+draw = true
+thick = 2.0
+
+[node name="SP2" type="Spatial" parent="." index="12"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 12, 19 )
+
+[node name="ThreeDLine1" parent="." index="13" instance=ExtResource( 14 )]
+material_override = ExtResource( 8 )
+p1 = Vector3( 0, 0, 100 )
+p2 = Vector3( 0, 10, 0 )
+draw = true
+thick = 20.0
+
+[node name="SP1" type="Spatial" parent="." index="14"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 12, -19 )

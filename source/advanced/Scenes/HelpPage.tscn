@@ -1,0 +1,323 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://Res/Republiko-Outline3.otf" type="DynamicFontData" id=1]
+[ext_resource path="res://Res/UI.tres" type="Theme" id=2]
+[ext_resource path="res://Scenes/Transition.tscn" type="PackedScene" id=3]
+[ext_resource path="res://HelpPage.gd" type="Script" id=4]
+[ext_resource path="res://Res/OLDBLEND.ttf" type="DynamicFontData" id=5]
+[ext_resource path="res://Images/controllericoninfo.png" type="Texture" id=6]
+[ext_resource path="res://Images/lineLight36.png" type="Texture" id=7]
+[ext_resource path="res://Images/lineLight37.png" type="Texture" id=8]
+[ext_resource path="res://Images/lineLight34.png" type="Texture" id=9]
+[ext_resource path="res://Images/lineLight35.png" type="Texture" id=10]
+[ext_resource path="res://Images/lineLight39.png" type="Texture" id=11]
+[ext_resource path="res://Images/lineLight38.png" type="Texture" id=12]
+
+[sub_resource type="DynamicFont" id=1]
+size = 220
+outline_size = 6
+outline_color = Color( 0.960784, 0.796078, 0.439216, 1 )
+use_mipmaps = true
+use_filter = true
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 137
+outline_size = 9
+outline_color = Color( 0.976471, 0.952941, 0.952941, 1 )
+use_mipmaps = true
+use_filter = true
+font_data = ExtResource( 5 )
+
+[node name="HelpPage" type="Control"]
+theme = ExtResource( 2 )
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="ColorRect" parent="."]
+margin_right = 1031.0
+margin_bottom = 580.0
+mouse_filter = 2
+color = Color( 0.0941176, 0.215686, 0.321569, 1 )
+
+[node name="Label" type="Label" parent="TextureRect"]
+anchor_left = 0.996
+anchor_top = 0.088
+anchor_right = 1.0
+anchor_bottom = 0.088
+margin_left = -491.876
+margin_top = 26.96
+margin_right = -269.288
+margin_bottom = 139.96
+text = "up :
+down :
+left :
+right :"
+align = 2
+
+[node name="Label2" type="Label" parent="TextureRect"]
+anchor_left = 0.964
+anchor_top = 0.331
+anchor_right = 1.0
+anchor_bottom = 0.398
+margin_left = -489.884
+margin_top = 7.01999
+margin_right = -272.0
+margin_bottom = 134.16
+custom_constants/line_spacing = 9
+text = "pass :
+shoot / header :
+chip pass /cross / slide :
+through pass :
+"
+align = 2
+
+[node name="Label3" type="Label" parent="TextureRect"]
+anchor_left = 0.442
+anchor_top = 0.637
+anchor_right = 0.442
+anchor_bottom = 0.637
+margin_left = 155.298
+margin_top = 1.53998
+margin_right = 301.298
+margin_bottom = 56.54
+text = "burst / sprint :
+"
+align = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+self_modulate = Color( 1, 1, 1, 0.666667 )
+margin_left = 107.0
+margin_top = -1.0
+margin_right = 170.0
+margin_bottom = 582.0
+mouse_filter = 2
+color = Color( 0.156863, 0.372549, 0.168627, 1 )
+
+[node name="ColorRect2" type="ColorRect" parent="."]
+self_modulate = Color( 1, 1, 1, 0.666667 )
+margin_left = 187.0
+margin_top = -1.0
+margin_right = 223.0
+margin_bottom = 581.0
+mouse_filter = 2
+color = Color( 0.0714, 0.17, 0.07633, 1 )
+
+[node name="Label3" type="Label" parent="."]
+visible = false
+modulate = Color( 0.27451, 0.235294, 0.156863, 1 )
+self_modulate = Color( 1, 1, 1, 0.109804 )
+margin_left = 295.0
+margin_top = 98.0
+margin_right = 631.0
+margin_bottom = 354.0
+custom_colors/font_color = Color( 0.6, 0.0980392, 0.0980392, 1 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 1 )
+text = "23"
+
+[node name="Controllericoninfo" type="Sprite" parent="."]
+visible = false
+position = Vector2( 600, 220 )
+texture = ExtResource( 6 )
+
+[node name="Label2" type="Label" parent="."]
+visible = false
+margin_left = 281.0
+margin_top = 79.0
+margin_right = 589.0
+margin_bottom = 335.0
+custom_colors/font_color = Color( 0.6, 0.0980392, 0.0980392, 1 )
+custom_constants/line_spacing = 0
+custom_fonts/font = SubResource( 1 )
+text = "23"
+
+[node name="Label5" type="Label" parent="."]
+margin_left = 34.0
+margin_top = 38.0
+margin_right = 367.0
+margin_bottom = 350.0
+custom_colors/font_color = Color( 0.980392, 0.976471, 0.952941, 1 )
+custom_colors/font_outline_modulate = Color( 1, 0.83347, 0.472656, 1 )
+custom_constants/shadow_offset_x = 5
+custom_constants/line_spacing = -30
+custom_constants/shadow_offset_y = 4
+custom_constants/shadow_as_outline = 0
+custom_fonts/font = SubResource( 2 )
+text = "super
+liquid
+soccer"
+
+[node name="Keys" type="Control" parent="."]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+margin_right = 1031.0
+margin_bottom = 580.0
+
+[node name="Pass" type="Label" parent="Keys"]
+anchor_left = 0.828
+anchor_top = 0.371
+anchor_right = 0.828
+anchor_bottom = 0.752
+margin_left = -77.668
+margin_top = -14.18
+margin_right = -36.668
+margin_bottom = -171.06
+text = "<M>"
+
+[node name="Up" type="Label" parent="Keys"]
+anchor_left = 0.892
+anchor_top = 0.371
+anchor_right = 0.892
+anchor_bottom = 0.752
+margin_left = -145.663
+margin_top = -136.08
+margin_right = -104.663
+margin_bottom = -292.96
+text = "<W>"
+
+[node name="Down" type="Label" parent="Keys"]
+anchor_left = 0.892
+anchor_top = 0.371
+anchor_right = 0.892
+anchor_bottom = 0.752
+margin_left = -141.663
+margin_top = -107.08
+margin_right = -100.663
+margin_bottom = -263.96
+text = "<S>"
+
+[node name="Left" type="Label" parent="Keys"]
+anchor_left = 0.892
+anchor_top = 0.371
+anchor_right = 0.892
+anchor_bottom = 0.752
+margin_left = -142.663
+margin_top = -79.08
+margin_right = -101.663
+margin_bottom = -235.96
+text = "<A>"
+
+[node name="Right" type="Label" parent="Keys"]
+anchor_left = 0.892
+anchor_top = 0.371
+anchor_right = 0.892
+anchor_bottom = 0.752
+margin_left = -141.663
+margin_top = -49.08
+margin_right = -100.663
+margin_bottom = -205.96
+text = "<D>"
+
+[node name="Shoot" type="Label" parent="Keys"]
+anchor_left = 0.828
+anchor_top = 0.437
+anchor_right = 0.828
+anchor_bottom = 0.437
+margin_left = -77.6681
+margin_top = -16.46
+margin_right = -37.6682
+margin_bottom = 9.53999
+text = "<J>"
+
+[node name="Chip" type="Label" parent="Keys"]
+anchor_left = 0.828
+anchor_top = 0.495
+anchor_right = 0.828
+anchor_bottom = 0.495
+margin_left = -76.668
+margin_top = -16.1
+margin_right = -35.668
+margin_bottom = 9.89999
+text = "<L>"
+
+[node name="Thru" type="Label" parent="Keys"]
+anchor_left = 0.828
+anchor_top = 0.555
+anchor_right = 0.828
+anchor_bottom = 0.555
+margin_left = -76.668
+margin_top = -12.9
+margin_right = -36.668
+margin_bottom = 13.1001
+text = "<I>"
+
+[node name="Burst" type="Label" parent="Keys"]
+anchor_left = 0.645
+anchor_top = 0.634
+anchor_right = 0.817
+anchor_bottom = 0.634
+margin_left = 111.005
+margin_top = 3.28003
+margin_right = 151.005
+margin_bottom = 29.28
+text = "<P>"
+
+[node name="Switch" type="Label" parent="Keys"]
+visible = false
+anchor_left = 0.644
+anchor_top = 0.698
+anchor_right = 0.657
+anchor_bottom = 0.698
+margin_right = 40.0
+margin_bottom = 26.0
+text = "<U>"
+
+[node name="Low" type="Label" parent="Keys"]
+visible = false
+anchor_left = 0.644
+anchor_top = 0.753
+anchor_right = 0.644
+anchor_bottom = 0.753
+margin_right = 40.0
+margin_bottom = 26.0
+text = "<Q>"
+
+[node name="LineLight34" type="Sprite" parent="Keys"]
+visible = false
+position = Vector2( 732, 171 )
+scale = Vector2( 0.4, 0.4 )
+texture = ExtResource( 9 )
+
+[node name="LineLight36" type="Sprite" parent="Keys"]
+visible = false
+position = Vector2( 732, 205 )
+scale = Vector2( 0.4, 0.4 )
+texture = ExtResource( 7 )
+
+[node name="LineLight37" type="Sprite" parent="Keys"]
+visible = false
+position = Vector2( 732, 276 )
+scale = Vector2( 0.4, 0.4 )
+texture = ExtResource( 8 )
+
+[node name="LineLight35" type="Sprite" parent="Keys"]
+visible = false
+position = Vector2( 732, 241 )
+scale = Vector2( 0.4, 0.4 )
+texture = ExtResource( 10 )
+
+[node name="LineLight39" type="Sprite" parent="Keys"]
+visible = false
+position = Vector2( 621, 317 )
+scale = Vector2( 0.4, 0.4 )
+texture = ExtResource( 11 )
+
+[node name="LineLight38" type="Sprite" parent="Keys/LineLight39"]
+position = Vector2( -0.00012207, 77.4999 )
+texture = ExtResource( 12 )
+
+[node name="BackButton" type="Button" parent="."]
+anchor_right = 0.298
+margin_left = 409.0
+margin_top = 459.0
+margin_right = 651.0
+margin_bottom = 504.0
+text = "back"
+
+[node name="Transition" parent="." instance=ExtResource( 3 )]
+margin_right = 1031.0
+margin_bottom = 580.0
+
+[connection signal="pressed" from="BackButton" to="." method="_on_BackButton_pressed"]

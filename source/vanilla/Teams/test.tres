@@ -1,0 +1,80 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://Team.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+teamname = "Argentina"
+shortname = "Arg"
+Shirt1Color = Color( 0.909804, 0.933333, 0.945098, 1 )
+Shirt2Color = Color( 0.243137, 0.521569, 0.686275, 1 )
+ShortColor = Color( 0.0431373, 0.129412, 0.203922, 1 )
+KeeperColor = Color( 0.803922, 0.552941, 0.164706, 1 )
+altShirt1Color = Color( 0.0392157, 0.137255, 0.215686, 1 )
+altShirt2Color = Color( 0.0431373, 0.105882, 0.2, 1 )
+altShortColor = Color( 0.027451, 0.101961, 0.192157, 1 )
+numberColor = Color( 0, 0, 0, 1 )
+shirtType = 2
+level = 0
+tictacs = 4
+aggression = 2
+player0 = {
+"aggression": 22.0,
+"agility": 4,
+"name": "E Martinez",
+"shoot": 0.5,
+"smart": 10,
+"speed": 3
+}
+player1 = {
+"aggression": 0.75,
+"agility": 5,
+"name": "G Heinz",
+"shoot": 0.5,
+"smart": 10,
+"speed": 3
+}
+player2 = {
+"aggression": 0.5,
+"agility": 4,
+"name": "A DiStefano",
+"shoot": 1.0,
+"smart": 8,
+"speed": 3
+}
+player3 = {
+"aggression": 0.5,
+"agility": 5,
+"name": "D Madonna",
+"shoot": 1.0,
+"smart": 6,
+"speed": 6
+}
+player4 = {
+"aggression": 0.5,
+"agility": 6,
+"name": "L Messy",
+"shoot": 1.0,
+"smart": 6,
+"speed": 6
+}
+player5 = {
+"aggression": 0.75,
+"agility": 5,
+"name": "M Batigol",
+"shoot": 1.0,
+"smart": 9,
+"speed": 3
+}
+player6 = {
+"aggression": 0.5,
+"agility": 6,
+"name": "M Kempes",
+"shoot": 1.0,
+"size": 5,
+"smart": 8,
+"speed": 3
+}
+def = [ Vector2( 0.35, 0.82743 ), Vector2( 0.592117, 0.834043 ), Vector2( 0.468157, 0.663929 ), Vector2( 0.25, 0.6 ), Vector2( 0.7, 0.6 ), Vector2( 0.470395, 0.786494 ) ]
+mid = [ Vector2( 0.3, 0.68 ), Vector2( 0.65, 0.68 ), Vector2( 0.56573, 0.545717 ), Vector2( 0.25, 0.35 ), Vector2( 0.7, 0.35 ), Vector2( 0.384668, 0.545014 ) ]
+att = [ Vector2( 0.3, 0.46 ), Vector2( 0.65, 0.5 ), Vector2( 0.456011, 0.189642 ), Vector2( 0.25, 0.16 ), Vector2( 0.7, 0.15 ), Vector2( 0.504884, 0.312707 ) ]

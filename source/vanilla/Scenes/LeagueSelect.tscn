@@ -1,0 +1,647 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://Res/OLDBLEND.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://Res/UI.tres" type="Theme" id=2]
+[ext_resource path="res://Scenes/Cups.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Scenes/Transition.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Res/Cups.tres" type="Environment" id=6]
+
+[sub_resource type="GDScript" id=6]
+script/source = "extends Control
+
+var teams
+var teamfiles
+var cup=0
+var playerTeam=0
+var isLeague=false
+var cups = [\"beginner\",\"semi-pro\",\"professional\",\"international\"]
+var currcup=null
+
+var docomp=[1,0,0,0,0,0,0,0,0,0]
+var levs=[1,1,0]
+var teamz=[] # array of teams to pick from
+var selteamz=[] # array of teams to go to tourney
+var cupz=[]
+var rounds=2
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	Global.teams=[]
+	Global.teamfiles=[]
+	teams=Global.teams
+	teamfiles=Global.teamfiles
+	# read in teams
+	#readLevel(0)
+	readTeams()
+	
+	$ColorRect/ViewportContainer/Viewport/Cups._showCup(5)
+	#readLevel(2)
+	fillList()
+	
+	currcup=$ColorRect/ViewportContainer/Viewport/Cups/Cups/Cup6
+	$ColorRect/SelectBtn.grab_focus()
+func _physics_process(delta):
+	
+	currcup.rotation_degrees.y+=10.0*delta
+	
+func readTeams():
+	# READ ALL THE TEAMS!
+	var dir=Directory.new()
+	teams.clear()
+	teamfiles.clear()
+	teams = Global.teams
+	for i in range(1,4):
+	#Global._eprint(l)
+		var l=str(i)
+		if dir.open(\"res://Teams/\"+l+\"/\") == OK:
+			dir.list_dir_begin(true,true)
+			var filen = dir.get_next()
+			while (filen!=\"\"):
+				var fn=\"res://Teams/\"+l+\"/\"+filen
+				var t = load(fn)
+				teams.append(t)
+				teamfiles.append(fn)
+				#Global._eprint(t.teamname)
+				filen=dir.get_next()
+			dir.list_dir_end()
+		
+	
+func checkSaveCup():
+	var fname=\"user://cup\"+str(cup)+\".save\"
+	var save_game = File.new()
+	return save_game.file_exists(fname)
+func checkSaveLeague():
+	var fname=\"user://league\"+str(cup)+\".save\"
+	var save_game = File.new()
+	return save_game.file_exists(fname)
+
+#func _input(event):
+#
+#	if event.is_action_pressed(\"ui_right\"):
+#		cup=(cup+1) % 4
+#		$ColorRect/ViewportContainer/Viewport/Cups._dorotate(cup)
+#		$ColorRect/CupName.text=cups[cup]
+#		currcup=cupz[cup]
+#	# update the teams for that cup
+#		readLevel(3-cup)
+#		fillList()
+#	# if we've not won the prior cup, lock it!
+#		if cup==1 and Global.stats.stats_dict.amcups<1:
+#			$ColorRect/SelectBtn.text=\"Locked\"
+#			$ColorRect/SelectBtn.disabled=true
+#		elif cup==2 and Global.stats.stats_dict.procups<1:
+#			$ColorRect/SelectBtn.text=\"Locked\"
+#		elif cup==3 and Global.stats.stats_dict.chumpcups<1:
+#			$ColorRect/SelectBtn.disabled=true
+#			$ColorRect/SelectBtn.text=\"Locked\"
+#
+#		else:
+#			$ColorRect/SelectBtn.disabled=true
+#			$ColorRect/SelectBtn.text=\"Select\"
+#			$ColorRect/SelectBtn.disabled=false
+#
+		
+# fill teams in UI
+func fillList():
+	# for now just grab all the teams
+	teamz.clear()
+	
+	$ColorRect/CupTeams.clear()
+	for i in range(teams.size()):
+		for j in range(0,10):
+			if docomp[j]:
+				if teams[i].League==j:
+					if levs[teams[i].level-1]:
+						$ColorRect/CupTeams.add_item(teams[i].teamname)
+						teamz.append(i)
+						break
+					
+	$ColorRect/CupTeams.select(0)
+
+# select player team
+func _on_CupTeams_item_selected(_index):
+	# select team
+	playerTeam=_index
+	
+	
+# go back to menu
+func _on_backBtn_pressed():
+	# go back to main menu
+	$ColorRect/Transition._wipeOff()
+	yield($ColorRect/Transition/Tween,\"tween_completed\")
+	
+	var _foo=get_tree().change_scene(\"res://Scenes/Menu.tscn\")
+
+
+func _on_SelectBtn_pressed():
+	# go to tournement screen
+	print (\"creating tournament\")
+	
+	if selteamz.size()%2==1:
+		$ColorRect/teamsLabel.text=\"Need even number of teams - \"+str(selteamz.size()) + \" / 18 teams\"
+		return
+	
+	Global.tournament = load(\"res://Scenes/LeagueTournament.tscn\").instance()
+	Global.tournament._initLeague(selteamz,rounds,playerTeam,cup) # depends on cup TODO
+	Global.tTeam=selteamz[playerTeam]
+	var _foo=get_tree().change_scene(\"res://Scenes/LeagueViewer.tscn\")
+
+func _on_CupTeams_item_activated(_index):
+	# select team
+	$ColorRect/SelectBtn.grab_focus()
+
+
+func _on_ContinueButton_pressed():
+	if Global.tType==0:
+		Global.tournament = load(\"res://Scenes/CupTournament.tscn\").instance()
+		var res=Global.tournament._continueCup(cup)
+		if (res):
+			Global.tTeam=Global.tournament.pteam
+			var _foo=get_tree().change_scene(\"res://Scenes/CupViewer.tscn\")
+		else:
+			print(\"no save file!\")
+	else:
+		Global.tournament = load(\"res://Scenes/LeagueTournament.tscn\").instance()
+		Global.tournament._continueLeague(cup) # depends on cup TODO
+		#Global.tTeam=playerTeam
+		Global.tTeam=Global.tournament.playerteam
+		var _foo=get_tree().change_scene(\"res://Scenes/LeagueViewer.tscn\")
+
+	
+
+func _on_CheckBoxEng_toggled(button_pressed):
+	docomp[0]=button_pressed
+	fillList()
+	
+
+
+func _on_CheckBoxEsp_toggled(button_pressed):
+	docomp[1]=button_pressed
+	fillList()
+
+func _on_CheckBoxFra_toggled(button_pressed):
+	docomp[2]=button_pressed
+	fillList()
+
+
+func _on_CheckBoxIta_toggled(button_pressed):
+	docomp[3]=button_pressed
+	fillList()
+
+
+func _on_CheckBoxUSA_toggled(button_pressed):
+	docomp[4]=button_pressed
+	fillList()
+
+func _on_CheckBoxBra_toggled(button_pressed):
+	docomp[5]=button_pressed
+	fillList()
+
+func _on_CheckBoxArg_toggled(button_pressed):
+	docomp[6]=button_pressed
+	fillList()
+
+func _on_CheckBoxEuropa_toggled(button_pressed):
+	docomp[7]=button_pressed
+	fillList()
+
+func _on_CheckBoxSAm_toggled(button_pressed):
+	docomp[8]=button_pressed
+	fillList()
+
+func _on_CheckBoxWorld_toggled(button_pressed):
+	docomp[9]=button_pressed
+	fillList()
+
+func _on_Level1Button_toggled(button_pressed):
+	levs[0]=button_pressed
+	fillList()
+
+func _on_Level2Button_toggled(button_pressed):
+	levs[1]=button_pressed
+	fillList()
+
+func _on_Level3Button_toggled(button_pressed):
+	levs[2]=button_pressed
+	fillList()
+
+
+func _on_AddSelectedButton_pressed():
+	# copy selected teams to league 
+	#$ColorRect/CupTeamsEntered.clear()
+	var sel=$ColorRect/CupTeams.get_selected_items()
+	var added=false
+	for i in range(sel.size()):
+		added=false
+		for j in range(selteamz.size()):
+			if teamz[sel[i]]==selteamz[j]:
+				added=true
+		if !added:
+			$ColorRect/CupTeamsEntered.add_item(teams[teamz[sel[i]]].teamname)
+			selteamz.append(teamz[sel[i]])
+	$ColorRect/teamsLabel.text=str(selteamz.size()) + \" teams / 18 max\"
+
+func _on_AddAllButton_pressed():
+	# copy all teams to league
+	var added=false
+	for i in range(teamz.size()):
+		added=false
+		for j in range(selteamz.size()):
+			if teamz[i]==selteamz[j]:
+				added=true
+		if !added:
+			$ColorRect/CupTeamsEntered.add_item(teams[teamz[i]].teamname)
+			selteamz.append(teamz[i])
+	$ColorRect/teamsLabel.text=str(selteamz.size()) + \" teams / 18 max\"
+
+func _on_ClearButton_pressed():
+	$ColorRect/CupTeamsEntered.clear()
+	selteamz.clear()
+
+func _on_RemoveButton_pressed():
+	var rem=$ColorRect/CupTeamsEntered.get_selected_items()
+	if rem:
+		$ColorRect/CupTeamsEntered.remove_item(rem[0])
+		selteamz.remove(rem[0])
+		$ColorRect/teamsLabel.text=str(selteamz.size()) + \" teams / 18 max\"
+"
+
+[sub_resource type="DynamicFont" id=1]
+size = 80
+use_mipmaps = true
+use_filter = true
+font_data = ExtResource( 1 )
+
+[sub_resource type="World" id=2]
+environment = ExtResource( 6 )
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[node name="LeagueSelect" type="Control"]
+theme = ExtResource( 2 )
+script = SubResource( 6 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 1920.0
+margin_bottom = 1080.0
+rect_pivot_offset = Vector2( -726.805, 449.317 )
+color = Color( 0.803922, 0.231373, 0.231373, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="ColorRect"]
+anchor_left = 0.297
+anchor_top = 0.065
+anchor_right = 0.5
+anchor_bottom = 0.2
+margin_left = -0.23999
+margin_top = -0.199997
+margin_right = 242.0
+margin_bottom = -74.0
+custom_colors/font_color = Color( 0.960784, 0.796078, 0.439216, 1 )
+custom_fonts/font = SubResource( 1 )
+text = "league tournament"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ViewportContainer" type="ViewportContainer" parent="ColorRect"]
+anchor_left = 0.183
+anchor_top = 0.1
+anchor_right = 0.567
+anchor_bottom = 0.583
+margin_left = 1039.64
+margin_top = 46.0
+margin_right = 827.36
+margin_bottom = 50.36
+stretch = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Viewport" type="Viewport" parent="ColorRect/ViewportContainer"]
+size = Vector2( 524, 526 )
+own_world = true
+world = SubResource( 2 )
+handle_input_locally = false
+msaa = 4
+render_target_update_mode = 3
+
+[node name="Cups" parent="ColorRect/ViewportContainer/Viewport" instance=ExtResource( 4 )]
+
+[node name="CupName" type="Label" parent="ColorRect"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.307
+anchor_top = 0.128
+anchor_right = 0.675
+anchor_bottom = 0.136
+margin_left = -572.08
+margin_top = 22.16
+margin_right = 622.0
+margin_bottom = 65.8
+text = "select player team:"
+align = 1
+
+[node name="SelectBtn" type="Button" parent="ColorRect"]
+anchor_left = 0.43
+anchor_top = 0.848
+anchor_right = 0.571
+anchor_bottom = 0.855
+margin_right = 6.0
+margin_bottom = 50.0
+focus_neighbour_left = NodePath("../backBtn")
+focus_neighbour_top = NodePath("../CupTeams")
+focus_neighbour_right = NodePath("../CupTeams")
+text = "start league"
+
+[node name="backBtn" type="Button" parent="ColorRect"]
+anchor_left = 0.272
+anchor_top = 0.848
+anchor_right = 0.36
+anchor_bottom = 0.855
+margin_right = 6.0
+margin_bottom = 50.0
+text = "back"
+
+[node name="CupTeams" type="ItemList" parent="ColorRect"]
+margin_left = 93.0
+margin_top = 198.0
+margin_right = 552.0
+margin_bottom = 751.0
+rect_scale = Vector2( 1, 1.0023 )
+focus_neighbour_left = NodePath("../SelectBtn")
+focus_neighbour_top = NodePath("../SelectBtn")
+focus_neighbour_right = NodePath("../AddSelectedButton")
+focus_neighbour_bottom = NodePath("../SelectBtn")
+theme = ExtResource( 2 )
+custom_colors/guide_color = Color( 0, 0, 0, 0 )
+custom_colors/font_color_selected = Color( 1, 1, 1, 1 )
+custom_colors/font_color = Color( 0.678431, 0.678431, 0.678431, 1 )
+custom_constants/vseparation = 0
+custom_constants/line_separation = 0
+custom_constants/icon_margin = 0
+custom_constants/hseparation = 0
+custom_styles/bg = SubResource( 3 )
+select_mode = 1
+allow_reselect = true
+same_column_width = true
+fixed_column_width = 256
+icon_mode = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CupTeamsEntered" type="ItemList" parent="ColorRect"]
+anchor_left = 0.355
+anchor_right = 0.371
+margin_left = 121.48
+margin_top = 194.0
+margin_right = 574.68
+margin_bottom = 657.0
+rect_scale = Vector2( 1, 1.0023 )
+focus_neighbour_left = NodePath("../SelectBtn")
+focus_neighbour_top = NodePath("../SelectBtn")
+focus_neighbour_right = NodePath("../SelectBtn")
+focus_neighbour_bottom = NodePath("../SelectBtn")
+theme = ExtResource( 2 )
+custom_colors/guide_color = Color( 0, 0, 0, 0 )
+custom_colors/font_color_selected = Color( 1, 1, 1, 1 )
+custom_colors/font_color = Color( 0.678431, 0.678431, 0.678431, 1 )
+custom_constants/vseparation = 0
+custom_constants/line_separation = 0
+custom_constants/icon_margin = 0
+custom_constants/hseparation = 0
+custom_styles/bg = SubResource( 3 )
+allow_reselect = true
+same_column_width = true
+fixed_column_width = 256
+icon_mode = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ContinueButton" type="Button" parent="ColorRect"]
+anchor_left = 0.597
+anchor_top = 0.848
+anchor_right = 0.727
+anchor_bottom = 0.855
+margin_right = 6.0
+margin_bottom = 50.0
+text = "load..."
+
+[node name="Label2" type="Label" parent="ColorRect"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.122
+anchor_top = 0.147
+anchor_right = 0.168
+anchor_bottom = 0.154
+margin_left = -0.240005
+margin_top = 0.240005
+margin_right = 95.44
+margin_bottom = 32.68
+text = "select teams:"
+
+[node name="FilterButtons" type="Control" parent="ColorRect"]
+anchor_left = 0.276
+anchor_top = 0.622
+anchor_right = 0.716
+anchor_bottom = 0.724
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="Level1Button" type="Button" parent="ColorRect/FilterButtons"]
+anchor_left = 0.071
+anchor_right = 0.134
+margin_right = 6.0
+margin_bottom = 40.0
+toggle_mode = true
+pressed = true
+text = "1"
+
+[node name="Level2Button" type="Button" parent="ColorRect/FilterButtons"]
+anchor_left = 0.071
+anchor_top = 0.402
+anchor_right = 0.134
+anchor_bottom = 0.402
+margin_right = 6.0
+margin_bottom = 40.0
+toggle_mode = true
+pressed = true
+text = "2"
+
+[node name="Level3Button" type="Button" parent="ColorRect/FilterButtons"]
+anchor_left = 0.071
+anchor_top = 0.807
+anchor_right = 0.134
+anchor_bottom = 0.823
+margin_right = 6.0
+margin_bottom = 40.0
+toggle_mode = true
+text = "3"
+
+[node name="CheckBoxEng" type="CheckBox" parent="ColorRect/FilterButtons"]
+anchor_left = 0.2
+anchor_top = 0.401
+anchor_right = 0.302
+anchor_bottom = 0.401
+margin_right = 22.0
+margin_bottom = 40.0
+pressed = true
+text = "Brit"
+
+[node name="CheckBoxEsp" type="CheckBox" parent="ColorRect/FilterButtons"]
+anchor_left = 0.389
+anchor_top = 0.401
+anchor_right = 0.491
+anchor_bottom = 0.401
+margin_right = 22.0
+margin_bottom = 40.0
+text = "Esp"
+
+[node name="CheckBoxFra" type="CheckBox" parent="ColorRect/FilterButtons"]
+anchor_left = 0.554
+anchor_top = 0.401
+anchor_right = 0.649
+anchor_bottom = 0.401
+margin_right = 22.0
+margin_bottom = 40.0
+text = "Fra"
+
+[node name="CheckBoxIta" type="CheckBox" parent="ColorRect/FilterButtons"]
+anchor_left = 0.719
+anchor_top = 0.401
+anchor_right = 0.814
+anchor_bottom = 0.401
+margin_right = 22.0
+margin_bottom = 40.0
+text = "Ita"
+
+[node name="CheckBoxUSA" type="CheckBox" parent="ColorRect/FilterButtons"]
+anchor_left = 0.885
+anchor_top = 0.401
+anchor_right = 0.984
+anchor_bottom = 0.401
+margin_right = 22.0
+margin_bottom = 40.0
+text = "USA"
+
+[node name="CheckBoxBra" type="CheckBox" parent="ColorRect/FilterButtons"]
+anchor_left = 0.2
+anchor_top = 0.859
+anchor_right = 0.302
+anchor_bottom = 0.859
+margin_right = 22.0
+margin_bottom = 40.0
+text = "Bra"
+
+[node name="CheckBoxArg" type="CheckBox" parent="ColorRect/FilterButtons"]
+anchor_left = 0.389
+anchor_top = 0.859
+anchor_right = 0.491
+anchor_bottom = 0.859
+margin_right = 22.0
+margin_bottom = 40.0
+text = "Arg"
+
+[node name="CheckBoxEuropa" type="CheckBox" parent="ColorRect/FilterButtons"]
+anchor_left = 0.554
+anchor_top = 0.859
+anchor_right = 0.649
+anchor_bottom = 0.859
+margin_right = 22.0
+margin_bottom = 40.0
+text = "Eur"
+
+[node name="CheckBoxSAm" type="CheckBox" parent="ColorRect/FilterButtons"]
+anchor_left = 0.719
+anchor_top = 0.859
+anchor_right = 0.814
+anchor_bottom = 0.859
+margin_right = 62.9069
+margin_bottom = 40.0
+text = "SAm"
+
+[node name="CheckBoxWorld" type="CheckBox" parent="ColorRect/FilterButtons"]
+anchor_left = 0.885
+anchor_top = 0.859
+anchor_right = 0.984
+anchor_bottom = 0.859
+margin_right = 22.0
+margin_bottom = 40.0
+text = "ROW"
+
+[node name="Transition" parent="ColorRect" instance=ExtResource( 5 )]
+visible = false
+
+[node name="AddSelectedButton" type="Button" parent="ColorRect"]
+anchor_left = 0.29
+anchor_top = 0.26
+anchor_right = 0.408
+anchor_bottom = 0.284
+margin_right = 6.0
+margin_bottom = 40.0
+focus_neighbour_right = NodePath("../CupTeamsEntered")
+text = "add selected"
+
+[node name="AddAllButton" type="Button" parent="ColorRect"]
+anchor_left = 0.29
+anchor_top = 0.354
+anchor_right = 0.408
+anchor_bottom = 0.378
+margin_right = 6.0
+margin_bottom = 40.0
+text = "add all"
+
+[node name="ClearButton" type="Button" parent="ColorRect"]
+anchor_left = 0.292
+anchor_top = 0.448
+anchor_right = 0.41
+anchor_bottom = 0.448
+margin_right = 6.0
+margin_bottom = 40.0
+text = "clear"
+
+[node name="RemoveButton" type="Button" parent="ColorRect"]
+anchor_left = 0.292
+anchor_top = 0.536
+anchor_right = 0.41
+anchor_bottom = 0.536
+margin_right = 6.0
+margin_bottom = 40.0
+text = "remove >"
+
+[node name="teamsLabel" type="Label" parent="ColorRect"]
+anchor_left = 0.504
+anchor_top = 0.614
+anchor_right = 0.512
+anchor_bottom = 0.614
+margin_left = -252.68
+margin_top = -0.119995
+margin_right = 435.96
+margin_bottom = 33.88
+text = "18 teams max"
+align = 1
+
+[connection signal="pressed" from="ColorRect/SelectBtn" to="." method="_on_SelectBtn_pressed"]
+[connection signal="pressed" from="ColorRect/backBtn" to="." method="_on_backBtn_pressed"]
+[connection signal="item_activated" from="ColorRect/CupTeamsEntered" to="." method="_on_CupTeams_item_activated"]
+[connection signal="item_selected" from="ColorRect/CupTeamsEntered" to="." method="_on_CupTeams_item_selected"]
+[connection signal="pressed" from="ColorRect/ContinueButton" to="." method="_on_ContinueButton_pressed"]
+[connection signal="toggled" from="ColorRect/FilterButtons/Level1Button" to="." method="_on_Level1Button_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/Level2Button" to="." method="_on_Level2Button_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/Level3Button" to="." method="_on_Level3Button_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/CheckBoxEng" to="." method="_on_CheckBoxEng_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/CheckBoxEsp" to="." method="_on_CheckBoxEsp_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/CheckBoxFra" to="." method="_on_CheckBoxFra_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/CheckBoxIta" to="." method="_on_CheckBoxIta_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/CheckBoxUSA" to="." method="_on_CheckBoxUSA_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/CheckBoxBra" to="." method="_on_CheckBoxBra_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/CheckBoxArg" to="." method="_on_CheckBoxArg_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/CheckBoxEuropa" to="." method="_on_CheckBoxEuropa_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/CheckBoxSAm" to="." method="_on_CheckBoxSAm_toggled"]
+[connection signal="toggled" from="ColorRect/FilterButtons/CheckBoxWorld" to="." method="_on_CheckBoxWorld_toggled"]
+[connection signal="pressed" from="ColorRect/AddSelectedButton" to="." method="_on_AddSelectedButton_pressed"]
+[connection signal="pressed" from="ColorRect/AddAllButton" to="." method="_on_AddAllButton_pressed"]
+[connection signal="pressed" from="ColorRect/ClearButton" to="." method="_on_ClearButton_pressed"]
+[connection signal="pressed" from="ColorRect/RemoveButton" to="." method="_on_RemoveButton_pressed"]

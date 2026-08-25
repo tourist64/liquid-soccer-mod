@@ -1,0 +1,89 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/Transition.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Language.gd" type="Script" id=2]
+[ext_resource path="res://Res/UI.tres" type="Theme" id=3]
+
+[node name="Language" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 3 )
+script = ExtResource( 2 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 853.0
+margin_bottom = 480.0
+color = Color( 0.453125, 0.111511, 0.111511, 1 )
+
+[node name="EButton" type="Button" parent="ColorRect"]
+anchor_left = 0.208
+anchor_top = 0.202
+anchor_right = 0.212
+anchor_bottom = 0.202
+margin_right = 191.0
+margin_bottom = 50.0
+text = "English"
+
+[node name="EspButton" type="Button" parent="ColorRect"]
+anchor_left = 0.208
+anchor_top = 0.415
+anchor_right = 0.212
+anchor_bottom = 0.415
+margin_right = 191.0
+margin_bottom = 50.0
+text = "Espanol"
+
+[node name="DeButton" type="Button" parent="ColorRect"]
+anchor_left = 0.208
+anchor_top = 0.628
+anchor_right = 0.212
+anchor_bottom = 0.628
+margin_right = 191.0
+margin_bottom = 50.0
+text = "Deutsch"
+
+[node name="ITButton" type="Button" parent="ColorRect"]
+anchor_left = 0.562
+anchor_top = 0.202
+anchor_right = 0.562
+anchor_bottom = 0.202
+margin_right = 191.0
+margin_bottom = 50.0
+text = "Italiano"
+
+[node name="FRAButton" type="Button" parent="ColorRect"]
+anchor_left = 0.562
+anchor_top = 0.415
+anchor_right = 0.562
+anchor_bottom = 0.415
+margin_right = 191.0
+margin_bottom = 50.0
+text = "Francais"
+
+[node name="ScoButton" type="Button" parent="ColorRect"]
+anchor_left = 0.376
+anchor_top = 0.788
+anchor_right = 0.397
+anchor_bottom = 0.788
+margin_right = 191.0
+margin_bottom = 50.0
+text = "Scottish"
+
+[node name="PTButton" type="Button" parent="ColorRect"]
+anchor_left = 0.562
+anchor_top = 0.628
+anchor_right = 0.562
+anchor_bottom = 0.628
+margin_right = 191.0
+margin_bottom = 50.0
+text = "Português"
+
+[node name="Transition" parent="." instance=ExtResource( 1 )]
+
+[connection signal="pressed" from="ColorRect/EButton" to="." method="_on_EButton_pressed"]
+[connection signal="pressed" from="ColorRect/EspButton" to="." method="_on_EspButton_pressed"]
+[connection signal="pressed" from="ColorRect/DeButton" to="." method="_on_DeButton_pressed"]
+[connection signal="pressed" from="ColorRect/ITButton" to="." method="_on_ITButton_pressed"]
+[connection signal="pressed" from="ColorRect/FRAButton" to="." method="_on_FRAButton_pressed"]
+[connection signal="pressed" from="ColorRect/ScoButton" to="." method="_on_ScoButton_pressed"]
+[connection signal="pressed" from="ColorRect/PTButton" to="." method="_on_ScoButton_pressed"]

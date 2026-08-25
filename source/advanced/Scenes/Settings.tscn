@@ -1,0 +1,788 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://Res/OLDBLEND.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://Res/UI.tres" type="Theme" id=2]
+[ext_resource path="res://Scenes/Settings.gd" type="Script" id=3]
+[ext_resource path="res://Images/controllericon.png" type="Texture" id=4]
+[ext_resource path="res://Scenes/Transition.tscn" type="PackedScene" id=5]
+[ext_resource path="res://SoundFX/kick1.wav" type="AudioStream" id=6]
+[ext_resource path="res://SoundFX/applause.wav" type="AudioStream" id=7]
+
+[sub_resource type="ButtonGroup" id=3]
+
+[sub_resource type="DynamicFont" id=1]
+size = 46
+use_mipmaps = true
+use_filter = true
+font_data = ExtResource( 1 )
+
+[sub_resource type="ButtonGroup" id=5]
+
+[node name="Settings" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 2 )
+script = ExtResource( 3 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 1031.0
+margin_bottom = 580.0
+color = Color( 0.0941176, 0.215686, 0.321569, 1 )
+
+[node name="Graphics" type="ColorRect" parent="ColorRect"]
+visible = false
+anchor_left = 0.33
+anchor_top = 0.2
+anchor_right = 0.855
+anchor_bottom = 0.665
+margin_right = 40.0
+margin_bottom = 40.0
+color = Color( 0.6, 0.0980392, 0.0980392, 1 )
+
+[node name="Vsync" type="Label" parent="ColorRect/Graphics"]
+visible = false
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.211
+anchor_top = 0.347
+anchor_right = 0.237
+anchor_bottom = 0.347
+margin_left = -44.522
+margin_top = 5.16864
+margin_right = 30.9756
+margin_bottom = 49.1686
+text = "v-sync:"
+
+[node name="ButtonVsync" type="Button" parent="ColorRect/Graphics"]
+visible = false
+anchor_left = 0.908
+anchor_top = 0.018
+anchor_right = 0.917
+anchor_bottom = 0.546
+margin_left = -297.91
+margin_top = 91.0
+margin_right = -224.91
+margin_bottom = -14.3485
+toggle_mode = true
+pressed = true
+text = "on"
+
+[node name="FXLabel" type="Label" parent="ColorRect/Graphics"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.077
+anchor_top = 0.624
+anchor_right = 0.077
+anchor_bottom = 0.624
+margin_left = 17.5599
+margin_top = -9.29248
+margin_right = 87.5599
+margin_bottom = 26.7075
+text = "trails :"
+
+[node name="ParticlesLabel" type="Label" parent="ColorRect/Graphics"]
+visible = false
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.114
+anchor_top = 0.725
+anchor_right = 0.151
+anchor_bottom = 0.725
+margin_left = 203.388
+margin_top = -38.82
+margin_right = 289.338
+margin_bottom = -2.82002
+text = "particles :"
+
+[node name="ShaderLabel" type="Label" parent="ColorRect/Graphics"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.085
+anchor_top = 0.857
+anchor_right = 0.177
+anchor_bottom = 0.857
+margin_left = 10.0326
+margin_top = -9.86017
+margin_right = 62.4689
+margin_bottom = 26.1398
+text = "shader:"
+
+[node name="ShaderOption" type="OptionButton" parent="ColorRect/Graphics"]
+anchor_left = 0.252
+anchor_top = 0.85
+anchor_right = 0.587
+anchor_bottom = 0.881
+margin_left = 41.4007
+margin_top = -10.048
+margin_right = 106.696
+margin_bottom = 17.9267
+align = 1
+
+[node name="TrailsButton" type="Button" parent="ColorRect/Graphics"]
+anchor_left = 0.259
+anchor_top = 0.601
+anchor_right = 0.398
+anchor_bottom = 0.601
+margin_left = 19.7725
+margin_top = -6.92705
+margin_right = 30.486
+margin_bottom = 29.073
+toggle_mode = true
+pressed = true
+text = "on"
+
+[node name="ParticlesButton" type="Button" parent="ColorRect/Graphics"]
+visible = false
+anchor_left = 0.25
+anchor_top = 0.731
+anchor_right = 0.389
+anchor_bottom = 0.731
+margin_left = 244.772
+margin_top = -39.9926
+margin_right = 255.486
+margin_bottom = -3.99265
+toggle_mode = true
+pressed = true
+text = "on"
+
+[node name="ShadowsLabel" type="Label" parent="ColorRect/Graphics"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.128
+anchor_top = 0.074
+anchor_right = 0.128
+anchor_bottom = 0.074
+margin_right = 40.0
+margin_bottom = 26.0
+text = "shadows :"
+
+[node name="CrowdLabel" type="Label" parent="ColorRect/Graphics"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.587
+anchor_top = 0.074
+anchor_right = 0.614
+anchor_bottom = 0.074
+margin_right = 40.0
+margin_bottom = 26.0
+text = "crowd :"
+
+[node name="ShadowsButton" type="Button" parent="ColorRect/Graphics"]
+anchor_left = 0.376
+anchor_top = 0.064
+anchor_right = 0.504
+anchor_bottom = 0.064
+margin_right = 6.0
+margin_bottom = 32.0
+toggle_mode = true
+text = "off"
+
+[node name="CrowdButton" type="Button" parent="ColorRect/Graphics"]
+anchor_left = 0.78
+anchor_top = 0.064
+anchor_right = 0.899
+anchor_bottom = 0.064
+margin_right = 6.0
+margin_bottom = 32.0
+toggle_mode = true
+pressed = true
+text = "on"
+
+[node name="Game" type="ColorRect" parent="ColorRect"]
+anchor_left = 0.33
+anchor_top = 0.2
+anchor_right = 0.8
+anchor_bottom = 0.656
+margin_left = -0.490021
+margin_right = 114.94
+margin_bottom = 85.52
+color = Color( 0.6, 0.0980392, 0.0980392, 1 )
+
+[node name="MoveAssistLabel" type="Label" parent="ColorRect/Game"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.138
+anchor_top = 0.694
+anchor_right = 0.3
+anchor_bottom = 0.702
+margin_left = -46.0
+margin_top = -18.32
+margin_right = 8.0
+margin_bottom = 5.43999
+text = "move assist :"
+
+[node name="CameraLabel" type="Label" parent="ColorRect/Game"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.077
+anchor_top = 0.263
+anchor_right = 0.077
+anchor_bottom = 0.272
+margin_left = -16.421
+margin_top = -0.117004
+margin_right = 80.579
+margin_bottom = 35.552
+text = "camera:"
+
+[node name="CameraButton" type="OptionButton" parent="ColorRect/Game"]
+anchor_left = 0.254
+anchor_top = 0.256
+anchor_right = 0.577
+anchor_bottom = 0.256
+margin_left = 0.0319977
+margin_top = -0.304001
+margin_right = 20.116
+margin_bottom = 31.696
+align = 1
+
+[node name="MoveAssist" type="OptionButton" parent="ColorRect/Game"]
+anchor_left = 0.252
+anchor_top = 0.694
+anchor_right = 0.337
+anchor_bottom = 0.694
+margin_left = 40.0
+margin_top = -21.32
+margin_right = 74.5
+margin_bottom = 10.68
+text = "off"
+align = 1
+
+[node name="GameLength" type="Control" parent="ColorRect/Game"]
+anchor_right = 0.008
+margin_left = -633.6
+margin_top = -147.012
+margin_right = -593.6
+margin_bottom = -107.012
+
+[node name="halfLab" type="Label" parent="ColorRect/Game/GameLength"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+margin_left = 654.0
+margin_top = 166.0
+margin_right = 803.0
+margin_bottom = 202.0
+text = "half length :"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button4" type="Button" parent="ColorRect/Game/GameLength"]
+anchor_top = 0.39
+anchor_right = 0.633
+anchor_bottom = 0.606
+margin_left = 797.6
+margin_top = 148.412
+margin_right = 851.789
+margin_bottom = 171.772
+toggle_mode = true
+group = SubResource( 3 )
+text = "1 min"
+
+[node name="Button1" type="Button" parent="ColorRect/Game/GameLength"]
+anchor_right = 0.633
+margin_left = 890.6
+margin_top = 163.012
+margin_right = 951.789
+margin_bottom = 195.012
+toggle_mode = true
+group = SubResource( 3 )
+text = "2 min"
+
+[node name="Button2" type="Button" parent="ColorRect/Game/GameLength"]
+anchor_right = 0.538
+margin_left = 992.6
+margin_top = 164.012
+margin_right = 1056.96
+margin_bottom = 196.012
+toggle_mode = true
+group = SubResource( 3 )
+text = "3 min"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DifficultyLabel" type="Label" parent="ColorRect/Game"]
+self_modulate = Color( 0.913725, 0.701961, 0.392157, 1 )
+anchor_left = 0.078
+anchor_top = 0.517
+anchor_right = 0.078
+anchor_bottom = 0.517
+margin_left = -17.0
+margin_top = -16.76
+margin_right = 88.0
+margin_bottom = 17.24
+text = "difficulty:"
+
+[node name="DifficultySlider" type="HSlider" parent="ColorRect/Game"]
+anchor_left = 0.356
+anchor_top = 0.518
+anchor_right = 0.704
+anchor_bottom = 0.542
+margin_left = 16.768
+margin_top = -12.851
+margin_right = 21.768
+margin_bottom = 3.14897
+max_value = 10.0
+value = 5.0
+rounded = true
+tick_count = 5
+ticks_on_borders = true
+
+[node name="EasyLabel" type="Label" parent="ColorRect/Game"]
+anchor_left = 0.26
+anchor_top = 0.509
+anchor_right = 0.26
+anchor_bottom = 0.517
+margin_left = -4.0
+margin_top = -16.52
+margin_right = 57.0
+margin_bottom = 17.48
+text = "easy"
+
+[node name="HardLabel" type="Label" parent="ColorRect/Game"]
+anchor_left = 0.73
+anchor_top = 0.509
+anchor_right = 0.773
+anchor_bottom = 0.517
+margin_left = 16.7599
+margin_top = -16.52
+margin_right = 56.7599
+margin_bottom = 17.48
+text = "hard"
+
+[node name="PlayerSwitchLabel" type="Label" parent="ColorRect/Game"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.524
+anchor_top = 0.869
+anchor_right = 0.524
+anchor_bottom = 0.877
+margin_left = -240.0
+margin_top = -15.32
+margin_right = -87.0
+margin_bottom = 18.68
+text = "language :"
+
+[node name="PlayerSwitchButton" type="OptionButton" parent="ColorRect/Game"]
+anchor_left = 0.77
+anchor_top = 0.857
+anchor_right = 0.936
+anchor_bottom = 0.873
+margin_left = -220.0
+margin_top = -15.96
+margin_right = -156.0
+margin_bottom = 11.56
+text = "English"
+align = 1
+
+[node name="MoveLabel" type="Label" parent="ColorRect/Game"]
+margin_left = 300.26
+margin_top = 209.0
+margin_right = 589.26
+margin_bottom = 264.0
+text = "player always moves toward ball"
+autowrap = true
+
+[node name="Audio" type="ColorRect" parent="ColorRect"]
+visible = false
+anchor_left = 0.33
+anchor_top = 0.2
+anchor_right = 0.8
+anchor_bottom = 0.656
+margin_right = 40.0
+margin_bottom = 40.0
+color = Color( 0.6, 0.0980392, 0.0980392, 1 )
+
+[node name="MasterVolume" type="Label" parent="ColorRect/Audio"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.933
+anchor_top = 0.01
+anchor_right = 0.933
+anchor_bottom = 0.333
+margin_left = -436.125
+margin_top = 30.384
+margin_right = -307.125
+margin_bottom = 74.384
+text = "volume :"
+align = 2
+
+[node name="MusicVolume" type="Label" parent="ColorRect/Audio"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.933
+anchor_top = 0.113
+anchor_right = 0.933
+anchor_bottom = 0.333
+margin_left = -436.125
+margin_top = 30.384
+margin_right = -307.125
+margin_bottom = 74.384
+text = "music :"
+align = 2
+
+[node name="FXVolume" type="Label" parent="ColorRect/Audio"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.933
+anchor_top = 0.208
+anchor_right = 0.933
+anchor_bottom = 0.333
+margin_left = -436.125
+margin_top = 30.384
+margin_right = -307.125
+margin_bottom = 74.384
+text = "fx :"
+align = 2
+
+[node name="CrowdVolume" type="Label" parent="ColorRect/Audio"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.933
+anchor_top = 0.312
+anchor_right = 0.933
+anchor_bottom = 0.333
+margin_left = -436.125
+margin_top = 30.384
+margin_right = -307.125
+margin_bottom = 74.384
+text = "crowd :"
+align = 2
+
+[node name="MasterVolSlider" type="HSlider" parent="ColorRect/Audio"]
+anchor_left = 0.933
+anchor_top = 0.004
+anchor_right = 1.0
+anchor_bottom = 0.333
+margin_left = -291.859
+margin_top = 33.9645
+margin_right = -47.4
+margin_bottom = -29.207
+value = 75.0
+tick_count = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MusicVolSlider" type="HSlider" parent="ColorRect/Audio"]
+anchor_left = 0.933
+anchor_top = 0.115
+anchor_right = 1.0
+anchor_bottom = 0.333
+margin_left = -291.369
+margin_top = 30.2288
+margin_right = -46.91
+margin_bottom = -0.207047
+value = 75.0
+tick_count = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="FXVolSlider" type="HSlider" parent="ColorRect/Audio"]
+anchor_left = 0.933
+anchor_top = 0.21
+anchor_right = 1.0
+anchor_bottom = 0.333
+margin_left = -290.369
+margin_top = 35.6352
+margin_right = -47.91
+margin_bottom = 19.793
+value = 75.0
+tick_count = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CrowdVolSlider" type="HSlider" parent="ColorRect/Audio"]
+anchor_left = 0.933
+anchor_top = 0.298
+anchor_right = 1.0
+anchor_bottom = 0.345
+margin_left = -290.859
+margin_top = 31.8538
+margin_right = -50.4
+margin_bottom = 47.6864
+value = 75.0
+tick_count = 5
+
+[node name="Keyboard" type="ColorRect" parent="ColorRect"]
+visible = false
+anchor_left = 0.33
+anchor_top = 0.2
+anchor_right = 0.8
+anchor_bottom = 0.656
+margin_right = 40.0
+margin_bottom = 40.0
+color = Color( 0.6, 0.0980392, 0.0980392, 1 )
+
+[node name="setKeysButton" type="Button" parent="ColorRect/Keyboard"]
+anchor_left = 0.405
+anchor_top = 0.865
+anchor_right = 0.596
+anchor_bottom = 0.865
+margin_left = 106.431
+margin_top = -29.9312
+margin_right = 165.218
+margin_bottom = 2.06879
+text = "set keys..."
+
+[node name="UDLRLabel" type="Label" parent="ColorRect/Keyboard"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.103
+anchor_top = 0.103
+anchor_right = 0.103
+anchor_bottom = 0.111
+margin_left = -4.90375
+margin_top = -22.6646
+margin_right = 67.0963
+margin_bottom = 88.2643
+text = "up :
+down :
+left :
+right :"
+align = 2
+
+[node name="UDLRKeys" type="Label" parent="ColorRect/Keyboard"]
+anchor_left = 0.214
+anchor_top = 0.103
+anchor_right = 0.23
+anchor_bottom = 0.103
+margin_left = -1.84476
+margin_top = -22.6646
+margin_right = 66.1007
+margin_bottom = 90.3354
+text = "W
+S
+A
+D"
+align = 1
+
+[node name="buttonsLabel" type="Label" parent="ColorRect/Keyboard"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.547
+anchor_top = 0.103
+anchor_right = 0.547
+anchor_bottom = 0.111
+margin_left = -7.66779
+margin_top = -23.6646
+margin_right = 66.3322
+margin_bottom = 87.2643
+text = "pass :
+shoot :
+chip :
+thru :"
+align = 2
+
+[node name="buttonsKeys" type="Label" parent="ColorRect/Keyboard"]
+anchor_left = 0.658
+anchor_top = 0.103
+anchor_right = 0.666
+anchor_bottom = 0.103
+margin_left = 10.8812
+margin_top = -21.6646
+margin_right = 56.3539
+margin_bottom = 91.3354
+text = "M
+J
+L
+I"
+align = 1
+
+[node name="shoulderLabel" type="Label" parent="ColorRect/Keyboard"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.226
+anchor_top = 0.416
+anchor_right = 0.338
+anchor_bottom = 0.416
+margin_left = -61.7729
+margin_top = 30.9862
+margin_right = 40.2315
+margin_bottom = 85.9862
+text = "sprint :"
+align = 2
+
+[node name="shoulderKeys" type="Label" parent="ColorRect/Keyboard"]
+anchor_left = 0.468
+anchor_top = 0.409
+anchor_right = 0.468
+anchor_bottom = 0.452
+margin_left = -9.15039
+margin_top = 32.9862
+margin_right = 24.8496
+margin_bottom = 87.9862
+text = "P
+"
+align = 1
+
+[node name="pressLabel" type="Label" parent="ColorRect/Keyboard"]
+visible = false
+anchor_left = 0.593
+anchor_top = 0.544
+anchor_right = 0.666
+anchor_bottom = 0.544
+margin_right = 40.0
+margin_bottom = 34.0
+text = "press key for ... "
+
+[node name="KeyDefaultButton" type="Button" parent="ColorRect/Keyboard"]
+anchor_left = 0.101
+anchor_top = 0.741
+anchor_right = 0.381
+anchor_bottom = 0.749
+margin_right = 6.0
+margin_bottom = 32.0
+text = "default"
+
+[node name="Title" type="Label" parent="ColorRect"]
+anchor_left = 0.465
+anchor_top = 0.065
+anchor_right = 0.5
+anchor_bottom = 0.2
+margin_left = -41.645
+margin_top = -0.199999
+margin_right = 242.5
+margin_bottom = -22.0
+theme = ExtResource( 2 )
+custom_colors/font_color = Color( 0.960784, 0.796078, 0.439216, 1 )
+custom_fonts/font = SubResource( 1 )
+text = "Settings"
+
+[node name="ButtonBack" type="Button" parent="ColorRect"]
+anchor_left = 0.5
+anchor_top = 0.807
+anchor_right = 0.596
+anchor_bottom = 0.86
+margin_left = -33.5
+margin_top = 21.64
+margin_right = 35.612
+margin_bottom = 42.2
+text = "back"
+
+[node name="Controller1" type="TextureRect" parent="ColorRect"]
+visible = false
+anchor_left = 0.307
+anchor_top = 0.699
+anchor_right = 0.358
+anchor_bottom = 0.714
+margin_left = -52.871
+margin_top = 24.48
+margin_right = 159.626
+margin_bottom = 273.28
+rect_scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 4 )
+
+[node name="Label" type="Label" parent="ColorRect/Controller1"]
+visible = false
+anchor_left = 0.105
+anchor_top = 0.044
+anchor_right = 0.105
+anchor_bottom = 0.044
+margin_right = 40.0
+margin_bottom = 44.0
+text = "no controller"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Controller2" type="TextureRect" parent="ColorRect"]
+visible = false
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.697
+anchor_top = 0.691
+anchor_right = 0.725
+anchor_bottom = 0.691
+margin_left = -6.54102
+margin_top = 20.32
+margin_right = 225.575
+margin_bottom = 276.32
+rect_scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="ColorRect/Controller2"]
+visible = false
+anchor_top = 0.044
+anchor_bottom = 0.053
+margin_left = 30.1699
+margin_right = 232.17
+margin_bottom = 44.0
+text = "no controller "
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GfxButton" type="Button" parent="ColorRect"]
+anchor_left = 0.093
+anchor_top = 0.218
+anchor_right = 0.314
+anchor_bottom = 0.225
+margin_right = 6.0
+margin_bottom = 42.0
+group = SubResource( 5 )
+text = "Graphics..."
+
+[node name="GameButton" type="Button" parent="ColorRect"]
+anchor_left = 0.093
+anchor_top = 0.349
+anchor_right = 0.314
+anchor_bottom = 0.349
+margin_right = 6.0
+margin_bottom = 42.0
+focus_neighbour_top = NodePath("../GfxButton")
+focus_neighbour_bottom = NodePath("../AudioButton")
+group = SubResource( 5 )
+text = "Game..."
+
+[node name="AudioButton" type="Button" parent="ColorRect"]
+anchor_left = 0.093
+anchor_top = 0.48
+anchor_right = 0.314
+anchor_bottom = 0.489
+margin_right = 6.0
+margin_bottom = 42.0
+group = SubResource( 5 )
+text = "Audio..."
+
+[node name="KeysButton" type="Button" parent="ColorRect"]
+anchor_left = 0.093
+anchor_top = 0.613
+anchor_right = 0.286
+anchor_bottom = 0.632
+margin_left = 0.194992
+margin_top = -0.440002
+margin_right = 29.481
+margin_bottom = 41.88
+group = SubResource( 5 )
+text = "Keyboard..."
+
+[node name="CrowdSound" type="AudioStreamPlayer" parent="ColorRect"]
+stream = ExtResource( 7 )
+volume_db = -5.0
+bus = "Crowd"
+
+[node name="FXSound" type="AudioStreamPlayer" parent="ColorRect"]
+stream = ExtResource( 6 )
+volume_db = -4.0
+bus = "SFX"
+
+[node name="Transition" parent="." instance=ExtResource( 5 )]
+
+[connection signal="pressed" from="ColorRect/Graphics/ButtonVsync" to="." method="_on_ButtonVsync_pressed"]
+[connection signal="item_selected" from="ColorRect/Graphics/ShaderOption" to="." method="_on_ShaderOption_item_selected"]
+[connection signal="toggled" from="ColorRect/Graphics/TrailsButton" to="." method="_on_TrailsButton_toggled"]
+[connection signal="toggled" from="ColorRect/Graphics/ParticlesButton" to="." method="_on_ParticlesButton_toggled"]
+[connection signal="toggled" from="ColorRect/Graphics/ShadowsButton" to="." method="_on_ShadowsButton_toggled"]
+[connection signal="toggled" from="ColorRect/Graphics/CrowdButton" to="." method="_on_CrowdButton_toggled"]
+[connection signal="item_selected" from="ColorRect/Game/CameraButton" to="." method="_on_CameraButton_item_selected"]
+[connection signal="item_selected" from="ColorRect/Game/MoveAssist" to="." method="_on_OptionButton_item_selected"]
+[connection signal="pressed" from="ColorRect/Game/GameLength/Button4" to="." method="_on_Button4_pressed"]
+[connection signal="pressed" from="ColorRect/Game/GameLength/Button1" to="." method="_on_Button1_pressed"]
+[connection signal="pressed" from="ColorRect/Game/GameLength/Button2" to="." method="_on_Button2_pressed"]
+[connection signal="value_changed" from="ColorRect/Game/DifficultySlider" to="." method="_on_DifficultySlider_value_changed"]
+[connection signal="item_selected" from="ColorRect/Game/PlayerSwitchButton" to="." method="_on_PlayerSwitchButton_item_selected"]
+[connection signal="drag_ended" from="ColorRect/Audio/MasterVolSlider" to="." method="_on_MasterVolSlider_drag_ended"]
+[connection signal="value_changed" from="ColorRect/Audio/MasterVolSlider" to="." method="_on_MasterVolSlider_value_changed"]
+[connection signal="drag_ended" from="ColorRect/Audio/MusicVolSlider" to="." method="_on_MusicVolSlider_drag_ended"]
+[connection signal="value_changed" from="ColorRect/Audio/MusicVolSlider" to="." method="_on_MusicVolSlider_value_changed"]
+[connection signal="drag_ended" from="ColorRect/Audio/FXVolSlider" to="." method="_on_FXVolSlider_drag_ended"]
+[connection signal="value_changed" from="ColorRect/Audio/FXVolSlider" to="." method="_on_FXVolSlider_value_changed"]
+[connection signal="drag_ended" from="ColorRect/Audio/CrowdVolSlider" to="." method="_on_CrowdVolSlider_drag_ended"]
+[connection signal="value_changed" from="ColorRect/Audio/CrowdVolSlider" to="." method="_on_CrowdVolSlider_value_changed"]
+[connection signal="pressed" from="ColorRect/Keyboard/setKeysButton" to="." method="_on_setKeysButton_pressed"]
+[connection signal="pressed" from="ColorRect/Keyboard/KeyDefaultButton" to="." method="_on_KeyDefaultButton_pressed"]
+[connection signal="pressed" from="ColorRect/ButtonBack" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="ColorRect/GfxButton" to="." method="_on_GfxButton_pressed"]
+[connection signal="pressed" from="ColorRect/GameButton" to="." method="_on_GameButton_pressed"]
+[connection signal="pressed" from="ColorRect/AudioButton" to="." method="_on_AudioButton_pressed"]
+[connection signal="pressed" from="ColorRect/KeysButton" to="." method="_on_KeysButton_pressed"]

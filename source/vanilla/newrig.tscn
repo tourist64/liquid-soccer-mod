@@ -1,0 +1,92 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://newrig.dae" type="PackedScene" id=1]
+
+[node name="newrig" instance=ExtResource( 1 )]
+
+[node name="QuickRigCharacter_Ctrl_HipsEffector" parent="QuickRigCharacter_Ctrl_Reference" index="0"]
+transform = Transform( 1, 0.000197254, 2.69161e-07, -0.00019, 0.963593, -0.267375, -5.3e-05, 0.267375, 0.963593, -1.17089, 75.4199, 0.916357 )
+
+[node name="QuickRigCharacter_Ctrl_LeftAnkleEffector" parent="QuickRigCharacter_Ctrl_Reference" index="1"]
+transform = Transform( 0.988425, -0.0862348, 0.124817, 0.0510468, 0.963812, 0.261649, -0.142863, -0.252249, 0.957058, 43.6567, 33.6135, 34.3877 )
+
+[node name="QuickRigCharacter_Ctrl_RightAnkleEffector" parent="QuickRigCharacter_Ctrl_Reference" index="2"]
+transform = Transform( 0.961159, -0.179677, -0.209499, -0.203611, 0.0508227, -0.977732, 0.186324, 0.982412, 0.0122644, -41.7472, 51.1583, -30.4659 )
+
+[node name="QuickRigCharacter_Ctrl_LeftWristEffector" parent="QuickRigCharacter_Ctrl_Reference" index="3"]
+transform = Transform( 0.202592, -0.0649646, -0.977106, -0.978353, 0.0295793, -0.204817, 0.042208, 0.997449, -0.0575658, 97.4512, 77.0309, 32.0593 )
+
+[node name="QuickRigCharacter_Ctrl_RightWristEffector" parent="QuickRigCharacter_Ctrl_Reference" index="4"]
+transform = Transform( 0.114641, 0.080128, 0.99017, 0.991195, -0.0757067, -0.108633, 0.0662581, 0.993905, -0.0881016, -90.2742, 76.7519, 20.6033 )
+
+[node name="QuickRigCharacter_Ctrl_LeftKneeEffector" parent="QuickRigCharacter_Ctrl_Reference" index="5"]
+transform = Transform( 0.992684, -0.0660574, 0.10107, 0.0340379, 0.956222, 0.290657, -0.115845, -0.285091, 0.951475, 40.9045, 61.9885, 17.9132 )
+
+[node name="QuickRigCharacter_Ctrl_RightKneeEffector" parent="QuickRigCharacter_Ctrl_Reference" index="6"]
+transform = Transform( 0.982323, -0.0452256, -0.18165, -0.167058, 0.226035, -0.959687, 0.0844617, 0.973069, 0.214483, -43.782, 56.8275, 5.67624 )
+
+[node name="QuickRigCharacter_Ctrl_LeftElbowEffector" parent="QuickRigCharacter_Ctrl_Reference" index="7"]
+transform = Transform( 0.202593, -0.0649658, -0.977106, -0.978353, 0.0295789, -0.204818, 0.042208, 0.997449, -0.0575671, 86.5261, 129.79, 29.7831 )
+
+[node name="QuickRigCharacter_Ctrl_RightElbowEffector" parent="QuickRigCharacter_Ctrl_Reference" index="8"]
+transform = Transform( 0.114642, 0.0801259, 0.99017, 0.991195, -0.0757068, -0.108634, 0.066258, 0.993906, -0.0880996, -84.092, 130.203, 24.1764 )
+
+[node name="QuickRigCharacter_Ctrl_LeftFootEffector" parent="QuickRigCharacter_Ctrl_Reference" index="11"]
+transform = Transform( 0.988425, -0.0862348, 0.124817, 0.0510468, 0.963812, 0.261649, -0.142863, -0.252249, 0.957058, 47.1167, 40.2367, 58.1205 )
+
+[node name="QuickRigCharacter_Ctrl_RightFootEffector" parent="QuickRigCharacter_Ctrl_Reference" index="12"]
+transform = Transform( 0.961159, -0.179677, -0.209499, -0.203611, 0.0508227, -0.977732, 0.186324, 0.982412, 0.0122644, -46.6457, 24.7198, -34.2544 )
+
+[node name="QuickRigCharacter_Ctrl_LeftShoulderEffector" parent="QuickRigCharacter_Ctrl_Reference" index="13"]
+transform = Transform( 0.202836, -0.064966, -0.977055, -0.978302, 0.0295807, -0.205062, 0.0422239, 0.997449, -0.0575563, 75.893, 181.075, 27.5697 )
+
+[node name="QuickRigCharacter_Ctrl_RightShoulderEffector" parent="QuickRigCharacter_Ctrl_Reference" index="14"]
+transform = Transform( 0.114891, 0.0801309, 0.990141, 0.991167, -0.0757074, -0.108883, 0.0662361, 0.993905, -0.0881213, -78.1919, 181.104, 27.5778 )
+
+[node name="QuickRigCharacter_Ctrl_LeftHipEffector" parent="QuickRigCharacter_Ctrl_Reference" index="16"]
+transform = Transform( 0.994892, -0.088418, 0.0486978, 0.0646254, 0.92853, 0.36559, -0.077542, -0.360575, 0.929501, 36.9777, 102.923, 0.91638 )
+
+[node name="QuickRigCharacter_Ctrl_RightHipEffector" parent="QuickRigCharacter_Ctrl_Reference" index="17"]
+transform = Transform( 0.993335, 0.0957852, -0.0641274, -0.0884976, 0.990184, 0.108181, 0.0738601, -0.101785, 0.99206, -39.3197, 102.923, 0.91638 )
+
+[node name="QuickRigCharacter_Ctrl_Hips" parent="QuickRigCharacter_Ctrl_Reference" index="18"]
+transform = Transform( 1, 0.000197254, 2.69178e-07, -0.00019, 0.963593, -0.267375, -5.3e-05, 0.267375, 0.963593, -1.16774, 90.9907, 5.23994 )
+
+[node name="QuickRigCharacter_Ctrl_LeftUpLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips" index="0"]
+transform = Transform( 0.995112, -0.0834971, 0.0527404, 0.0587871, 0.929922, 0.363027, -0.0793562, -0.358151, 0.930285, 38.1487, -16.1599, -0.002922 )
+
+[node name="QuickRigCharacter_Ctrl_LeftLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_LeftUpLeg" index="0"]
+transform = Transform( 0.999529, 0.000187397, 0.0306695, 0.00186675, 0.997756, -0.0669344, -0.0306132, 0.0669603, 0.997285, 0, -47.1733, 0 )
+
+[node name="QuickRigCharacter_Ctrl_LeftFoot" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_LeftUpLeg/QuickRigCharacter_Ctrl_LeftLeg" index="0"]
+transform = Transform( 0.998883, -0.0397915, 0.025511, 0.0401589, 0.999094, -0.0140532, -0.0249287, 0.015062, 0.999576, 0, -38.0452, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightUpLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips" index="1"]
+transform = Transform( 0.99338, 0.0947043, -0.0650197, -0.0867761, 0.989511, 0.115493, 0.0752754, -0.109086, 0.991178, -38.1487, -16.1599, -0.002922 )
+
+[node name="QuickRigCharacter_Ctrl_RightLeg" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_RightUpLeg" index="0"]
+transform = Transform( 0.996792, 5.57154e-05, -0.0800293, -0.079491, 0.116478, -0.990007, 0.00926648, 0.993193, 0.116109, -4e-06, -47.1733, 0.000461 )
+
+[node name="QuickRigCharacter_Ctrl_RightFoot" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_RightUpLeg/QuickRigCharacter_Ctrl_RightLeg" index="0"]
+transform = Transform( 0.99429, -0.100463, -0.0359946, 0.0911076, 0.974747, -0.203882, 0.0555682, 0.199438, 0.978333, 4e-06, -38.0452, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightToeBase" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_RightUpLeg/QuickRigCharacter_Ctrl_RightLeg/QuickRigCharacter_Ctrl_RightFoot" index="0"]
+transform = Transform( 1, 0, 1.11804e-07, 0, 1, 0, -1.11804e-07, 0, 1, -0.002411, -2.98997, 28.7479 )
+
+[node name="QuickRigCharacter_Ctrl_LeftArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_LeftShoulder" index="0"]
+transform = Transform( 0.20302, -0.065025, -0.977013, -0.931355, 0.295183, -0.213178, 0.30226, 0.953225, -0.00063324, 31.9393, -9.36795, 0 )
+
+[node name="QuickRigCharacter_Ctrl_LeftForeArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_LeftShoulder/QuickRigCharacter_Ctrl_LeftArm" index="0"]
+transform = Transform( 1, 9.33333e-07, -0.000168533, -9.33333e-07, 1, 1.64516e-10, 0.000168533, -7.21777e-12, 1, 52.422, 0, 0 )
+
+[node name="QuickRigCharacter_Ctrl_LeftHand" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_LeftShoulder/QuickRigCharacter_Ctrl_LeftArm/QuickRigCharacter_Ctrl_LeftForeArm" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 1.1118e-06, 0, -1.1118e-06, 1, 53.9265, 0, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_RightShoulder" index="0"]
+transform = Transform( 0.114699, 0.0800931, 0.990166, 0.972814, 0.19281, -0.128285, -0.201189, 0.977962, -0.0558005, -31.9393, -9.36795, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightForeArm" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_RightShoulder/QuickRigCharacter_Ctrl_RightArm" index="0"]
+transform = Transform( 0.999999, -1.24678e-05, 0.00114234, 1.2462e-05, 1, 5.01424e-06, -0.00114234, -5e-06, 0.999999, -51.354, 0, 0 )
+
+[node name="QuickRigCharacter_Ctrl_RightHand" parent="QuickRigCharacter_Ctrl_Reference/QuickRigCharacter_Ctrl_Hips/QuickRigCharacter_Ctrl_Spine/QuickRigCharacter_Ctrl_Spine1/QuickRigCharacter_Ctrl_Spine2/QuickRigCharacter_Ctrl_RightShoulder/QuickRigCharacter_Ctrl_RightArm/QuickRigCharacter_Ctrl_RightForeArm" index="0"]
+transform = Transform( 1, -1e-06, -1.11802e-07, 1e-06, 1, -2e-06, 1.11804e-07, 2e-06, 1, -53.9265, 0, 0 )

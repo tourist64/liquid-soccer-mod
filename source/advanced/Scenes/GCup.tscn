@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Res/GCup.dae" type="PackedScene" id=1]
+[ext_resource path="res://Res/Cups.tres" type="Environment" id=2]
+[ext_resource path="res://Scenes/GCup.gd" type="Script" id=3]
+[ext_resource path="res://Materials/GCup.tres" type="Material" id=4]
+
+[node name="GCup" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+
+[node name="Camera" type="Camera" parent="." index="0"]
+transform = Transform( 1, 0, 0, 0, 0.99801, -0.0630518, 0, 0.0630518, 0.99801, 0, 0.311123, 0.652899 )
+environment = ExtResource( 2 )
+
+[node name="Cup5" parent="Cups" index="0"]
+transform = Transform( 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0 )
+
+[node name="pCylinder2" parent="Cups/Cup5" index="1"]
+material/0 = ExtResource( 4 )
+
+[node name="pSphere1" parent="Cups/Cup5" index="2"]
+material/0 = ExtResource( 4 )

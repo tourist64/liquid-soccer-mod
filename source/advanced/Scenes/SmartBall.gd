@@ -1,0 +1,391 @@
+extends RigidBody
+
+
+var player = null
+var shooter = null
+var isShot = false
+
+var curl = Vector3.ZERO
+var drag = Vector3.ZERO
+var Game = null
+var oob = false
+var oobpos = Vector3.ZERO
+var trail = null
+var minPassSpeed = 80
+var maxPassSpeed = 100
+
+
+var doHit = false
+var rayC = null
+
+var shotV = Vector3.ZERO
+var dirHit = Vector3.ZERO
+var isUp = false
+var Nn = Vector3(1, 0, 0)
+var lastPlayer = null
+var hitCount = 0
+var canSave = true
+enum bstate{OPEN, SHOOTING, TRAPPED, CAUGHT, CROSSING}
+var state
+var hitK = null
+var sa = null
+var sas = null
+
+func _ready():
+	
+	
+	state = bstate.OPEN
+	sa = $SaveArea / CollisionShape
+	sas = $SaveArea / CollisionShape.shape
+	
+func _initialize():
+	player = null
+	shooter = null
+	linear_velocity = Vector3.ZERO
+	
+	state = bstate.OPEN
+	Game = Global.game
+	
+	
+func _physics_process(delta):
+	
+	
+	sa.global_transform.origin = global_transform.origin + linear_velocity * delta * 1.2
+	sa.global_transform.origin.y = max(2.0, sa.global_transform.origin.y)
+	
+	if state == bstate.SHOOTING:
+		
+		var left = linear_velocity.normalized().cross(Vector3.UP)
+		if (linear_velocity.x < 0.0):
+			left = - left
+		
+		apply_central_impulse(((curl.z * left) + (curl.y * Vector3.UP)) * delta * 50.0)
+		curl.z *= 0.98
+		
+		
+		
+	
+	elif state == bstate.CROSSING:
+		apply_central_impulse(curl * delta * 50.0)
+		
+		curl *= 0.98
+		
+		
+	else:
+		curl *= 0.995
+
+
+
+
+
+
+
+			
+		
+		
+
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+		
+		
+	if (Global.gameOn) and ( not oob):
+		if (abs(translation.x) > 140.0) or (abs(translation.z) > 90.0):
+			oobpos = translation
+			var lst = player
+			if not lst:
+				lst = lastPlayer
+			if not lst:
+				lst = shooter
+			oob = true
+			yield(get_tree().create_timer(0.16), "timeout")
+			Game._oob(lst)
+	elif (Global.penShoot) and Global.penOn:
+		if (abs(translation.x) > 140.0) or (abs(translation.z) > 90.0):
+			yield(get_tree().create_timer(0.06), "timeout")
+			Game._shootoutMissed()
+	
+func _integrate_forces(pstate):
+	if state == bstate.TRAPPED:
+		var diff = translation - (player.myArea.get_global_transform().origin)
+		diff.y = 0
+		if (diff.length() > 0.01):
+			
+			pstate.linear_velocity = - diff * 20 + Vector3(0, - 1, 0)
+		
+		
+		
+	elif state == bstate.CAUGHT:
+		var pos = (player.myCaught.get_global_transform().origin)
+		
+		pos.y = max(0.0, pos.y)
+		pstate.linear_velocity = Vector3.ZERO
+		pstate.transform.origin = pos
+		
+		
+			
+		
+	elif state == bstate.SHOOTING:
+		pstate.linear_velocity *= drag
+		
+	pstate.transform.origin.y = max(0.0, pstate.transform.origin.y)
+func _ballTrapped( var cplayer):
+	if (Global.gameOn):
+		trail.render = false
+		state = bstate.TRAPPED
+		if player:
+			player.AI._losePosession()
+		player = cplayer
+		isShot = false
+		linear_velocity = player.velocity * 2.0
+		
+func _ballFree():
+	
+	
+	
+	state = bstate.OPEN
+	player = null
+	isShot = false
+		
+func _ballCaught( var cplayer):
+	
+	if not canSave:
+		return false
+	trail.render = false
+	linear_velocity = Vector3.ZERO
+		
+		
+	state = bstate.CAUGHT
+	player = cplayer
+	isShot = false
+	return true
+		
+		
+	
+
+func _shootBall( var shootr, var direction, var curldirection):
+	if state == bstate.CAUGHT:
+		return
+	state = bstate.SHOOTING
+	linear_velocity *= 0.25
+	linear_velocity.y = 0.01
+	lastPlayer = null
+	shooter = shootr
+	isShot = true
+	player = null
+	doHit = false
+	curl = curldirection * 1.5
+	if abs(curl.z) > 0.25:
+		drag = Vector3(0.995, 1.0, 0.995)
+	else:
+		drag = Vector3.ONE
+	
+	trail.render = true
+	apply_central_impulse(direction)
+	shotV = linear_velocity
+	$BallKicked.play()
+	hitCount = 0
+	
+	
+	
+func _passBall( var direction, var passer):
+	
+	
+	
+	oob = false
+	linear_velocity *= 0.1
+	state = bstate.OPEN
+	shooter = passer
+	lastPlayer = null
+	player = null
+	
+	var dl = direction.length()
+	var dr = direction
+	var ddl = max(minPassSpeed, min(dl, maxPassSpeed))
+	
+	isShot = false
+	$BallPassed.play()
+	apply_central_impulse(dr * (ddl / dl) + Vector3(0, 5, 0))
+	
+	
+func _crossBall( var direction, var passer, var curld, var islow):
+	
+	linear_velocity *= 0.25
+	var d = direction
+	
+	shooter = passer
+	lastPlayer = null
+	player = null
+	curl = curld
+	
+	var dl = direction.length()
+	d = d / dl
+	dl *= 1.1
+	
+	
+	state = bstate.CROSSING
+	$BallPassed.play()
+	var high = 30
+	if islow:
+		high = 10
+		dl *= 1.1
+	isShot = false
+	
+	apply_central_impulse(d * dl + Vector3(0, high, 0))
+
+
+func _tapBall( var direction, var passer):
+	
+	
+	oob = false
+	linear_velocity *= 0.4
+	state = bstate.OPEN
+	
+	
+	shooter = passer
+	lastPlayer = null
+	if player:
+		player.AI._losePosession()
+	$BallPassed.play()
+	player = null
+	isShot = false
+	
+	apply_central_impulse(direction)
+	
+func _reset():
+	
+	visible = true
+func _replay():
+	visible = false
+
+func resetSave():
+	canSave = true
+func _reflectSaved( var N, var ddir, var iUp: bool):
+	if state == bstate.CAUGHT:
+		canSave = true
+		return
+	
+	if canSave:
+		canSave = false
+		
+	
+	
+	
+		var face = sign(N.x)
+		
+		var bv = Vector3(rand_range(face * 0.95, face * 1.15), rand_range(0, 0.5), sign(ddir) * rand_range(1.2, 1.8))
+		
+		if (iUp) and translation.y > 7.5 and not (Global.isPenalties):
+			bv.y = rand_range(1.1, 1.6)
+			bv.x = - face
+			
+		linear_velocity = Vector3.ZERO
+		apply_central_impulse(bv * rand_range(25.0, 30.0))
+		Game._hitP()
+		trail.render = false
+		state = bstate.OPEN
+		isShot = false
+		
+		if player:
+			player.AI._losePosession()
+			player = null
+
+		$BallBounce.play()
+		
+		yield(get_tree().create_timer(0.2), "timeout")
+		canSave = true
+		
+func _canSave():
+	return canSave and (Global.gameOn or Global.penOn)
+func _isOpen():
+	return state == bstate.OPEN
+func _isFree():
+	return state == bstate.OPEN or state == bstate.CROSSING or state == bstate.SHOOTING
+func _isTrapped():
+	return state == bstate.TRAPPED
+func _isShooting():
+	return state == bstate.SHOOTING or isShot
+func _isCaught():
+	return state == bstate.CAUGHT
+func _isCrossing():
+	return state == bstate.CROSSING
+func _canHead():
+	return state == bstate.OPEN or state == bstate.CROSSING
+	
+func _on_Ball_body_entered(body):
+	if (state == bstate.SHOOTING):
+		
+		
+		
+		
+		hitCount += 1
+		curl *= 0.2
+		if body.get_collision_layer_bit(7):
+			
+			
+			if linear_velocity.normalized().dot(shotV.normalized()) < 0.1:
+				trail.render = false
+				$BallBounce.play()
+				
+				state = bstate.OPEN
+				
+				
+				
+				Game._hitP()
+			
+			lastPlayer = body.get_parent()
+		elif body.get_collision_layer_bit(22):
+			$PostSounds.play()
+			trail.render = false
+			
+			state = bstate.OPEN
+			Game._catch()
+			Game._hitP()
+			
+		elif not (body.get_collision_layer_bit(14)) or hitCount > 1:
+			trail.render = false
+			$BallBounce.play()
+			
+			state = bstate.OPEN
+			Game._hitP()
+	elif (state == bstate.CROSSING):
+		
+		
+		if body.get_collision_layer_bit(7):
+			lastPlayer = body.get_parent()
+			
+				
+			linear_velocity *= 0.85
+		state = bstate.OPEN
+		Game._hitP()
+	elif (state == bstate.OPEN) and body.get_collision_layer_bit(7):
+		lastPlayer = body.get_parent()
+		
+		lastPlayer._ballHit()
+		
+		linear_velocity *= 0.75
+		
+		apply_central_impulse(Vector3(0, - 5, 0))
+			
+		
+		Game._hitP()
+
+
+func _on_Ball_input_event(_camera, _event, _click_position, _click_normal, _shape_idx):
+	pass

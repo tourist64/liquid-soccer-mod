@@ -1,0 +1,29 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://Languages/default.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+menus = [ "Spiel!", "Elfmeterschießen", "Chumps League!", "Weltmeisterschaft!", "Einstellungen", "Hilfe", "Lernprogramm" ]
+setmenus = [ "Grafik", "Audio", "Spielmodi", "Kontrollen" ]
+gamemenus = [ "time", "camera", "difficulty", "move assist", "switch" ]
+controls = [ "Nach oben bewegen", "nach unten bewegen", "nach links bewegen", "nach  rechts bewegen", "pass den ball", "schieß/kopf den Ball", "erhabener Pass/Grätschen", "Durchlass", "sprint", "switch" ]
+tut = [ "Pfeiltasten bzw um den Spieler zu bewegen", "heb den Ball auf!", "um zu sprinten", "um den Ball zu passen", "für Hochpass / bananenflanke", "um zu schießen oder zu köpfen", "Erziele ein Tor zum Ausstieg!", "Ändern Sie die Schaltflächen in den Einstellungen!" ]
+toexit = "zum Beenden"
+ingame = [ "Abstoß", "eckball!", "ELFMETER!", "einwurf", "gelbe karte!", "Rote Karte!", "Torschütze :", "Foul von", "zynisches Foul!", "Elfmeterschießen", "plötzlicher Tod!", "Verletzungs Zeit" ]
+commentary = [ "er schießt er trifft!", "obere Ecke!", "Bombenschuss!", "was für ein Tor!", "hast du das gesehen??!?!", "meisterliches tor" ]
+spcommentary = [ "perfekte Platzierung", "Eis in seinen Adern", "Lehrbuch erschossen!", "Torwart hatte keine Chance", "eine vom Trainingsgelände!", "welche technik!" ]
+headcommentary = [ "Aufzählungszeichen!", "ich glaube er meinte das!", "flüchtiger Kopf!!", "Lehrbuchüberschrift!", "bananenflanke!", "Tauchkopf!!" ]
+deflcommentary = [ "große Ablenkung!", "hat den Torhüter auf dem falschen Fuß erwischt!", "Ach nein!", "Fußballtorte auf seinem Gesicht!", "wie stehen die Chancen!", "eigentor!" ]
+longcommentary = [ "golaso!", "Impossigoal!", "BombenSchuss!", "das runde muss ins eckige!", "Traumtor!", "gooooooooaaaaallll!" ]
+achievements1 = [ "score a goal", "win a game", "concede a goal", "score 10 goals", "score with a header", "score 10 headers", "win a cup" ]
+achievements2 = [ "win 10 games", "score 10 goals", "score 10 headers", "score a bicycle kick", "score 3 goals in a game", "win the world cup" ]
+achievements3 = [ "win 50 games", "score 50 goals", "score 5 goals in a game", "win the cup", "win the cup with Canada", "score from your own half", "beat brazil", "beat argentina", "beat england" ]
+fouls = [ "Ich habe ihn nie berührt Schiedsrichter!", "Schiri bitte!", "das is eine schwalbe", "Schiri!", "Ich habe den Ball!", "er hat es verdient" ]
+fouled = [ "Autsch!", "Ich kann mein Bein nicht spüren", "aaaaaargh!", "gelbe Karte!", "alles tut weh!", "der Schmerz!" ]
+recovered = [ "Ich bin ok!", "ich fühle mich jetzt viel besser", "Ich werde es ablaufen lassen", "er wird dafür bezahlen", "Zauberschwamm!!", "Ich denke, ich bin in Ordnung", "wunderbare Genesung" ]
+remorse = [ "Ich fühle mich schlecht", "Entschuldigung Schiedsrichter", "es war ein Unfall", "Es tut mir leid", "Ach je", "war nur ein Kratzer" ]
+toplay = " to spiel"
+lostfocus = "Fokus verloren – zum Fortfahren auf das Spielfenster klicken"
+unlockteam = "Du hast eine Vereinsmannschaft freigeschaltet! :"
+unlockask = "Ein Video ansehen, um ein Topteam freizuschalten?"

@@ -1,0 +1,35 @@
+{
+  "id": "world-cup-2026",
+  "name": "World Cup 2026",
+  "version": "0.1.0",
+  "game": "SuperLiquidSoccer",
+  "patches": [
+    {
+      "path": "res://Scenes/Menu.tscn",
+      "find": "text = \"super\nliquid\nsoccer\"",
+      "replace": "text = \"super\nmod\nsoccer\"",
+      "count": 1
+    }
+  ],
+  "files": [
+    {"path": "res://Scenes/WorldCup.gdc", "source": "files/Scenes/WorldCup.gdc", "overwrite": true},
+    {"path": "res://Scenes/WCGroupTournament.gdc", "source": "files/Scenes/WCGroupTournament.gdc", "overwrite": true},
+    {"path": "res://Scenes/WCGroup.gdc", "source": "files/Scenes/WCGroup.gdc", "overwrite": true},
+    {"path": "res://Scenes/WCViewer.gdc", "source": "files/Scenes/WCViewer.gdc", "overwrite": true},
+    {"path": "res://Scenes/CupViewer.gdc", "source": "files/Scenes/CupViewer.gdc", "overwrite": true},
+    {"path": "res://Scenes/GlobalCupSelect.gdc", "source": "files/Scenes/GlobalCupSelect.gdc", "overwrite": true},
+    {"path": "res://Teams/0/South Africa.tres", "source": "files/Teams/0/South Africa.tres"},
+    {"path": "res://Teams/0/Czechia.tres", "source": "files/Teams/0/Czechia.tres"},
+    {"path": "res://Teams/0/Haiti.tres", "source": "files/Teams/0/Haiti.tres"},
+    {"path": "res://Teams/0/Paraguay.tres", "source": "files/Teams/0/Paraguay.tres"},
+    {"path": "res://Teams/0/Curaçao.tres", "source": "files/Teams/0/Curaçao.tres"},
+    {"path": "res://Teams/0/New Zealand.tres", "source": "files/Teams/0/New Zealand.tres"},
+    {"path": "res://Teams/0/Cabo Verde.tres", "source": "files/Teams/0/Cabo Verde.tres"},
+    {"path": "res://Teams/0/Norway.tres", "source": "files/Teams/0/Norway.tres"},
+    {"path": "res://Teams/0/Iraq.tres", "source": "files/Teams/0/Iraq.tres"},
+    {"path": "res://Teams/0/Austria.tres", "source": "files/Teams/0/Austria.tres"},
+    {"path": "res://Teams/0/Jordan.tres", "source": "files/Teams/0/Jordan.tres"},
+    {"path": "res://Teams/0/Congo DR.tres", "source": "files/Teams/0/Congo DR.tres"},
+    {"path": "res://Teams/0/Uzbekistan.tres", "source": "files/Teams/0/Uzbekistan.tres"}
+  ]
+}

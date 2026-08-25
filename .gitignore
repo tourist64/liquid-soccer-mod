@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+
+# Ferramentas locais de recuperação; não fazem parte do projeto.
+tools/gdre/
+
+# Backups locais e variantes antigas do jogo.
+game3/.index.pck.vanilla
+game3/index-original.pck
+game3/index-mod-world-cup-2026.pck
+game3/.git-original/
+
+# Estado gerado por editores.
+.godot/
+source/**/.godot/
+source/**/.import/

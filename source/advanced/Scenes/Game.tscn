@@ -1,0 +1,594 @@
+[gd_scene load_steps=54 format=2]
+
+[ext_resource path="res://Scenes/Goal.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Res/TinyStadiumEnv.tres" type="Environment" id=2]
+[ext_resource path="res://Scenes/SmartBall.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Scenes/Team.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Scenes/Camera.gd" type="Script" id=5]
+[ext_resource path="res://Scenes/Game.gd" type="Script" id=6]
+[ext_resource path="res://Scenes/Hud.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Materials/SmartBall.tres" type="Material" id=8]
+[ext_resource path="res://Scenes/ReplayCamera.gd" type="Script" id=9]
+[ext_resource path="res://Scenes/Trailz.tscn" type="PackedScene" id=10]
+[ext_resource path="res://SoundFX/antici2.wav" type="AudioStream" id=11]
+[ext_resource path="res://Scenes/ReplayBall.gd" type="Script" id=12]
+[ext_resource path="res://Images/blob.png" type="Texture" id=13]
+[ext_resource path="res://SoundFX/goal.wav" type="AudioStream" id=14]
+[ext_resource path="res://SoundFX/crowd.wav" type="AudioStream" id=15]
+[ext_resource path="res://SoundFX/net1.wav" type="AudioStream" id=16]
+[ext_resource path="res://Scenes/ThreeDLine.tscn" type="PackedScene" id=17]
+[ext_resource path="res://Materials/Trail.tres" type="Material" id=18]
+[ext_resource path="res://SoundFX/slide2.wav" type="AudioStream" id=19]
+[ext_resource path="res://SoundFX/slide1.wav" type="AudioStream" id=20]
+[ext_resource path="res://SoundFX/oohclap.wav" type="AudioStream" id=21]
+[ext_resource path="res://Scenes/HitFX.tscn" type="PackedScene" id=22]
+[ext_resource path="res://Scenes/Ref.tscn" type="PackedScene" id=23]
+[ext_resource path="res://SoundFX/winner.wav" type="AudioStream" id=24]
+[ext_resource path="res://Images/champs.jpg" type="Texture" id=27]
+[ext_resource path="res://SoundFX/whistle.wav" type="AudioStream" id=28]
+[ext_resource path="res://SoundFX/ooh.wav" type="AudioStream" id=29]
+[ext_resource path="res://SoundFX/hit.wav" type="AudioStream" id=30]
+[ext_resource path="res://Scenes/Cups.tscn" type="PackedScene" id=31]
+[ext_resource path="res://SoundFX/applause.wav" type="AudioStream" id=32]
+[ext_resource path="res://SoundFX/foul.wav" type="AudioStream" id=33]
+[ext_resource path="res://SoundFX/ooohclap.wav" type="AudioStream" id=34]
+
+[sub_resource type="QuadMesh" id=26]
+size = Vector2( 30, 3 )
+
+[sub_resource type="SpatialMaterial" id=25]
+params_cull_mode = 2
+albedo_texture = ExtResource( 27 )
+uv1_scale = Vector3( 1, 0.2, 1 )
+
+[sub_resource type="Curve" id=73]
+min_value = -360.0
+max_value = 360.0
+_data = [ Vector2( 0, -360 ), 0.0, 0.0, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=74]
+width = 256
+curve = SubResource( 73 )
+
+[sub_resource type="ParticlesMaterial" id=72]
+lifetime_randomness = 0.18
+emission_shape = 2
+emission_box_extents = Vector3( 150, 1, 100 )
+gravity = Vector3( 0, -1, 0 )
+initial_velocity = 5.0
+initial_velocity_random = 0.48
+angular_velocity = 100.0
+angular_velocity_random = 0.39
+tangential_accel_random = 0.27
+angle = -11.2
+angle_random = 0.42
+angle_curve = SubResource( 74 )
+scale_random = 0.16
+
+[sub_resource type="SpatialMaterial" id=75]
+params_billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id=76]
+material = SubResource( 75 )
+size = Vector2( 1, 0.6 )
+
+[sub_resource type="QuadMesh" id=21]
+size = Vector2( 2, 2 )
+
+[sub_resource type="Shader" id=22]
+code = "shader_type spatial;
+uniform float from=0.1;
+uniform float to=0.5;
+render_mode unshaded;
+uniform float zNear=1.0;
+uniform float zFar=200;
+void vertex(){
+	POSITION=vec4(VERTEX,1.0);
+}
+float linDepth(sampler2D tex, vec2 pos,mat4 mat){
+	float depth=texture(tex,pos).x;
+	vec3 ndc=vec3(pos,depth) * 2.0 -1.0;
+	vec4 view=mat * vec4(ndc,1.0);
+	view.xyz/=view.w;
+	float linear_depth=view.z;
+	float scaled_depth=(zFar*zNear)/(zFar+(linear_depth*(zNear-zFar)));
+	
+	return scaled_depth*10.0;
+}
+void fragment(){
+	vec3 orig =texture(SCREEN_TEXTURE,SCREEN_UV).xyz;
+	float d1=linDepth(DEPTH_TEXTURE,SCREEN_UV+vec2(0.001,0.0),INV_PROJECTION_MATRIX);
+	float d2=linDepth(DEPTH_TEXTURE,SCREEN_UV+vec2(-0.001,0.0),INV_PROJECTION_MATRIX);
+	float d3=linDepth(DEPTH_TEXTURE,SCREEN_UV+vec2(0.0,0.001),INV_PROJECTION_MATRIX);
+	float d4=linDepth(DEPTH_TEXTURE,SCREEN_UV+vec2(0.0,-0.001),INV_PROJECTION_MATRIX);
+	
+	d1=abs(d1-d2);
+	d3=abs(d3-d4);
+	d1=max(d1,d3);
+	d1=smoothstep(from,to,d1);
+	ALBEDO=mix(orig,vec3(10.0),d1);
+	ALBEDO=vec3(d1*10.0);
+	
+	
+}
+"
+
+[sub_resource type="ShaderMaterial" id=23]
+shader = SubResource( 22 )
+shader_param/from = 0.074
+shader_param/to = 0.521
+shader_param/zNear = 1.0
+shader_param/zFar = 20.0
+
+[sub_resource type="SphereMesh" id=2]
+radius = 0.75
+height = 1.5
+radial_segments = 16
+rings = 16
+
+[sub_resource type="SpatialMaterial" id=5]
+flags_unshaded = true
+params_cull_mode = 2
+albedo_color = Color( 0.941176, 0.67451, 0.215686, 1 )
+
+[sub_resource type="CubeMesh" id=13]
+size = Vector3( 1, 1, 1 )
+
+[sub_resource type="Shader" id=19]
+code = "// NOTE: Shader automatically converted from Godot Engine 3.4.2.stable's SpatialMaterial.
+
+shader_type spatial;
+render_mode blend_mix,depth_draw_never,unshaded;
+uniform vec4 albedo : hint_color;
+uniform sampler2D texture_albedo : hint_albedo;
+uniform float specular;
+uniform float metallic;
+uniform float roughness : hint_range(0,1);
+uniform float point_size : hint_range(0,128);
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+uniform vec3 uv2_scale;
+uniform vec3 uv2_offset;
+
+
+void vertex() {
+	UV=UV*uv1_scale.xy+uv1_offset.xy;
+}
+
+
+
+
+void fragment() {
+	vec2 base_uv = UV;
+	vec4 albedo_tex = texture(texture_albedo,base_uv);
+	
+	ALPHA = albedo.a * (1.0-albedo_tex.r);
+	ALBEDO = albedo.rgb * albedo_tex.rgb * ALPHA;
+}
+"
+
+[sub_resource type="ShaderMaterial" id=20]
+shader = SubResource( 19 )
+shader_param/albedo = Color( 0.356863, 0.439216, 0.388235, 0.25098 )
+shader_param/specular = 0.5
+shader_param/metallic = 0.0
+shader_param/roughness = 1.0
+shader_param/point_size = 1.0
+shader_param/uv1_scale = Vector3( 1, 1, 1 )
+shader_param/uv1_offset = Vector3( 0, 0, 0 )
+shader_param/uv2_scale = Vector3( 1, 1, 1 )
+shader_param/uv2_offset = Vector3( 0, 0, 0 )
+shader_param/texture_albedo = ExtResource( 13 )
+
+[sub_resource type="PlaneMesh" id=18]
+size = Vector2( 4, 4 )
+
+[sub_resource type="MultiMesh" id=15]
+transform_format = 1
+custom_data_format = 2
+instance_count = 16
+mesh = SubResource( 18 )
+transform_array = PoolVector3Array( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
+custom_data_array = PoolColorArray( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )
+
+[sub_resource type="BoxShape" id=7]
+resource_local_to_scene = true
+extents = Vector3( 51.2943, 25, 90 )
+
+[sub_resource type="BoxShape" id=8]
+resource_local_to_scene = true
+extents = Vector3( 36.0382, 25, 90 )
+
+[sub_resource type="BoxShape" id=9]
+resource_local_to_scene = true
+extents = Vector3( 50.3153, 25, 90 )
+
+[sub_resource type="ShaderMaterial" id=10]
+
+[node name="Game" type="Spatial"]
+script = ExtResource( 6 )
+
+[node name="VPC" type="ViewportContainer" parent="."]
+margin_right = 1031.0
+margin_bottom = 580.0
+stretch = true
+
+[node name="VP" type="Viewport" parent="VPC"]
+size = Vector2( 1031, 580 )
+size_override_stretch = true
+handle_input_locally = false
+fxaa = true
+sharpen_intensity = 0.5
+usage = 3
+render_target_update_mode = 3
+shadow_atlas_size = 1024
+shadow_atlas_quad_0 = 1
+shadow_atlas_quad_1 = 1
+
+[node name="ChampBanner" type="MeshInstance" parent="VPC/VP"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 65, 1.52379, 50 )
+visible = false
+mesh = SubResource( 26 )
+material/0 = SubResource( 25 )
+
+[node name="Cups" parent="VPC/VP" instance=ExtResource( 31 )]
+transform = Transform( 0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 57.0719, 0, 57.963 )
+visible = false
+
+[node name="Particles" type="Particles" parent="VPC/VP"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 91.0523, 3.57441 )
+visible = false
+cast_shadow = 0
+amount = 512
+lifetime = 12.0
+visibility_aabb = AABB( -124.13, -94.3877, -93.7102, 248.232, 192.15, 187.371 )
+process_material = SubResource( 72 )
+draw_pass_1 = SubResource( 76 )
+
+[node name="GameGroup" type="Spatial" parent="VPC/VP"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="VPC/VP/GameGroup"]
+environment = ExtResource( 2 )
+
+[node name="AltCameras" type="Spatial" parent="VPC/VP/GameGroup"]
+
+[node name="CameraTopUD" type="Camera" parent="VPC/VP/GameGroup/AltCameras"]
+transform = Transform( -4.37114e-08, -0.906308, 0.422618, 0, 0.422618, 0.906308, -1, 3.9616e-08, -1.84732e-08, 0, 90, 0 )
+v_offset = -20.0
+fov = 50.0
+far = 500.0
+script = ExtResource( 5 )
+target = NodePath("../../Ball")
+mlimitx = 180
+mlimitz = 100
+mfov = 50
+zoffset = 0
+xoffset = 20
+
+[node name="CameraTopLR" type="Camera" parent="VPC/VP/GameGroup/AltCameras"]
+transform = Transform( 1, 0, 0, 0, 0.18239, 0.983226, 0, -0.983226, 0.18239, 0, 80, 0 )
+fov = 60.0
+near = 1.0
+far = 500.0
+script = ExtResource( 5 )
+target = NodePath("../../Ball")
+mlimitz = 100
+mfov = 60
+zoffset = 20
+
+[node name="WinnerCamera" type="Camera" parent="VPC/VP/GameGroup/AltCameras"]
+transform = Transform( 1, 0, 0, 0, 0.990849, 0.134972, 0, -0.134972, 0.990849, 65.0714, 8.05258, 75.07 )
+fov = 65.0
+far = 400.0
+
+[node name="Camera" type="Camera" parent="VPC/VP/GameGroup"]
+pause_mode = 2
+process_priority = -1
+transform = Transform( 1, 0, 0, 0, 0.670258, 0.742128, 0, -0.742128, 0.670258, 34.11, 74.41, 0 )
+fov = 45.0
+near = 20.0
+far = 300.0
+script = ExtResource( 5 )
+translate_min = 0
+target = NodePath("../Ball")
+
+[node name="MeshInstance" type="MeshInstance" parent="VPC/VP/GameGroup/Camera"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5 )
+visible = false
+cast_shadow = 0
+generate_lightmap = false
+mesh = SubResource( 21 )
+material/0 = SubResource( 23 )
+
+[node name="Goal" parent="VPC/VP/GameGroup" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -138.702, 0, 0 )
+
+[node name="Goal2" parent="VPC/VP/GameGroup" instance=ExtResource( 1 )]
+transform = Transform( -1, 0, -3.89414e-07, 0, 1, 0, 3.89414e-07, 0, -1, 138.424, 0, 0 )
+
+[node name="Ball" parent="VPC/VP/GameGroup" instance=ExtResource( 3 )]
+collision_mask = 4194779
+
+[node name="Team" parent="VPC/VP/GameGroup" instance=ExtResource( 4 )]
+shirtColor = Color( 0.937255, 0.937255, 0.878431, 1 )
+shirtColor2 = Color( 0.298039, 0.74902, 0.92549, 1 )
+shortColor = Color( 0.0313726, 0.113725, 0.172549, 1 )
+keeperColor = Color( 0.854902, 0.498039, 0.0352941, 1 )
+skin1Color = Color( 0.882353, 0.658824, 0.537255, 1 )
+skin2Color = Color( 0.25098, 0.203922, 0.14902, 1 )
+teamID = 1
+
+[node name="Team2" parent="VPC/VP/GameGroup" instance=ExtResource( 4 )]
+shirtColor = Color( 0.898039, 0.772549, 0.203922, 1 )
+shirtColor2 = Color( 0.247059, 0.439216, 0.192157, 1 )
+shortColor = Color( 0.129412, 0.294118, 0.576471, 1 )
+keeperColor = Color( 0.309804, 0.898039, 0.121569, 1 )
+skin1Color = Color( 0.882353, 0.686275, 0.580392, 1 )
+skin2Color = Color( 0.227451, 0.168627, 0.133333, 1 )
+kit = 1
+teamID = 2
+
+[node name="ReplayBall" type="MeshInstance" parent="VPC/VP/GameGroup"]
+transform = Transform( 0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0 )
+visible = false
+mesh = SubResource( 2 )
+material/0 = ExtResource( 8 )
+script = ExtResource( 12 )
+
+[node name="Replays" type="Spatial" parent="VPC/VP/GameGroup"]
+
+[node name="ReplayCamera1A" type="Camera" parent="VPC/VP/GameGroup/Replays"]
+transform = Transform( -1.49586e-07, -0.396235, 0.918149, -6.45548e-08, 0.918149, 0.396235, -1, 2.8777e-13, -1.62921e-07, 164.244, 21.0835, 0 )
+far = 1147.6
+script = ExtResource( 9 )
+
+[node name="ReplayCamera2A" type="Camera" parent="VPC/VP/GameGroup/Replays"]
+transform = Transform( -1.62921e-07, 0.396235, -0.918149, 0, 0.918149, 0.396235, 1, 6.4555e-08, -1.49586e-07, -164, 21, 0 )
+current = true
+far = 1147.6
+script = ExtResource( 9 )
+
+[node name="ReplayCamera1B" type="Camera" parent="VPC/VP/GameGroup/Replays"]
+transform = Transform( -0.897151, -0.175027, 0.40557, 0, 0.918149, 0.396235, -0.441725, 0.355482, -0.823718, 157.735, 8.02444, -69.5009 )
+fov = 50.0
+near = 1.0
+far = 500.0
+script = ExtResource( 9 )
+
+[node name="ReplayCamera1C" type="Camera" parent="VPC/VP/GameGroup/Replays"]
+transform = Transform( 0.996357, -0.0337901, 0.0782978, 0, 0.918149, 0.396235, -0.0852778, -0.394792, 0.914805, 114.533, 11.0141, 100.871 )
+fov = 35.8
+near = 1.0
+far = 500.0
+script = ExtResource( 9 )
+
+[node name="ReplayCamera2C" type="Camera" parent="VPC/VP/GameGroup/Replays"]
+transform = Transform( 0.996357, -0.0337901, 0.0782978, 0, 0.918149, 0.396235, -0.0852778, -0.394792, 0.914805, -113.905, 11.0141, 100.871 )
+fov = 50.0
+near = 1.0
+far = 500.0
+script = ExtResource( 9 )
+
+[node name="ReplayCamera2B" type="Camera" parent="VPC/VP/GameGroup/Replays"]
+transform = Transform( -0.47955, 0.347702, -0.805689, 0, 0.918149, 0.396235, 0.877515, 0.190014, -0.440298, -149.506, 8.02444, -67.238 )
+fov = 50.0
+near = 1.0
+far = 500.0
+script = ExtResource( 9 )
+
+[node name="ReplayCamera1D" type="Camera" parent="VPC/VP/GameGroup/Replays"]
+transform = Transform( 0.214276, 0.0730651, 0.974037, -0.017218, 0.997326, -0.0710243, -0.976621, -0.00155215, 0.214961, 148.629, 2.48742, 5.90792 )
+near = 0.15
+far = 500.0
+script = ExtResource( 9 )
+
+[node name="ReplayCamera2D" type="Camera" parent="VPC/VP/GameGroup/Replays"]
+transform = Transform( -0.291516, -0.0828604, -0.95297, -0.0242385, 0.996561, -0.079236, 0.956259, 9.68036e-09, -0.292522, -148.154, 2.33105, -9.10807 )
+near = 0.15
+far = 500.0
+script = ExtResource( 9 )
+
+[node name="ReplayCamera1E" type="Camera" parent="VPC/VP/GameGroup/Replays"]
+transform = Transform( -4.37114e-08, -1, -4.37114e-08, 0, -4.37114e-08, 1, -1, 4.37114e-08, 1.91069e-15, 110, 140, 0 )
+fov = 35.5
+near = 20.07
+far = 200.0
+script = ExtResource( 9 )
+movingcam = false
+
+[node name="ReplayCamera2E" type="Camera" parent="VPC/VP/GameGroup/Replays"]
+transform = Transform( -4.37114e-08, -1, -4.37114e-08, 0, -4.37114e-08, 1, -1, 4.37114e-08, 1.91069e-15, -110, 140, 0 )
+fov = 35.5
+near = 20.07
+far = 200.0
+script = ExtResource( 9 )
+movingcam = false
+
+[node name="PenaltyCams" type="Spatial" parent="VPC/VP/GameGroup"]
+
+[node name="CameraP1" type="Camera" parent="VPC/VP/GameGroup/PenaltyCams"]
+transform = Transform( -4.37114e-08, -0.173648, 0.984808, 0, 0.984808, 0.173648, -1, 7.5904e-09, -4.30473e-08, -60, 15, 0 )
+fov = 25.0
+near = 5.0
+far = 327.4
+
+[node name="CameraP2" type="Camera" parent="VPC/VP/GameGroup/PenaltyCams"]
+transform = Transform( -4.37114e-08, 0.173648, -0.984808, 0, 0.984808, 0.173648, 1, 7.5904e-09, -4.30473e-08, 60, 15, 0 )
+fov = 25.0
+near = 5.0
+far = 327.4
+
+[node name="CameraFK" type="Camera" parent="VPC/VP/GameGroup/PenaltyCams"]
+current = true
+fov = 35.0
+near = 2.0
+far = 320.0
+
+[node name="ThreeDLine" parent="VPC/VP/GameGroup" instance=ExtResource( 17 )]
+material_override = SubResource( 5 )
+cast_shadow = 0
+thick = 3.0
+
+[node name="HitFX" parent="VPC/VP/GameGroup" instance=ExtResource( 22 )]
+
+[node name="DebugMesh" type="MeshInstance" parent="VPC/VP/GameGroup"]
+visible = false
+mesh = SubResource( 13 )
+
+[node name="Trailz" parent="VPC/VP/GameGroup" instance=ExtResource( 10 )]
+material_override = ExtResource( 18 )
+material = ExtResource( 18 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="VPC/VP/GameGroup"]
+transform = Transform( 0.628516, -0.372035, 0.68305, -0.763822, -0.129508, 0.6323, -0.146777, -0.91914, -0.365566, 0, 8.48317, 0 )
+visible = false
+layers = 2
+light_color = Color( 0.917647, 0.776471, 0.556863, 1 )
+light_energy = 0.1
+light_indirect_energy = 0.0
+light_specular = 0.0
+light_bake_mode = 0
+light_cull_mask = 4294967294
+shadow_color = Color( 0.0509804, 0.0313726, 0.0313726, 1 )
+shadow_bias = 0.5
+directional_shadow_mode = 0
+directional_shadow_split_1 = 0.2
+directional_shadow_split_2 = 0.3
+directional_shadow_depth_range = 1
+directional_shadow_max_distance = 460.0
+
+[node name="Blobs" type="MultiMeshInstance" parent="VPC/VP/GameGroup"]
+material_override = SubResource( 20 )
+cast_shadow = 0
+generate_lightmap = false
+multimesh = SubResource( 15 )
+
+[node name="Ref" parent="VPC/VP/GameGroup" instance=ExtResource( 23 )]
+
+[node name="Timers" type="Node" parent="."]
+
+[node name="Timer" type="Timer" parent="Timers"]
+one_shot = true
+
+[node name="GameTime" type="Timer" parent="Timers"]
+wait_time = 30.0
+one_shot = true
+
+[node name="ShootoutTimer" type="Timer" parent="Timers"]
+wait_time = 1.5
+one_shot = true
+
+[node name="Zones" type="Spatial" parent="."]
+
+[node name="Zone1" type="Area" parent="Zones"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -93.7229, 24.0643, 0 )
+collision_layer = 256
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape" type="CollisionShape" parent="Zones/Zone1"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72321, 0, 0 )
+shape = SubResource( 7 )
+
+[node name="Zone2" type="Area" parent="Zones"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 24.064, 0 )
+collision_layer = 256
+collision_mask = 4
+
+[node name="CollisionShape" type="CollisionShape" parent="Zones/Zone2"]
+shape = SubResource( 8 )
+
+[node name="Zone3" type="Area" parent="Zones"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 89.4528, 24.0643, 0 )
+collision_layer = 256
+collision_mask = 4
+
+[node name="CollisionShape" type="CollisionShape" parent="Zones/Zone3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8022, 0, 0 )
+shape = SubResource( 9 )
+
+[node name="Sounds" type="Spatial" parent="."]
+
+[node name="WhistleSounds" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 28 )
+volume_db = -12.0
+bus = "SFX"
+
+[node name="CrowdSounds" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 15 )
+volume_db = -14.319
+bus = "Crowd"
+
+[node name="NetSounds" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 16 )
+bus = "SFX"
+
+[node name="GoalSounds" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 14 )
+bus = "Crowd"
+
+[node name="SlideSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 19 )
+volume_db = -10.903
+bus = "SFX"
+
+[node name="SlideSound2" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 20 )
+volume_db = -10.065
+bus = "SFX"
+
+[node name="OofSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 30 )
+volume_db = -5.871
+bus = "SFX"
+
+[node name="CrowdOoh" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 29 )
+volume_db = -8.0
+bus = "Crowd"
+
+[node name="CrowdCross" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 11 )
+volume_db = -8.0
+bus = "Crowd"
+
+[node name="CrowdExcited" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 21 )
+volume_db = -9.964
+bus = "Crowd"
+
+[node name="CrowdApplause" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 32 )
+volume_db = -5.0
+bus = "Crowd"
+
+[node name="CrowdFoul" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 33 )
+volume_db = -4.0
+bus = "Crowd"
+
+[node name="CrowdBigOOH" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 34 )
+volume_db = -4.412
+bus = "Crowd"
+
+[node name="Winner" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 24 )
+volume_db = -6.0
+bus = "Crowd"
+
+[node name="Hud" parent="." instance=ExtResource( 7 )]
+material = SubResource( 10 )
+
+[node name="Spatial" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -65.7939, 1, 11 )
+
+[connection signal="timeout" from="Timers/Timer" to="." method="_on_Timer_timeout"]
+[connection signal="timeout" from="Timers/GameTime" to="." method="_on_GameTime_timeout"]
+[connection signal="timeout" from="Timers/ShootoutTimer" to="." method="_on_ShootoutTimer_timeout"]
+[connection signal="body_entered" from="Zones/Zone1" to="." method="_on_Zone1_body_entered"]
+[connection signal="body_entered" from="Zones/Zone2" to="." method="_on_Zone2_body_entered"]
+[connection signal="body_entered" from="Zones/Zone3" to="." method="_on_Zone3_body_entered"]

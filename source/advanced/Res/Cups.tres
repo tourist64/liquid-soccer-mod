@@ -1,0 +1,24 @@
+[gd_resource type="Environment" load_steps=3 format=2]
+
+[ext_resource path="res://Images/stadium_01_1k.exr" type="Texture" id=1]
+
+[sub_resource type="PanoramaSky" id=1]
+radiance_size = 1
+panorama = ExtResource( 1 )
+
+[resource]
+background_mode = 3
+background_sky = SubResource( 1 )
+background_sky_orientation = Basis( 0.642788, 0.286965, -0.710264, 0, 0.927184, 0.374607, 0.766044, -0.240792, 0.595982 )
+background_color = Color( 0.803922, 0.231373, 0.231373, 0 )
+ambient_light_energy = 0.0
+ss_reflections_enabled = true
+dof_blur_far_enabled = true
+dof_blur_far_distance = 29.39
+dof_blur_far_transition = 0.19
+dof_blur_far_quality = 2
+glow_enabled = true
+glow_intensity = 5.99
+glow_strength = 0.69
+glow_hdr_luminance_cap = 1.0
+glow_hdr_scale = 1.0

@@ -1,0 +1,32 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[ext_resource path="res://Materials/player2026.shader" type="Shader" id=1]
+
+[resource]
+resource_local_to_scene = true
+shader = ExtResource( 1 )
+shader_param/albedo_color = null
+shader_param/Skin = null
+shader_param/Shirt = null
+shader_param/Shirt2 = null
+shader_param/Shirt3 = null
+shader_param/Shorts = null
+shader_param/Shoes = null
+shader_param/Numbers = null
+shader_param/Gloves = null
+shader_param/BibColor = null
+shader_param/kit = null
+shader_param/specular = null
+shader_param/metallic = null
+shader_param/roughness = 1.0
+shader_param/point_size = null
+shader_param/uv1_scale = null
+shader_param/uv1_offset = null
+shader_param/uv2_scale = null
+shader_param/uv2_offset = null
+shader_param/numChannelMult = null
+shader_param/nameOff = false
+shader_param/numUVOff = 0.0
+shader_param/isKeeper = false
+shader_param/isSimple = true
+shader_param/doBibs = false

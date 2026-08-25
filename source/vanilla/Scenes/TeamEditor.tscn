@@ -1,0 +1,654 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Scenes/TacticsEditor.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/newPlay.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Res/UI.tres" type="Theme" id=3]
+[ext_resource path="res://Scenes/TeamEditor.gd" type="Script" id=4]
+[ext_resource path="res://Scenes/Transition.tscn" type="PackedScene" id=5]
+
+[sub_resource type="ButtonGroup" id=1]
+
+[node name="TeamEditor" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 3 )
+script = ExtResource( 4 )
+
+[node name="BG" type="ColorRect" parent="."]
+margin_left = 1.41425
+margin_top = 1.41425
+margin_right = 1921.41
+margin_bottom = 1081.41
+color = Color( 0.803922, 0.231373, 0.231373, 1 )
+
+[node name="VPC" type="ViewportContainer" parent="BG"]
+anchor_left = 0.717
+anchor_top = 0.092
+anchor_right = 0.717
+anchor_bottom = 0.092
+margin_left = -0.640015
+margin_top = -0.360001
+margin_right = 371.36
+margin_bottom = 544.64
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VP" type="Viewport" parent="BG/VPC"]
+size = Vector2( 372, 545 )
+transparent_bg = true
+handle_input_locally = false
+msaa = 2
+render_target_update_mode = 3
+
+[node name="Player" parent="BG/VPC/VP" instance=ExtResource( 2 )]
+
+[node name="Camera" type="Camera" parent="BG/VPC/VP"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.53913, 2.60123 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="BG/VPC/VP"]
+transform = Transform( 0.278933, -0.599672, 0.750059, 0.321385, 0.794313, 0.515536, -0.904935, 0.0972576, 0.414286, 0, 0, 2.16151 )
+light_color = Color( 0.964706, 0.796078, 0.647059, 1 )
+light_energy = 2.0
+
+[node name="TacticsEditor" parent="BG" instance=ExtResource( 1 )]
+anchor_top = 0.033
+anchor_bottom = 0.033
+margin_left = 6.10352e-05
+rect_scale = Vector2( 0.8, 0.8 )
+
+[node name="PlayerStats" type="ColorRect" parent="BG"]
+anchor_left = 0.404
+anchor_top = 0.175
+anchor_right = 0.544
+anchor_bottom = 0.62
+margin_left = 0.319946
+margin_top = -16.0
+margin_right = 164.52
+margin_bottom = 142.4
+rect_scale = Vector2( 0.8, 0.8 )
+color = Color( 0.6, 0.0980392, 0.0980392, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PName" type="TextEdit" parent="BG/PlayerStats"]
+anchor_left = 0.043
+anchor_top = 0.018
+anchor_right = 0.061
+anchor_bottom = 0.018
+margin_left = -0.052
+margin_top = -0.151999
+margin_right = 389.948
+margin_bottom = 53.848
+text = "player name"
+
+[node name="PAggression" type="TextEdit" parent="BG/PlayerStats"]
+anchor_left = 0.745
+anchor_top = 0.149
+anchor_right = 0.87
+anchor_bottom = 0.167
+margin_right = 40.0
+margin_bottom = 40.0
+text = "0.5"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PAgility" type="TextEdit" parent="BG/PlayerStats"]
+anchor_left = 0.745
+anchor_top = 0.238
+anchor_right = 0.87
+anchor_bottom = 0.254
+margin_top = -2.0
+margin_right = 40.0
+margin_bottom = 38.0
+text = "1.0"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PShoot" type="TextEdit" parent="BG/PlayerStats"]
+anchor_left = 0.745
+anchor_top = 0.316
+anchor_right = 0.87
+anchor_bottom = 0.325
+margin_right = 40.0
+margin_bottom = 40.0
+text = "1.0"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PCurl" type="TextEdit" parent="BG/PlayerStats"]
+anchor_left = 0.745
+anchor_top = 0.403
+anchor_right = 0.87
+anchor_bottom = 0.42
+margin_right = 40.0
+margin_bottom = 40.0
+text = "1.0"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PSmart" type="TextEdit" parent="BG/PlayerStats"]
+anchor_left = 0.745
+anchor_top = 0.491
+anchor_right = 0.87
+anchor_bottom = 0.535
+margin_left = 0.414948
+margin_top = -0.251984
+margin_right = 40.2899
+margin_bottom = 22.932
+text = "5"
+virtual_keyboard_enabled = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PSpeed" type="TextEdit" parent="BG/PlayerStats"]
+anchor_left = 0.745
+anchor_top = 0.578
+anchor_right = 0.854
+anchor_bottom = 0.578
+margin_left = 0.414948
+margin_top = -0.395996
+margin_right = 47.2179
+margin_bottom = 45.604
+text = "35"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PStamina" type="TextEdit" parent="BG/PlayerStats"]
+anchor_left = 0.745
+anchor_top = 0.657
+anchor_right = 0.87
+anchor_bottom = 0.674
+margin_right = 40.0
+margin_bottom = 40.0
+text = "1.0"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="BG/PlayerStats"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.044
+anchor_top = 0.158
+anchor_right = 0.079
+anchor_bottom = 0.167
+margin_left = -0.051981
+margin_top = 0.0383072
+margin_right = 250.793
+margin_bottom = 306.287
+size_flags_vertical = 0
+custom_constants/line_spacing = 18
+text = "Aggression
+Agility
+Shoot
+Curl
+Smart
+Speed
+Stamina"
+align = 2
+
+[node name="SkinColor" type="ColorPickerButton" parent="BG/PlayerStats"]
+anchor_left = 0.754
+anchor_top = 0.759
+anchor_right = 0.868
+anchor_bottom = 0.759
+margin_right = 6.0
+margin_bottom = 50.0
+color = Color( 0.890196, 0.6, 0.6, 1 )
+
+[node name="HairColor" type="ColorPickerButton" parent="BG/PlayerStats"]
+anchor_left = 0.315
+anchor_top = 0.759
+anchor_right = 0.429
+anchor_bottom = 0.759
+margin_right = 6.0
+margin_bottom = 50.0
+color = Color( 0.478431, 0.27451, 0.12549, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label2" type="Label" parent="BG/PlayerStats"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.561
+anchor_top = 0.759
+anchor_right = 0.561
+anchor_bottom = 0.759
+margin_right = 40.0
+margin_bottom = 44.0
+text = "skin:"
+
+[node name="Label3" type="Label" parent="BG/PlayerStats"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.122
+anchor_top = 0.759
+anchor_right = 0.219
+anchor_bottom = 0.759
+margin_right = 40.0
+margin_bottom = 44.0
+text = "hair:"
+
+[node name="HairType" type="OptionButton" parent="BG/PlayerStats"]
+anchor_left = 0.044
+anchor_top = 0.868
+anchor_right = 0.053
+anchor_bottom = 0.868
+margin_left = -0.052
+margin_top = 0.348022
+margin_right = 185.051
+margin_bottom = 50.348
+rect_scale = Vector2( 0.8, 0.8 )
+text = "hair type"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BeardType" type="OptionButton" parent="BG/PlayerStats"]
+anchor_left = 0.57
+anchor_top = 0.868
+anchor_right = 0.57
+anchor_bottom = 0.868
+margin_left = -0.052
+margin_top = 0.348022
+margin_right = 185.051
+margin_bottom = 50.348
+rect_scale = Vector2( 0.8, 0.8 )
+text = "Face hair"
+
+[node name="Teamname" type="Label" parent="BG"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.385
+anchor_top = 0.018
+anchor_right = 0.423
+anchor_bottom = 0.018
+margin_top = -0.439922
+margin_right = 311.0
+margin_bottom = 43.5601
+text = "Edit Teams"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SaveButton" type="Button" parent="BG"]
+anchor_left = 0.544
+anchor_top = 0.912
+anchor_right = 0.658
+anchor_bottom = 0.912
+margin_right = 6.0
+margin_bottom = 50.0
+text = "Save"
+
+[node name="SaveAsButton" type="Button" parent="BG"]
+anchor_left = 0.684
+anchor_top = 0.912
+anchor_right = 0.798
+anchor_bottom = 0.912
+margin_right = 6.0
+margin_bottom = 50.0
+text = "Save New"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BackButton" type="Button" parent="BG"]
+anchor_left = 0.86
+anchor_top = 0.912
+anchor_right = 0.956
+anchor_bottom = 0.912
+margin_right = 6.0
+margin_bottom = 50.0
+text = "Back"
+
+[node name="HomeButton" type="Button" parent="BG"]
+anchor_left = 0.718
+anchor_top = 0.614
+anchor_right = 0.806
+anchor_bottom = 0.614
+margin_right = 6.0
+margin_bottom = 50.0
+toggle_mode = true
+pressed = true
+group = SubResource( 1 )
+text = "Home"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AwayButton" type="Button" parent="BG"]
+anchor_left = 0.815
+anchor_top = 0.614
+anchor_right = 0.903
+anchor_bottom = 0.614
+margin_right = 6.0
+margin_bottom = 50.0
+toggle_mode = true
+group = SubResource( 1 )
+text = "Away"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="S1" type="ColorPickerButton" parent="BG"]
+anchor_left = 0.65
+anchor_top = 0.175
+anchor_right = 0.685
+anchor_bottom = 0.193
+margin_right = 6.0
+margin_bottom = 50.0
+color = Color( 0.533333, 0.0509804, 0.0509804, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="S2" type="ColorPickerButton" parent="BG"]
+anchor_left = 0.65
+anchor_top = 0.256
+anchor_right = 0.685
+anchor_bottom = 0.273
+margin_right = 6.0
+margin_bottom = 50.0
+color = Color( 0.137255, 0.0235294, 0.0235294, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="S3" type="ColorPickerButton" parent="BG"]
+anchor_left = 0.65
+anchor_top = 0.335
+anchor_right = 0.685
+anchor_bottom = 0.351
+margin_right = 6.0
+margin_bottom = 50.0
+color = Color( 0.137255, 0.0235294, 0.0235294, 1 )
+
+[node name="Short" type="ColorPickerButton" parent="BG"]
+anchor_left = 0.65
+anchor_top = 0.424
+anchor_right = 0.685
+anchor_bottom = 0.44
+margin_right = 6.0
+margin_bottom = 50.0
+color = Color( 0.92549, 0.894118, 0.894118, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Number" type="ColorPickerButton" parent="BG"]
+anchor_left = 0.65
+anchor_top = 0.504
+anchor_right = 0.685
+anchor_bottom = 0.519
+margin_right = 6.0
+margin_bottom = 50.0
+color = Color( 0.92549, 0.894118, 0.894118, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Keeper" type="ColorPickerButton" parent="BG"]
+anchor_left = 0.65
+anchor_top = 0.586
+anchor_right = 0.685
+anchor_bottom = 0.602
+margin_right = 6.0
+margin_bottom = 50.0
+color = Color( 0.298039, 0.776471, 0.0823529, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TeamList" type="OptionButton" parent="BG"]
+anchor_left = 0.045
+anchor_top = 0.087
+anchor_right = 0.246
+anchor_bottom = 0.087
+margin_right = 20.0
+margin_bottom = 50.0
+align = 1
+
+[node name="KitType" type="OptionButton" parent="BG"]
+anchor_left = 0.737
+anchor_top = 0.684
+anchor_right = 0.886
+anchor_bottom = 0.693
+margin_right = 20.0
+margin_bottom = 50.0
+custom_constants/hseparation = 0
+text = "Kit Type"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ETeamName" type="TextEdit" parent="BG"]
+anchor_left = 0.269
+anchor_top = 0.084
+anchor_right = 0.446
+anchor_bottom = 0.092
+margin_right = 40.0
+margin_bottom = 40.0
+text = "TeamName"
+
+[node name="TeamParams" type="ColorRect" parent="BG"]
+anchor_left = 0.407
+anchor_top = 0.646
+anchor_right = 0.623
+anchor_bottom = 0.846
+margin_left = -0.438293
+margin_top = -4.67725
+margin_right = 39.8427
+margin_bottom = 46.3236
+color = Color( 0.6, 0.0980392, 0.0980392, 1 )
+
+[node name="SponsorL" type="Label" parent="BG/TeamParams"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+margin_right = 217.0
+margin_bottom = 44.0
+text = "sponsor:"
+align = 2
+
+[node name="TLevel" type="Label" parent="BG/TeamParams"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_top = 0.199
+anchor_bottom = 0.199
+margin_right = 216.0
+margin_bottom = 44.0
+text = "level:"
+align = 2
+
+[node name="TAggression" type="Label" parent="BG/TeamParams"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.111
+anchor_top = 0.354
+anchor_right = 0.111
+anchor_bottom = 0.362
+margin_right = 40.0
+margin_bottom = 44.0
+text = "aggression:"
+align = 2
+
+[node name="TTactics" type="Label" parent="BG/TeamParams"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_top = 0.538
+anchor_bottom = 0.553
+margin_right = 217.0
+margin_bottom = 44.0
+text = "tactics:"
+align = 2
+
+[node name="TApproach" type="Label" parent="BG/TeamParams"]
+modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_top = 0.7
+anchor_bottom = 0.7
+margin_right = 215.0
+margin_bottom = 44.0
+text = "approach:"
+align = 2
+
+[node name="Sponsor" type="TextEdit" parent="BG/TeamParams"]
+anchor_left = 0.492
+anchor_top = 0.008
+anchor_right = 0.892
+anchor_bottom = 0.008
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="Level" type="TextEdit" parent="BG/TeamParams"]
+anchor_left = 0.661
+anchor_top = 0.177
+anchor_right = 0.692
+anchor_bottom = 0.193
+margin_left = 0.430695
+margin_top = 0.217422
+margin_right = 87.3344
+margin_bottom = 40.2597
+text = "1"
+
+[node name="Aggrssion" type="TextEdit" parent="BG/TeamParams"]
+anchor_left = 0.661
+anchor_top = 0.346
+anchor_right = 0.692
+anchor_bottom = 0.346
+margin_left = 0.430695
+margin_top = 0.413727
+margin_right = 90.3344
+margin_bottom = 40.4137
+text = "0.25"
+
+[node name="Tactics" type="TextEdit" parent="BG/TeamParams"]
+anchor_left = 0.661
+anchor_top = 0.523
+anchor_right = 0.692
+anchor_bottom = 0.523
+margin_left = 0.430695
+margin_top = -0.368851
+margin_right = 88.3344
+margin_bottom = 39.6311
+text = "0.5"
+
+[node name="Approach" type="TextEdit" parent="BG/TeamParams"]
+anchor_left = 0.661
+anchor_top = 0.7
+anchor_right = 0.692
+anchor_bottom = 0.7
+margin_left = 0.430695
+margin_top = -0.151428
+margin_right = 87.3344
+margin_bottom = 39.8486
+text = "0.5"
+
+[node name="Label" type="Label" parent="BG/TeamParams"]
+self_modulate = Color( 0.956863, 0.776471, 0.431373, 1 )
+anchor_left = 0.214
+anchor_top = 0.849
+anchor_right = 0.214
+anchor_bottom = 0.849
+margin_right = 40.0
+margin_bottom = 34.0
+text = "league:"
+
+[node name="LeagueButton" type="OptionButton" parent="BG/TeamParams"]
+anchor_left = 0.54
+anchor_top = 0.849
+anchor_right = 0.912
+anchor_bottom = 0.849
+margin_right = 20.0
+margin_bottom = 40.0
+text = "league"
+clip_text = true
+align = 1
+
+[node name="TeamDir" type="OptionButton" parent="BG"]
+anchor_left = 0.047
+anchor_top = 0.023
+anchor_right = 0.062
+anchor_bottom = 0.023
+margin_right = 20.0
+margin_bottom = 50.0
+rect_scale = Vector2( 0.9, 0.9 )
+text = "All Teams"
+
+[node name="TextEdit" type="TextEdit" parent="BG"]
+anchor_left = 0.477
+anchor_top = 0.085
+anchor_right = 0.523
+anchor_bottom = 0.093
+margin_left = 0.162048
+margin_top = 0.200363
+margin_right = -9.15778
+margin_bottom = 40.5604
+text = "GER"
+
+[node name="Label" type="Label" parent="BG"]
+self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )
+anchor_left = 0.595
+anchor_top = 0.198
+anchor_right = 0.595
+anchor_bottom = 0.23
+margin_left = -10.3975
+margin_top = 0.160843
+margin_right = 118.603
+margin_bottom = 439.601
+rect_scale = Vector2( 0.929, 0.984 )
+custom_constants/line_spacing = 10
+text = "shirt1
+
+shirt2
+
+shirt3
+
+shorts
+
+numbers
+
+keeper"
+
+[node name="Transition" parent="." instance=ExtResource( 5 )]
+visible = false
+
+[connection signal="gui_input" from="BG/VPC" to="." method="_on_VPC_gui_input"]
+[connection signal="focus_exited" from="BG/PlayerStats/PName" to="." method="_on_PName_focus_exited"]
+[connection signal="focus_exited" from="BG/PlayerStats/PAggression" to="." method="_on_player_data_exited"]
+[connection signal="focus_exited" from="BG/PlayerStats/PAgility" to="." method="_on_player_data_exited"]
+[connection signal="focus_exited" from="BG/PlayerStats/PShoot" to="." method="_on_player_data_exited"]
+[connection signal="focus_exited" from="BG/PlayerStats/PCurl" to="." method="_on_player_data_exited"]
+[connection signal="focus_exited" from="BG/PlayerStats/PSmart" to="." method="_on_player_data_exited"]
+[connection signal="focus_exited" from="BG/PlayerStats/PSpeed" to="." method="_on_player_data_exited"]
+[connection signal="focus_exited" from="BG/PlayerStats/PStamina" to="." method="_on_player_data_exited"]
+[connection signal="color_changed" from="BG/PlayerStats/SkinColor" to="." method="_on_SkinColor_color_changed"]
+[connection signal="color_changed" from="BG/PlayerStats/HairColor" to="." method="_on_HairColor_color_changed"]
+[connection signal="item_selected" from="BG/PlayerStats/HairType" to="." method="_on_HairType_item_selected"]
+[connection signal="item_selected" from="BG/PlayerStats/BeardType" to="." method="_on_BeardType_item_selected"]
+[connection signal="pressed" from="BG/SaveButton" to="." method="_on_SaveButton_pressed"]
+[connection signal="pressed" from="BG/SaveAsButton" to="." method="_on_SaveAsButton_pressed"]
+[connection signal="pressed" from="BG/BackButton" to="." method="_on_BackButton_pressed"]
+[connection signal="pressed" from="BG/HomeButton" to="." method="_on_HomeButton_pressed"]
+[connection signal="pressed" from="BG/AwayButton" to="." method="_on_AwayButton_pressed"]
+[connection signal="color_changed" from="BG/S1" to="." method="_on_S1_color_changed"]
+[connection signal="color_changed" from="BG/S2" to="." method="_on_S2_color_changed"]
+[connection signal="color_changed" from="BG/S3" to="." method="_on_S3_color_changed"]
+[connection signal="color_changed" from="BG/Short" to="." method="_on_Short_color_changed"]
+[connection signal="color_changed" from="BG/Number" to="." method="_on_Number_color_changed"]
+[connection signal="color_changed" from="BG/Keeper" to="." method="_on_Keeper_color_changed"]
+[connection signal="item_selected" from="BG/TeamList" to="." method="_on_TeamList_item_selected"]
+[connection signal="item_selected" from="BG/KitType" to="." method="_on_KitType_item_selected"]
+[connection signal="focus_exited" from="BG/ETeamName" to="." method="_on_ETeamName_focus_exited"]
+[connection signal="focus_exited" from="BG/TeamParams/Sponsor" to="." method="_on_Sponsor_focus_exited"]
+[connection signal="focus_exited" from="BG/TeamParams/Level" to="." method="_on_Sponsor_focus_exited"]
+[connection signal="focus_exited" from="BG/TeamParams/Aggrssion" to="." method="_on_Sponsor_focus_exited"]
+[connection signal="focus_exited" from="BG/TeamParams/Tactics" to="." method="_on_Sponsor_focus_exited"]
+[connection signal="focus_exited" from="BG/TeamParams/Approach" to="." method="_on_Sponsor_focus_exited"]
+[connection signal="item_selected" from="BG/TeamParams/LeagueButton" to="." method="_on_LeagueButton_item_selected"]
+[connection signal="item_selected" from="BG/TeamDir" to="." method="_on_TeamDir_item_selected"]
+[connection signal="focus_exited" from="BG/TextEdit" to="." method="_on_TextEdit_focus_exited"]

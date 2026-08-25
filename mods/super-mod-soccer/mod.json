@@ -1,0 +1,15 @@
+{
+  "id": "super-mod-soccer",
+  "name": "Super Mod Soccer",
+  "version": "0.1.0",
+  "game": "SuperLiquidSoccer",
+  "patches": [
+    {
+      "path": "res://Scenes/Menu.tscn",
+      "find": "text = \"super\nliquid\nsoccer\"",
+      "replace": "text = \"super\nmod\nsoccer\"",
+      "count": 1
+    }
+  ]
+}
+  

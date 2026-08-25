@@ -1,0 +1,481 @@
+[gd_scene load_steps=121 format=2]
+
+[sub_resource type="AnimationNodeBlend3" id=173]
+
+[sub_resource type="AnimationNodeAnimation" id=174]
+animation = "celebtrate2"
+
+[sub_resource type="AnimationNodeAnimation" id=10]
+animation = "celebwave"
+
+[sub_resource type="AnimationNodeAnimation" id=165]
+animation = "celebplane"
+
+[sub_resource type="AnimationNodeBlend2" id=175]
+filter_enabled = true
+filters = [ "QuickRigCharacter_Reference:QuickRigCharacter_LeftArm", "QuickRigCharacter_Reference:QuickRigCharacter_LeftForeArm", "QuickRigCharacter_Reference:QuickRigCharacter_LeftHand", "QuickRigCharacter_Reference:QuickRigCharacter_LeftShoulder", "QuickRigCharacter_Reference:QuickRigCharacter_RightArm", "QuickRigCharacter_Reference:QuickRigCharacter_RightForeArm", "QuickRigCharacter_Reference:QuickRigCharacter_RightHand", "QuickRigCharacter_Reference:QuickRigCharacter_RightShoulder" ]
+
+[sub_resource type="AnimationNodeAnimation" id=167]
+animation = "archer"
+
+[sub_resource type="AnimationNodeAnimation" id=101]
+animation = "bench"
+
+[sub_resource type="AnimationNodeTimeScale" id=102]
+
+[sub_resource type="AnimationNodeBlendTree" id=103]
+graph_offset = Vector2( -353, 39 )
+nodes/Animation/node = SubResource( 101 )
+nodes/Animation/position = Vector2( -100, 100 )
+nodes/TimeScale/node = SubResource( 102 )
+nodes/TimeScale/position = Vector2( 100, 120 )
+node_connections = [ "TimeScale", 0, "Animation", "output", 0, "TimeScale" ]
+
+[sub_resource type="AnimationNodeAnimation" id=13]
+animation = "bike"
+
+[sub_resource type="AnimationNodeTimeScale" id=14]
+
+[sub_resource type="AnimationNodeBlendTree" id=15]
+graph_offset = Vector2( -301, 50 )
+nodes/Animation/node = SubResource( 13 )
+nodes/Animation/position = Vector2( -20, 120 )
+nodes/TimeScale/node = SubResource( 14 )
+nodes/TimeScale/position = Vector2( 140, 120 )
+node_connections = [ "TimeScale", 0, "Animation", "output", 0, "TimeScale" ]
+
+[sub_resource type="AnimationNodeAnimation" id=106]
+animation = "celebslide"
+
+[sub_resource type="AnimationNodeAnimation" id=91]
+resource_local_to_scene = true
+animation = "ohno"
+
+[sub_resource type="AnimationNodeTimeScale" id=92]
+
+[sub_resource type="AnimationNodeTimeSeek" id=96]
+resource_local_to_scene = true
+
+[sub_resource type="AnimationNodeBlendTree" id=93]
+graph_offset = Vector2( -440, 27 )
+nodes/Animation/node = SubResource( 91 )
+nodes/Animation/position = Vector2( -300, 160 )
+nodes/TimeScale/node = SubResource( 92 )
+nodes/TimeScale/position = Vector2( 100, 100 )
+nodes/concedeSeek/node = SubResource( 96 )
+nodes/concedeSeek/position = Vector2( -100, 60 )
+node_connections = [ "TimeScale", 0, "concedeSeek", "concedeSeek", 0, "Animation", "output", 0, "TimeScale" ]
+
+[sub_resource type="AnimationNodeAnimation" id=16]
+animation = "divingH"
+
+[sub_resource type="AnimationNodeTimeScale" id=17]
+
+[sub_resource type="AnimationNodeBlendTree" id=18]
+graph_offset = Vector2( -99, 11 )
+nodes/Animation/node = SubResource( 16 )
+nodes/Animation/position = Vector2( 114, 84 )
+nodes/TimeScale/node = SubResource( 17 )
+nodes/TimeScale/position = Vector2( 280, 80 )
+nodes/output/position = Vector2( 440, 120 )
+node_connections = [ "TimeScale", 0, "Animation", "output", 0, "TimeScale" ]
+
+[sub_resource type="AnimationNodeAnimation" id=19]
+animation = "fouled"
+
+[sub_resource type="AnimationNodeAnimation" id=20]
+animation = "header"
+
+[sub_resource type="AnimationNodeTimeScale" id=21]
+
+[sub_resource type="AnimationNodeBlendTree" id=22]
+graph_offset = Vector2( -398, 54 )
+nodes/Animation/node = SubResource( 20 )
+nodes/Animation/position = Vector2( -100, 100 )
+nodes/TimeScale/node = SubResource( 21 )
+nodes/TimeScale/position = Vector2( 80, 120 )
+node_connections = [ "TimeScale", 0, "Animation", "output", 0, "TimeScale" ]
+
+[sub_resource type="AnimationNodeAnimation" id=23]
+animation = "Fidle"
+
+[sub_resource type="AnimationNodeAnimation" id=151]
+animation = "idlepoint"
+
+[sub_resource type="AnimationNodeAnimation" id=152]
+animation = "idlepointR"
+
+[sub_resource type="AnimationNodeAnimation" id=146]
+animation = "newidleclap"
+
+[sub_resource type="AnimationNodeAnimation" id=24]
+animation = "pickup"
+
+[sub_resource type="AnimationNodeAnimation" id=97]
+animation = "scissor"
+
+[sub_resource type="AnimationNodeAnimation" id=25]
+animation = "newshoot"
+
+[sub_resource type="AnimationNodeAnimation" id=26]
+animation = "slide"
+
+[sub_resource type="AnimationNodeTimeScale" id=27]
+
+[sub_resource type="AnimationNodeBlendTree" id=28]
+graph_offset = Vector2( -325, 2 )
+nodes/Animation/node = SubResource( 26 )
+nodes/Animation/position = Vector2( -80, 80 )
+nodes/TimeScale/node = SubResource( 27 )
+nodes/TimeScale/position = Vector2( 140, 80 )
+nodes/output/position = Vector2( 380, 120 )
+node_connections = [ "TimeScale", 0, "Animation", "output", 0, "TimeScale" ]
+
+[sub_resource type="AnimationNodeAnimation" id=168]
+animation = "somersault"
+
+[sub_resource type="AnimationNodeAnimation" id=68]
+animation = "FSprint"
+
+[sub_resource type="AnimationNodeAnimation" id=30]
+animation = "FRun"
+
+[sub_resource type="AnimationNodeTimeScale" id=31]
+
+[sub_resource type="AnimationNodeBlend2" id=69]
+sync = true
+
+[sub_resource type="AnimationNodeTimeScale" id=71]
+
+[sub_resource type="AnimationNodeBlendTree" id=34]
+graph_offset = Vector2( -351.691, 93.952 )
+nodes/Animation/node = SubResource( 30 )
+nodes/Animation/position = Vector2( -260, 80 )
+"nodes/Animation 3/node" = SubResource( 68 )
+"nodes/Animation 3/position" = Vector2( -264, 244 )
+nodes/RunSpeed/node = SubResource( 31 )
+nodes/RunSpeed/position = Vector2( -80, 80 )
+nodes/RunSprint/node = SubResource( 69 )
+nodes/RunSprint/position = Vector2( 128, 211 )
+nodes/SprintSpeed/node = SubResource( 71 )
+nodes/SprintSpeed/position = Vector2( -96, 284 )
+nodes/output/position = Vector2( 620, 140 )
+node_connections = [ "RunSpeed", 0, "Animation", "SprintSpeed", 0, "Animation 3", "RunSprint", 0, "RunSpeed", "RunSprint", 1, "SprintSpeed", "output", 0, "RunSprint" ]
+
+[sub_resource type="AnimationNodeAnimation" id=109]
+animation = "FSprint"
+
+[sub_resource type="AnimationNodeTimeScale" id=110]
+
+[sub_resource type="AnimationNodeBlendTree" id=111]
+graph_offset = Vector2( -431, 25 )
+nodes/Animation/node = SubResource( 109 )
+nodes/Animation/position = Vector2( -63, 115 )
+nodes/sprintspeed/node = SubResource( 110 )
+nodes/sprintspeed/position = Vector2( 120, 100 )
+node_connections = [ "sprintspeed", 0, "Animation", "output", 0, "sprintspeed" ]
+
+[sub_resource type="AnimationNodeAnimation" id=63]
+animation = "throw"
+
+[sub_resource type="AnimationNodeTimeScale" id=64]
+
+[sub_resource type="AnimationNodeBlendTree" id=65]
+graph_offset = Vector2( -328, 8 )
+nodes/Animation/node = SubResource( 63 )
+nodes/Animation/position = Vector2( -53, 109 )
+nodes/TimeScale/node = SubResource( 64 )
+nodes/TimeScale/position = Vector2( 120, 80 )
+node_connections = [ "TimeScale", 0, "Animation", "output", 0, "TimeScale" ]
+
+[sub_resource type="AnimationNodeAnimation" id=86]
+animation = "FWalk"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=36]
+xfade_time = 0.07
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=37]
+xfade_time = 0.07
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=38]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=39]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=40]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=41]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=42]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=43]
+xfade_time = 0.04
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=45]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=46]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=47]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=48]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=49]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=52]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=53]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=54]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=55]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=56]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=57]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=58]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=66]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=67]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=87]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=88]
+switch_mode = 1
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=89]
+switch_mode = 1
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=90]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=94]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=95]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=98]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=99]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=100]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=104]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=105]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=107]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=108]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=112]
+switch_mode = 1
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=113]
+switch_mode = 1
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=131]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=132]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=133]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=134]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=135]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=136]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=137]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=138]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=139]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=140]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=144]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=145]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=147]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=148]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=149]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=150]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=153]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=154]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=155]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=156]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=157]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=158]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=159]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=160]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=161]
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=162]
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=163]
+xfade_time = 0.06
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=164]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=169]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=170]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=171]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=172]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachine" id=59]
+states/archer/node = SubResource( 167 )
+states/archer/position = Vector2( 979.291, 200.332 )
+states/bench/node = SubResource( 103 )
+states/bench/position = Vector2( 573, 287.028 )
+states/bike/node = SubResource( 15 )
+states/bike/position = Vector2( 189.791, -121.156 )
+states/celebslide/node = SubResource( 106 )
+states/celebslide/position = Vector2( 747.791, 283.028 )
+states/concede/node = SubResource( 93 )
+states/concede/position = Vector2( 323.791, 243.028 )
+states/divingH/node = SubResource( 18 )
+states/divingH/position = Vector2( 220.791, 165.864 )
+states/fouled/node = SubResource( 19 )
+states/fouled/position = Vector2( 108, 69.864 )
+states/header/node = SubResource( 22 )
+states/header/position = Vector2( 1018.79, -73.136 )
+states/idle/node = SubResource( 23 )
+states/idle/position = Vector2( 587, 96.864 )
+states/idlepoint/node = SubResource( 151 )
+states/idlepoint/position = Vector2( 1093.79, -303.136 )
+states/idlepointR/node = SubResource( 152 )
+states/idlepointR/position = Vector2( 940.791, -359.812 )
+states/newidleclap/node = SubResource( 146 )
+states/newidleclap/position = Vector2( 740.791, -339.136 )
+states/pickup/node = SubResource( 24 )
+states/pickup/position = Vector2( 925.791, 127.864 )
+states/scissor/node = SubResource( 97 )
+states/scissor/position = Vector2( 1018.79, 44.028 )
+states/shot/node = SubResource( 25 )
+states/shot/position = Vector2( 549.773, -339.136 )
+states/slide/node = SubResource( 28 )
+states/slide/position = Vector2( 856.21, -26 )
+states/somersault/node = SubResource( 168 )
+states/somersault/position = Vector2( 931.291, 253.332 )
+states/sprint/node = SubResource( 34 )
+states/sprint/position = Vector2( 437, -179.136 )
+states/sprinthard/node = SubResource( 111 )
+states/sprinthard/position = Vector2( 276.791, -303.136 )
+states/throw/node = SubResource( 65 )
+states/throw/position = Vector2( 1119.79, -179.136 )
+states/walk/node = SubResource( 86 )
+states/walk/position = Vector2( 509, -80.136 )
+transitions = [ "idle", "sprint", SubResource( 36 ), "sprint", "idle", SubResource( 37 ), "slide", "sprint", SubResource( 38 ), "sprint", "slide", SubResource( 39 ), "sprint", "shot", SubResource( 40 ), "shot", "idle", SubResource( 41 ), "sprint", "fouled", SubResource( 42 ), "fouled", "idle", SubResource( 43 ), "idle", "fouled", SubResource( 45 ), "idle", "header", SubResource( 46 ), "header", "idle", SubResource( 47 ), "sprint", "pickup", SubResource( 48 ), "pickup", "idle", SubResource( 49 ), "idle", "divingH", SubResource( 52 ), "divingH", "idle", SubResource( 53 ), "sprint", "divingH", SubResource( 54 ), "idle", "pickup", SubResource( 55 ), "idle", "bike", SubResource( 56 ), "sprint", "bike", SubResource( 57 ), "bike", "idle", SubResource( 58 ), "idle", "throw", SubResource( 66 ), "throw", "idle", SubResource( 67 ), "idle", "walk", SubResource( 87 ), "walk", "sprint", SubResource( 88 ), "sprint", "walk", SubResource( 89 ), "walk", "idle", SubResource( 90 ), "idle", "concede", SubResource( 94 ), "concede", "idle", SubResource( 95 ), "idle", "scissor", SubResource( 98 ), "scissor", "idle", SubResource( 99 ), "sprint", "scissor", SubResource( 100 ), "idle", "bench", SubResource( 104 ), "bench", "idle", SubResource( 105 ), "idle", "celebslide", SubResource( 107 ), "celebslide", "idle", SubResource( 108 ), "sprint", "sprinthard", SubResource( 112 ), "sprinthard", "sprint", SubResource( 113 ), "sprinthard", "header", SubResource( 131 ), "sprint", "header", SubResource( 132 ), "sprinthard", "scissor", SubResource( 133 ), "sprinthard", "slide", SubResource( 134 ), "walk", "header", SubResource( 135 ), "walk", "scissor", SubResource( 136 ), "sprinthard", "bike", SubResource( 137 ), "sprinthard", "shot", SubResource( 138 ), "sprinthard", "divingH", SubResource( 139 ), "sprinthard", "concede", SubResource( 140 ), "sprint", "concede", SubResource( 144 ), "walk", "concede", SubResource( 145 ), "idle", "newidleclap", SubResource( 147 ), "newidleclap", "idle", SubResource( 148 ), "newidleclap", "walk", SubResource( 149 ), "newidleclap", "sprint", SubResource( 150 ), "idle", "idlepointR", SubResource( 153 ), "idlepointR", "idle", SubResource( 154 ), "idle", "idlepoint", SubResource( 155 ), "idlepoint", "idle", SubResource( 156 ), "idlepoint", "sprint", SubResource( 157 ), "idlepointR", "sprint", SubResource( 158 ), "idlepoint", "walk", SubResource( 159 ), "idlepointR", "walk", SubResource( 160 ), "idlepointR", "throw", SubResource( 161 ), "idlepoint", "throw", SubResource( 162 ), "newidleclap", "throw", SubResource( 163 ), "walk", "shot", SubResource( 164 ), "idle", "archer", SubResource( 169 ), "idle", "somersault", SubResource( 170 ), "somersault", "idle", SubResource( 171 ), "archer", "idle", SubResource( 172 ) ]
+start_node = "idle"
+graph_offset = Vector2( 220.273, -123.464 )
+
+[sub_resource type="AnimationNodeBlendTree" id=176]
+resource_local_to_scene = true
+graph_offset = Vector2( 27, -4 )
+nodes/AnimCheer/node = SubResource( 173 )
+nodes/AnimCheer/position = Vector2( 189, 89 )
+nodes/Animation/node = SubResource( 165 )
+nodes/Animation/position = Vector2( -20, 200 )
+"nodes/Animation 2/node" = SubResource( 174 )
+"nodes/Animation 2/position" = Vector2( -20, -20 )
+"nodes/Animation 3/node" = SubResource( 10 )
+"nodes/Animation 3/position" = Vector2( -20, 80 )
+nodes/BlendCelebrate/node = SubResource( 175 )
+nodes/BlendCelebrate/position = Vector2( 560, 40 )
+nodes/StateMachine/node = SubResource( 59 )
+nodes/StateMachine/position = Vector2( 360, -20 )
+nodes/output/position = Vector2( 980, 40 )
+node_connections = [ "BlendCelebrate", 0, "StateMachine", "BlendCelebrate", 1, "AnimCheer", "AnimCheer", 0, "Animation 3", "AnimCheer", 1, "Animation 2", "AnimCheer", 2, "Animation", "output", 0, "BlendCelebrate" ]
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=177]
+
+[node name="AnimationTree" type="AnimationTree"]
+tree_root = SubResource( 176 )
+anim_player = NodePath("../AnimationPlayer")
+active = true
+process_mode = 0
+parameters/AnimCheer/blend_amount = 0.0
+parameters/BlendCelebrate/blend_amount = 0.0
+parameters/StateMachine/playback = SubResource( 177 )
+parameters/StateMachine/bench/TimeScale/scale = 0.5
+parameters/StateMachine/bike/TimeScale/scale = 1.8
+parameters/StateMachine/concede/TimeScale/scale = 0.5
+parameters/StateMachine/concede/concedeSeek/seek_position = -1.0
+parameters/StateMachine/divingH/TimeScale/scale = 1.5
+parameters/StateMachine/header/TimeScale/scale = 1.5
+parameters/StateMachine/slide/TimeScale/scale = 2.4
+parameters/StateMachine/sprint/RunSpeed/scale = 1.0
+parameters/StateMachine/sprint/RunSprint/blend_amount = 0.0
+parameters/StateMachine/sprint/SprintSpeed/scale = 1.0
+parameters/StateMachine/sprinthard/sprintspeed/scale = 1.0
+parameters/StateMachine/throw/TimeScale/scale = 1.66
