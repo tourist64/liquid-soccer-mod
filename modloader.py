@@ -151,6 +151,13 @@ def load_manifest(mod_dir: Path) -> dict:
             raise ModloaderError(f"Arquivo da mod não encontrado: {file_entry['source']}")
         if not isinstance(file_entry.get("overwrite", False), bool):
             raise ModloaderError("overwrite precisa ser booleano")
+    resources = [patch["path"] for patch in manifest["patches"]]
+    resources.extend(file_entry["path"] for file_entry in manifest.get("files", []))
+    duplicates = sorted({path for path in resources if resources.count(path) > 1})
+    if duplicates:
+        raise ModloaderError(
+            f"A mod {manifest['id']} declara o mesmo recurso mais de uma vez: {', '.join(duplicates)}"
+        )
     return manifest
 
 
@@ -191,42 +198,90 @@ def validate_files(entries: list[PckEntry], manifest: dict, mod_dir: Path) -> li
     return changes
 
 
-def apply_mod(game_dir: Path, mod_dir: Path) -> None:
+def mod_resources(manifest: dict) -> list[str]:
+    resources = [patch["path"] for patch in manifest["patches"]]
+    resources.extend(file_entry["path"] for file_entry in manifest.get("files", []))
+    return resources
+
+
+def collect_conflicts(mods: list[tuple[Path, dict]]) -> dict[str, list[str]]:
+    owners: dict[str, list[str]] = {}
+    for mod_dir, manifest in mods:
+        label = f"{manifest['name']} ({mod_dir.name})"
+        for resource in mod_resources(manifest):
+            owners.setdefault(resource, []).append(label)
+    return {resource: labels for resource, labels in owners.items() if len(labels) > 1}
+
+
+def ensure_no_conflicts(mods: list[tuple[Path, dict]]) -> None:
+    conflicts = collect_conflicts(mods)
+    if not conflicts:
+        return
+    details = [f"{resource}: {' x '.join(labels)}" for resource, labels in sorted(conflicts.items())]
+    raise ModloaderError(
+        "Conflito entre mods detectado:\n- "
+        + "\n- ".join(details)
+        + "\nEscolha apenas um dos mods conflitantes para aplicar."
+    )
+
+
+def resolve_mod_dirs(mod_dirs: list[Path], *, all_mods: bool = False) -> list[Path]:
+    if mod_dirs:
+        return [path.resolve() for path in mod_dirs]
+    if all_mods:
+        return sorted(path.resolve() for path in DEFAULT_MODS_DIR.iterdir() if (path / "mod.json").is_file())
+    return [(DEFAULT_MODS_DIR / "multiplayer").resolve()]
+
+
+def load_mods(mod_dirs: list[Path], *, all_mods: bool = False) -> list[tuple[Path, dict]]:
+    selected = resolve_mod_dirs(mod_dirs, all_mods=all_mods)
+    if not selected:
+        raise ModloaderError("Nenhuma mod encontrada")
+    mods = [(mod_dir, load_manifest(mod_dir)) for mod_dir in selected]
+    ensure_no_conflicts(mods)
+    return mods
+
+
+def apply_mod(game_dir: Path, mod_dirs: list[Path]) -> None:
     vanilla_pck = game_dir / "index.pck"
     pck = game_dir / MODDED_PCK_NAME
     backup = game_dir / BACKUP_NAME
     if not vanilla_pck.is_file():
         raise ModloaderError(f"Jogo não encontrado: {vanilla_pck}")
-    manifest = load_manifest(mod_dir)
+    mods = load_mods(mod_dirs)
     if not backup.exists():
         shutil.copy2(vanilla_pck, backup)
     base_header, entries = read_pck(backup)
-    validate_patches(entries, manifest)
     by_path = {entry.path: entry for entry in entries}
-    for patch in manifest["patches"]:
-        entry = by_path[patch["path"]]
-        text = entry.data.decode("utf-8")
-        entry.data = text.replace(patch["find"], patch["replace"], patch.get("count", 1)).encode("utf-8")
-    for file_entry in manifest.get("files", []):
-        resource_path = file_entry["path"]
-        if resource_path in by_path:
-            if not file_entry.get("overwrite", False):
-                raise ModloaderError(f"Arquivo da mod já existe no PCK: {resource_path}")
-            by_path[resource_path].data = (mod_dir / file_entry["source"]).read_bytes()
-        else:
-            entry = PckEntry(resource_path, (mod_dir / file_entry["source"]).read_bytes())
-            entries.append(entry)
-            by_path[resource_path] = entry
+    for mod_dir, manifest in mods:
+        validate_patches(entries, manifest)
+        for patch in manifest["patches"]:
+            entry = by_path[patch["path"]]
+            text = entry.data.decode("utf-8")
+            entry.data = text.replace(patch["find"], patch["replace"], patch.get("count", 1)).encode("utf-8")
+        for file_entry in manifest.get("files", []):
+            resource_path = file_entry["path"]
+            if resource_path in by_path:
+                if not file_entry.get("overwrite", False):
+                    raise ModloaderError(f"Arquivo da mod já existe no PCK: {resource_path}")
+                by_path[resource_path].data = (mod_dir / file_entry["source"]).read_bytes()
+            else:
+                entry = PckEntry(resource_path, (mod_dir / file_entry["source"]).read_bytes())
+                entries.append(entry)
+                by_path[resource_path] = entry
     write_pck(pck, base_header, entries)
-    validate_patches(read_pck(pck)[1], manifest, expect_replacement=True)
-    validate_files(read_pck(pck)[1], manifest, mod_dir)
+    final_entries = read_pck(pck)[1]
+    for mod_dir, manifest in mods:
+        validate_patches(final_entries, manifest, expect_replacement=True)
+        validate_files(final_entries, manifest, mod_dir)
     html = (game_dir / "index.html").read_text(encoding="utf-8")
     html = html.replace('"executable":"index"', '"executable":"index-mod"', 1)
     html = re.sub(r'"index\.pck":\d+', f'"index-mod.pck":{pck.stat().st_size}', html, count=1)
     html = re.sub(r'"index\.wasm":\d+', f'"index-mod.wasm":{(game_dir / "index.wasm").stat().st_size}', html, count=1)
     shutil.copy2(game_dir / "index.wasm", game_dir / MODDED_WASM_NAME)
     atomic_write(game_dir / MODDED_HTML_NAME, html.encode("utf-8"))
-    print(f"Mod aplicada: {manifest['name']} ({manifest['version']})")
+    labels = ", ".join(f"{manifest['name']} ({manifest['version']})" for _, manifest in mods)
+    print(f"Mods aplicadas: {labels}")
     print(f"Abra: {game_dir / MODDED_HTML_NAME}")
 
 
@@ -264,7 +319,9 @@ def build_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
     for name in ("validate", "apply", "verify"):
         command = commands.add_parser(name)
-        command.add_argument("mod", type=Path, nargs="?", default=DEFAULT_MODS_DIR / "multiplayer")
+        command.add_argument("mods", type=Path, nargs="*", help="Uma ou mais pastas de mods")
+    conflicts = commands.add_parser("conflicts")
+    conflicts.add_argument("mods", type=Path, nargs="*", help="Mods a comparar; sem argumentos verifica todas")
     commands.add_parser("list")
     commands.add_parser("restore")
     return parser
@@ -276,16 +333,21 @@ def main() -> int:
         if args.command == "list":
             list_mods(args.mods_dir)
         elif args.command == "validate":
-            manifest = load_manifest(args.mod)
-            print(f"Mod válida: {manifest['name']} ({manifest['version']})")
+            mods = load_mods(args.mods)
+            for _, manifest in mods:
+                print(f"Mod válida: {manifest['name']} ({manifest['version']})")
         elif args.command == "apply":
-            apply_mod(args.game_dir, args.mod)
+            apply_mod(args.game_dir, args.mods)
         elif args.command == "verify":
-            manifest = load_manifest(args.mod)
+            mods = load_mods(args.mods)
             entries = read_pck(args.game_dir / MODDED_PCK_NAME)[1]
-            validate_patches(entries, manifest, expect_replacement=True)
-            validate_files(entries, manifest, args.mod)
-            print(f"Mod verificada: {manifest['name']}")
+            for mod_dir, manifest in mods:
+                validate_patches(entries, manifest, expect_replacement=True)
+                validate_files(entries, manifest, mod_dir)
+                print(f"Mod verificada: {manifest['name']}")
+        elif args.command == "conflicts":
+            mods = load_mods(resolve_mod_dirs(args.mods, all_mods=True), all_mods=False)
+            print(f"Nenhum conflito entre {len(mods)} mods.")
         elif args.command == "restore":
             restore_game(args.game_dir)
         return 0
