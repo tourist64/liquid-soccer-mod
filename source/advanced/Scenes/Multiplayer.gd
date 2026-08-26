@@ -19,7 +19,7 @@ func _ready():
 
 
 func _process(delta):
-	if not OS.has_feature("HTML5") or not waiting_for_connection:
+	if not OS.has_feature("HTML5") or (not waiting_for_connection and screen != "rooms"):
 		return
 	poll_elapsed += delta
 	if poll_elapsed < 0.25:
