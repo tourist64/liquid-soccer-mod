@@ -5,6 +5,8 @@ var screen = "nickname"
 var nickname = ""
 var busy = false
 var last_rooms = ""
+var waiting_for_connection = false
+var poll_elapsed = 0.0
 
 
 func _ready():
@@ -16,9 +18,13 @@ func _ready():
 		_set_status("O multiplayer funciona na versão publicada no navegador.")
 
 
-func _process(_delta):
-	if not OS.has_feature("HTML5") or (screen != "create" and screen != "rooms"):
+func _process(delta):
+	if not OS.has_feature("HTML5") or not waiting_for_connection:
 		return
+	poll_elapsed += delta
+	if poll_elapsed < 0.25:
+		return
+	poll_elapsed = 0.0
 
 	var raw_state = JavaScript.eval("window.slsMultiplayerState ? window.slsMultiplayerState() : '{}'", true)
 	if typeof(raw_state) != TYPE_STRING:
@@ -27,10 +33,16 @@ func _process(_delta):
 	if typeof(state) != TYPE_DICTIONARY:
 		return
 
-	$Screens/CreateScreen/CreateConfirm.disabled = bool(state.get("busy", false))
-	$Screens/CreateScreen/Start.visible = bool(state.get("host", false)) and bool(state.get("connected", false))
-	$Screens/CreateScreen/Start.disabled = not bool(state.get("connected", false))
+	var bridge_busy = bool(state.get("busy", false))
+	var connected = bool(state.get("connected", false))
+	var host = bool(state.get("host", false))
+	busy = bridge_busy
+	$Screens/CreateScreen/CreateConfirm.disabled = bridge_busy or (host and connected)
+	$Screens/CreateScreen/CreateConfirm.text = "Conectando..." if bridge_busy else ("Sala criada" if host and connected else "Criar sala")
+	$Screens/CreateScreen/Start.visible = host and connected
+	$Screens/CreateScreen/Start.disabled = not connected
 	$Screens/RoomsScreen/JoinSelected.disabled = bool(state.get("busy", false))
+	$Screens/RoomsScreen/JoinSelected.text = "Conectando..." if bridge_busy else "Entrar na sala"
 	$Screens/RoomsScreen/Refresh.disabled = bool(state.get("rooms_busy", false))
 
 	var status = str(state.get("status", ""))
@@ -39,6 +51,7 @@ func _process(_delta):
 	if screen == "rooms":
 		_update_rooms(state.get("rooms", []))
 	if bool(state.get("started", false)):
+		waiting_for_connection = false
 		_start_match()
 
 
@@ -116,6 +129,10 @@ func _on_Create_confirm_pressed():
 		_set_status("Preencha o nome e a senha da sala.")
 		return
 	busy = true
+	waiting_for_connection = true
+	poll_elapsed = 0.0
+	$Screens/CreateScreen/CreateConfirm.disabled = true
+	$Screens/CreateScreen/CreateConfirm.text = "Conectando..."
 	_set_status("Conectando à sala...")
 	if OS.has_feature("HTML5"):
 		var call = "window.slsMultiplayerCreate(%s,%s,%s)" % [_js_string(nickname), _js_string(room), _js_string(password)]
@@ -135,6 +152,10 @@ func _on_Join_selected_pressed():
 		return
 	var room_id = str($Screens/RoomsScreen/RoomList.get_item_metadata(selected[0]))
 	busy = true
+	waiting_for_connection = true
+	poll_elapsed = 0.0
+	$Screens/RoomsScreen/JoinSelected.disabled = true
+	$Screens/RoomsScreen/JoinSelected.text = "Conectando..."
 	_set_status("Conectando à sala...")
 	if OS.has_feature("HTML5"):
 		var call = "window.slsMultiplayerJoin(%s,%s,%s)" % [_js_string(nickname), _js_string(room_id), _js_string(password)]
@@ -148,6 +169,9 @@ func _on_Start_pressed():
 
 
 func _on_Back_pressed():
+	waiting_for_connection = false
+	busy = false
+	poll_elapsed = 0.0
 	if screen == "nickname":
 		if OS.has_feature("HTML5"):
 			JavaScript.eval("window.slsMultiplayerLeave && window.slsMultiplayerLeave()", true)

@@ -229,8 +229,16 @@
   window.slsMultiplayerEnsure = () => ensurePeer(() => {});
   window.slsMultiplayerState = () => JSON.stringify(state);
   window.slsMultiplayerListRooms = listRooms;
-  window.slsMultiplayerCreate = (nickname, room, password) => ensurePeer(() => setupPeer({ nickname, room, password }, true));
-  window.slsMultiplayerJoin = (nickname, room, password) => ensurePeer(() => setupPeer({ nickname, room, password, peer_id: room }, false));
+  window.slsMultiplayerCreate = (nickname, room, password) => {
+    state.busy = true;
+    setStatus("Carregando conexão segura...");
+    ensurePeer(() => setupPeer({ nickname, room, password }, true));
+  };
+  window.slsMultiplayerJoin = (nickname, room, password) => {
+    state.busy = true;
+    setStatus("Carregando conexão segura...");
+    ensurePeer(() => setupPeer({ nickname, room, password, peer_id: room }, false));
+  };
   window.slsMultiplayerStart = () => {
     if (!state.host || !state.connected) return;
     state.started = true;
