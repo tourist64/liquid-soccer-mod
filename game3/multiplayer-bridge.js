@@ -258,7 +258,10 @@
     const id = isHost ? peerIdFor(info.room) : undefined;
     log("abrindo peer", {id: id || "automático", host: isHost});
     try {
-      peer = new window.Peer(id);
+      peer = new window.Peer(id, {
+        debug: 3,
+        logFunction: (...args) => log("PeerJS debug", args.map((value) => String(value)).join(" "))
+      });
     } catch (error) {
       log("exceção criando peer", {message: error.message, stack: error.stack});
       state.busy = false;
@@ -307,6 +310,8 @@
       const message = error.type === "unavailable-id" ? "Essa sala já existe." : "Falha na conexão: " + error.type;
       setStatus(message);
     });
+    peer.on("disconnected", () => log("peer desconectado", {id: peer.id}));
+    peer.on("close", () => log("peer fechado", {id: peer.id}));
   }
 
   function listRooms() {
