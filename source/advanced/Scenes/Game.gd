@@ -188,6 +188,10 @@ func _ready():
 	Global._fadeOut()
 	Global.game = self
 	Global.isTutorial = false
+	if Global.multiplayer_mode and not Global.multiplayer_host:
+		set_process(false)
+		set_physics_process(false)
+		return
 	frame = 0
 	fframe = 0.0
 	set_process(false)

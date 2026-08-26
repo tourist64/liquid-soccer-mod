@@ -16,6 +16,11 @@
       "overwrite": true
     },
     {
+      "path": "res://Scenes/Game.gdc",
+      "source": "files/Scenes/Game.gdc",
+      "overwrite": true
+    },
+    {
       "path": "res://Scenes/AI.gdc",
       "source": "files/Scenes/AI.gdc",
       "overwrite": true

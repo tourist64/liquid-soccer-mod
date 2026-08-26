@@ -40,6 +40,7 @@ var joypads = []
 var p1human = true
 var p2human = false
 var multiplayer_mode = false
+var multiplayer_host = false
 var vsync = true
 var camtype = 0
 var camrot = false
@@ -152,11 +153,15 @@ func refreshMultiplayer():
 		return false
 	var enabled = JavaScript.eval("window.location.search.indexOf('mp=host') >= 0", true)
 	if enabled:
-		multiplayer_mode = true
-		p1human = true
-		p2human = true
-		setupMultiplayerKeys()
+		setMultiplayerRole(true)
 	return multiplayer_mode
+
+func setMultiplayerRole(host):
+	multiplayer_mode = true
+	multiplayer_host = host
+	p1human = true
+	p2human = true
+	setupMultiplayerKeys()
 
 func setupMultiplayerKeys():
 	var keys = {

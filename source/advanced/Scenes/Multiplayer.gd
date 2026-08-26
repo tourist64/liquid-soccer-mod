@@ -190,10 +190,9 @@ func _on_Back_pressed():
 
 
 func _start_match():
-	Global.multiplayer_mode = true
-	Global.p1human = true
-	Global.p2human = true
-	Global.setupMultiplayerKeys()
+	var raw_state = JavaScript.eval("window.slsMultiplayerState ? window.slsMultiplayerState() : '{}'", true)
+	var state = parse_json(raw_state) if typeof(raw_state) == TYPE_STRING else {}
+	Global.setMultiplayerRole(bool(state.get("host", false)))
 	Global.toLoad = 2
 	Global.isPenalties = false
 	get_tree().change_scene("res://Scenes/Loading.tscn")
