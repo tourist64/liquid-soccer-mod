@@ -20,44 +20,6 @@ func _ready():
 	last_status = $Status.text
 
 
-func _input(event):
-	if not event is InputEventMouseButton or not event.pressed or event.button_index != BUTTON_LEFT:
-		return
-	if $Back.get_global_rect().has_point(event.position):
-		get_viewport().set_input_as_handled()
-		_on_Back_pressed()
-	elif current_screen == "nickname" and $Screens/NicknameScreen/Continue.get_global_rect().has_point(event.position):
-		get_viewport().set_input_as_handled()
-		_on_Continue_pressed()
-	elif current_screen == "choice":
-		if $Screens/ChoiceScreen/Create.get_global_rect().has_point(event.position):
-			get_viewport().set_input_as_handled()
-			_on_Create_choice_pressed()
-		elif $Screens/ChoiceScreen/Enter.get_global_rect().has_point(event.position):
-			get_viewport().set_input_as_handled()
-			_on_Enter_choice_pressed()
-	elif current_screen == "create":
-		if $Screens/CreateScreen/Start.visible and $Screens/CreateScreen/Start.get_global_rect().has_point(event.position):
-			get_viewport().set_input_as_handled()
-			_on_Start_pressed()
-		elif $Screens/CreateScreen/CreateConfirm.visible and $Screens/CreateScreen/CreateConfirm.get_global_rect().has_point(event.position):
-			get_viewport().set_input_as_handled()
-			_on_Create_confirm_pressed()
-		elif $Screens/CreateScreen/CreateBack.get_global_rect().has_point(event.position):
-			get_viewport().set_input_as_handled()
-			_on_Back_pressed()
-	elif current_screen == "rooms":
-		if $Screens/RoomsScreen/Refresh.get_global_rect().has_point(event.position):
-			get_viewport().set_input_as_handled()
-			_on_Refresh_pressed()
-		elif $Screens/RoomsScreen/JoinSelected.get_global_rect().has_point(event.position):
-			get_viewport().set_input_as_handled()
-			_on_Join_selected_pressed()
-		elif $Screens/RoomsScreen/RoomsBack.get_global_rect().has_point(event.position):
-			get_viewport().set_input_as_handled()
-			_on_Back_pressed()
-
-
 func _process(_delta):
 	if not OS.has_feature("HTML5") or match_started:
 		return
