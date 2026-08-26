@@ -90,12 +90,16 @@ func _on_Create_choice_pressed():
 
 func _on_Enter_choice_pressed():
 	_show_screen("RoomsScreen")
+	waiting_for_connection = true
+	poll_elapsed = 0.0
 	_set_status("Procurando salas disponíveis...")
 	if OS.has_feature("HTML5"):
 		JavaScript.eval("window.slsMultiplayerListRooms && window.slsMultiplayerListRooms()", true)
 
 
 func _on_Refresh_pressed():
+	waiting_for_connection = true
+	poll_elapsed = 0.0
 	_set_status("Atualizando salas disponíveis...")
 	if OS.has_feature("HTML5"):
 		JavaScript.eval("window.slsMultiplayerListRooms && window.slsMultiplayerListRooms()", true)
