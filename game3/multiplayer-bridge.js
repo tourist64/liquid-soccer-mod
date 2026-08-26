@@ -177,13 +177,13 @@
         state.started = true;
         setStatus("Partida iniciando...");
       }
-      if (message.type === "team") {
-        const side = message.side === "team1" ? "team1" : "team2";
-        if (side !== (state.host ? "team1" : "team2")) {
-          state[side] = String(message.path || "");
-          state[side + "_alt"] = !!message.alt;
-          state[side + "_ready"] = false;
-        }
+      if (message.type === "teams" && !state.host) {
+        state.team1 = String(message.team1 || "");
+        state.team2 = String(message.team2 || "");
+        state.team1_alt = !!message.team1_alt;
+        state.team2_alt = !!message.team2_alt;
+        state.team1_ready = false;
+        state.team2_ready = false;
       }
       if (message.type === "ready") {
         const side = message.side === "team1" ? "team1" : "team2";
@@ -269,7 +269,7 @@
   }
 
   function maybeStartMatch() {
-    if (!state.host || state.match_started || !state.team1_ready || !state.team2_ready) return;
+    if (!state.host || state.match_started || !state.team1 || !state.team2 || !state.team1_ready || !state.team2_ready) return;
     state.match_started = true;
     localVideoTracks.forEach((track) => { track.enabled = true; });
     if (dataChannel && dataChannel.readyState === "open") dataChannel.send(JSON.stringify({type: "match_start"}));
@@ -367,13 +367,21 @@
   window.slsMultiplayerListRooms = listRooms;
   window.slsMultiplayerCreate = createRoom;
   window.slsMultiplayerJoin = joinRoom;
-  window.slsMultiplayerSetTeam = (path, alt) => {
-    if (!dataChannel || dataChannel.readyState !== "open") return;
-    const side = state.host ? "team1" : "team2";
-    state[side] = String(path || "");
-    state[side + "_alt"] = !!alt;
-    state[side + "_ready"] = false;
-    dataChannel.send(JSON.stringify({type: "team", side, path: state[side], alt: state[side + "_alt"]}));
+  window.slsMultiplayerSetTeams = (team1, team1Alt, team2, team2Alt) => {
+    if (!state.host || !dataChannel || dataChannel.readyState !== "open") return;
+    state.team1 = String(team1 || "");
+    state.team2 = String(team2 || "");
+    state.team1_alt = !!team1Alt;
+    state.team2_alt = !!team2Alt;
+    state.team1_ready = false;
+    state.team2_ready = false;
+    dataChannel.send(JSON.stringify({
+      type: "teams",
+      team1: state.team1,
+      team2: state.team2,
+      team1_alt: state.team1_alt,
+      team2_alt: state.team2_alt
+    }));
   };
   window.slsMultiplayerReady = () => {
     if (!dataChannel || dataChannel.readyState !== "open") return;
