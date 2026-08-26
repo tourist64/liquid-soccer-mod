@@ -48,6 +48,10 @@ No multiplayer, o anfitrião cria a sala, o segundo jogador entra com o mesmo no
 
 O multiplayer usa WebRTC/PeerJS para conectar os jogadores. O anfitrião executa a partida e transmite a tela, mantendo a sincronização simples para esse projeto pequeno.
 
+Se o PeerJS público ficar sem responder, é possível usar um PeerServer próprio. Em um terminal separado, execute `npx --yes --package peer peerjs --port 9000 --path /peerjs`; ao abrir o jogo em `localhost`, essa configuração já é selecionada automaticamente. Para jogar com alguém fora do computador, esse servidor precisa ser publicado em um host com WebSocket seguro (`wss://`); GitHub Pages serve os arquivos, mas não executa o servidor de sinalização.
+
+Durante o desenvolvimento local, o botão `Logs` mostra o diagnóstico do handshake WebSocket e `game3/multiplayer.log` recebe as mesmas linhas.
+
 ## Modloader
 
 O mod multiplayer é o padrão do comando `apply`:

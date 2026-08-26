@@ -22,7 +22,10 @@
   let peerLoadingTimer = null;
   const logs = [];
   const localLogEndpoint = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname) ? "/__sls_log" : null;
-  const peerServerOptions = {host: "1.peerjs.com", port: 443, secure: true, path: "/", key: "peerjs"};
+  const peerServerOptions = Object.assign({
+    host: "1.peerjs.com", port: 443, secure: true, path: "/", key: "peerjs"
+  }, window.SLS_PEER_SERVER || {});
+  const peerjsVersion = "1.5.5";
   let debugOutput = null;
 
   function log(message, details) {
@@ -106,7 +109,7 @@
     peerLoading = [callback];
     log("iniciando carregamento do PeerJS");
     const script = document.createElement("script");
-    script.src = "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js";
+    script.src = "https://unpkg.com/peerjs@" + peerjsVersion + "/dist/peerjs.min.js";
     script.dataset.slsPeer = "true";
     peerLoadingTimer = window.setTimeout(() => {
       if (!peerLoading) return;
@@ -258,6 +261,7 @@
     state.guest = "";
     const id = isHost ? peerIdFor(info.room) : undefined;
     log("abrindo peer", {id: id || "automático", host: isHost});
+    probePeerSocket();
     try {
       peer = new window.Peer(id, {
         ...peerServerOptions,
@@ -326,6 +330,43 @@
     });
     peer.on("disconnected", () => log("peer desconectado", {id: peer.id}));
     peer.on("close", () => log("peer fechado", {id: peer.id}));
+  }
+
+  function probePeerSocket() {
+    if (!window.WebSocket) {
+      log("WebSocket indisponível no navegador");
+      return;
+    }
+    const protocol = peerServerOptions.secure ? "wss" : "ws";
+    const path = (peerServerOptions.path || "/").replace(/\/?$/, "/");
+    const id = "sls-probe-" + Math.random().toString(36).slice(2, 10);
+    const url = protocol + "://" + peerServerOptions.host + ":" + peerServerOptions.port + path +
+      "peerjs?key=" + encodeURIComponent(peerServerOptions.key || "peerjs") +
+      "&id=" + id + "&token=" + id + "&version=" + peerjsVersion;
+    log("testando handshake WebSocket", {host: peerServerOptions.host, port: peerServerOptions.port, path});
+    let socket;
+    try {
+      socket = new WebSocket(url);
+    } catch (error) {
+      log("exceção abrindo WebSocket", {message: error.message});
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      log("timeout no handshake WebSocket", {ready_state: socket.readyState});
+      socket.close();
+    }, 7000);
+    socket.onopen = () => log("handshake WebSocket aberto");
+    socket.onmessage = (event) => {
+      let message = "mensagem não identificada";
+      try { message = JSON.parse(event.data).type || message; } catch (_error) {}
+      log("resposta do WebSocket", {type: message});
+      socket.close();
+    };
+    socket.onerror = () => log("erro no handshake WebSocket", {ready_state: socket.readyState});
+    socket.onclose = (event) => {
+      window.clearTimeout(timer);
+      log("WebSocket de diagnóstico fechado", {code: event.code, clean: event.wasClean});
+    };
   }
 
   function listRooms() {
