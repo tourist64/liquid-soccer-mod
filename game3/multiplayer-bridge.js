@@ -22,6 +22,7 @@
   let peerLoadingTimer = null;
   const logs = [];
   const localLogEndpoint = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname) ? "/__sls_log" : null;
+  const peerServerOptions = {host: "1.peerjs.com", port: 443, secure: true, path: "/", key: "peerjs"};
   let debugOutput = null;
 
   function log(message, details) {
@@ -259,6 +260,7 @@
     log("abrindo peer", {id: id || "automático", host: isHost});
     try {
       peer = new window.Peer(id, {
+        ...peerServerOptions,
         debug: 3,
         logFunction: (...args) => log("PeerJS debug", args.map((value) => String(value)).join(" "))
       });
@@ -330,7 +332,7 @@
     log("solicitando lista de salas");
     ensurePeer(() => {
       state.rooms_busy = true;
-      const browserPeer = new window.Peer();
+      const browserPeer = new window.Peer(undefined, peerServerOptions);
       browserPeer.on("open", () => {
         browserPeer.listAllPeers((ids) => {
           state.rooms = ids.filter((id) => id.indexOf("sls-") === 0).map((id) => ({ id, name: roomNameFromId(id) }));
