@@ -384,6 +384,7 @@
     send({ type: "key", code: event.code, down: false });
   });
 
-  installDebugPanel();
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", installDebugPanel);
+  else installDebugPanel();
   log("bridge multiplayer inicializado", {url: window.location.href});
 })();
