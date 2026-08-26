@@ -21,7 +21,7 @@ func _ready():
 
 
 func _process(_delta):
-	if not OS.has_feature("HTML5") or match_started:
+	if not OS.has_feature("HTML5") or match_started or current_screen == "nickname":
 		return
 
 	var raw_state = JavaScript.eval("window.slsMultiplayerState ? window.slsMultiplayerState() : '{}'", true)
@@ -51,8 +51,10 @@ func _process(_delta):
 
 
 func _show_screen(screen_name):
-	for screen in $Screens.get_children():
-		screen.visible = screen.name == screen_name
+	$Screens/NicknameScreen.visible = screen_name == "NicknameScreen"
+	$Screens/ChoiceScreen.visible = screen_name == "ChoiceScreen"
+	$Screens/CreateScreen.visible = screen_name == "CreateScreen"
+	$Screens/RoomsScreen.visible = screen_name == "RoomsScreen"
 	current_screen = screen_name.replace("Screen", "").to_lower()
 
 
@@ -70,6 +72,10 @@ func _on_Continue_pressed():
 	if nickname == "":
 		_set_status("Digite um nickname para continuar.")
 		return
+	call_deferred("_open_choice_screen")
+
+
+func _open_choice_screen():
 	_show_screen("ChoiceScreen")
 	_set_status("Escolha se deseja criar uma sala ou entrar em uma sala existente.")
 
