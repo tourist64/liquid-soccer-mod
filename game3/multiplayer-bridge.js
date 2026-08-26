@@ -25,6 +25,8 @@
   let rtc = null;
   let dataChannel = null;
   let pendingCandidates = [];
+  let localVideoTracks = [];
+  let remoteStream = null;
 
   function log(message, details) {
     let line = "[SLS " + new Date().toISOString() + "] " + message;
@@ -135,16 +137,20 @@
   }
 
   function showRemoteVideo(stream) {
+    remoteStream = stream;
+    if (!state.started) return;
     let video = document.getElementById("sls-multiplayer-video");
     if (!video) {
       video = document.createElement("video");
       video.id = "sls-multiplayer-video";
       video.autoplay = true;
       video.playsInline = true;
-      video.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#092b31;z-index:10000;pointer-events:none";
+      video.style.cssText = "display:none;position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#092b31;z-index:10000;pointer-events:none";
+      video.onplaying = () => { video.style.display = "block"; };
       document.body.appendChild(video);
     }
     video.srcObject = stream;
+    video.play().catch(() => {});
     setStatus("Partida em andamento.");
   }
 
@@ -162,6 +168,7 @@
       if (isHost && message.type === "key") dispatchKey(message.code, message.down);
       if (!isHost && message.type === "start") {
         state.started = true;
+        showRemoteVideo(remoteStream);
         setStatus("Partida iniciando...");
       }
     };
@@ -205,7 +212,18 @@
     if (isHost) {
       const canvas = document.querySelector("canvas");
       if (canvas && canvas.captureStream) {
-        for (const track of canvas.captureStream(30).getTracks()) rtc.addTrack(track);
+        localVideoTracks = canvas.captureStream(15).getVideoTracks();
+        for (const track of localVideoTracks) {
+          track.enabled = false;
+          track.contentHint = "motion";
+          const sender = rtc.addTrack(track);
+          const parameters = sender.getParameters();
+          parameters.encodings = parameters.encodings || [{}];
+          parameters.encodings[0].maxBitrate = 700000;
+          parameters.encodings[0].maxFramerate = 15;
+          parameters.encodings[0].scaleResolutionDownBy = 1.5;
+          sender.setParameters(parameters).catch(() => {});
+        }
       }
       bindDataChannel(rtc.createDataChannel("controls"), true);
     } else {
@@ -320,6 +338,7 @@
   window.slsMultiplayerStart = () => {
     if (!state.host || !state.connected || !dataChannel || dataChannel.readyState !== "open") return;
     state.started = true;
+    localVideoTracks.forEach((track) => { track.enabled = true; });
     dataChannel.send(JSON.stringify({type: "start"}));
     setStatus("Partida iniciando...");
   };
@@ -329,12 +348,15 @@
     stopPolling();
     if (dataChannel) dataChannel.close();
     if (rtc) rtc.close();
+    localVideoTracks.forEach((track) => track.stop());
     const video = document.getElementById("sls-multiplayer-video");
     if (video) video.remove();
     roomSession = null;
     rtc = null;
     dataChannel = null;
     pendingCandidates = [];
+    localVideoTracks = [];
+    remoteStream = null;
     state.busy = false;
     state.host = false;
     state.connected = false;
