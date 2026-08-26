@@ -74,7 +74,7 @@ Durante o desenvolvimento local, o botão `Logs` mostra o diagnóstico do pollin
 Os testes não precisam abrir o jogo nem usar duas abas. Eles validam o protocolo multiplayer e as regras de conflito do modloader:
 
 ```powershell
-node --test tests/multiplayer-protocol.test.js
+node --test tests/multiplayer-protocol.test.js tests/multiplayer-server.test.js
 py -m unittest discover -s tests -p "test_*.py" -v
 ```
 
