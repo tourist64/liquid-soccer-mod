@@ -46,11 +46,28 @@ No multiplayer, o anfitrião cria a sala, o segundo jogador entra com o mesmo no
 | Corrida | `U` |
 | Trocar jogador | `I` |
 
-O multiplayer usa WebRTC/PeerJS para conectar os jogadores. O anfitrião executa a partida e transmite a tela, mantendo a sincronização simples para esse projeto pequeno.
+O multiplayer usa sinalização HTTP por polling e WebRTC nativo para conectar os jogadores. O anfitrião executa a partida e transmite a tela, mantendo a sincronização simples para esse projeto pequeno.
 
-Se o PeerJS público ficar sem responder, é possível usar um PeerServer próprio. Em um terminal separado, execute `npx --yes --package peer peerjs --port 9000 --path /peerjs`; ao abrir o jogo em `localhost`, essa configuração já é selecionada automaticamente. Para jogar com alguém fora do computador, esse servidor precisa ser publicado em um host com WebSocket seguro (`wss://`); GitHub Pages serve os arquivos, mas não executa o servidor de sinalização.
+O multiplayer usa sinalização HTTP por polling e WebRTC nativo, sem depender do PeerJS público. No modo local, o servidor do jogo encaminha `/signal` para o servidor de sinalização na porta 9000. Para iniciar os dois processos:
 
-Durante o desenvolvimento local, o botão `Logs` mostra o diagnóstico do handshake WebSocket e `game3/multiplayer.log` recebe as mesmas linhas.
+```powershell
+py tools/dev_server.py --port 8000
+$env:PORT=9000; node multiplayer-server/server.js
+```
+
+Para jogar com alguém fora do computador, publique `multiplayer-server/` em um host HTTPS; GitHub Pages serve os arquivos, mas não executa o servidor de sinalização.
+
+Existe um servidor mínimo pronto em `multiplayer-server/` para hospedar na Discloud ou em outro host Node:
+
+```bash
+cd multiplayer-server
+npm install
+npm start
+```
+
+Para a Discloud, envie apenas a pasta `multiplayer-server/`, que já contém `discloud.config`. Depois, defina `window.SLS_SIGNAL_SERVER` em `game3/multiplayer-config.js` com a URL HTTPS desse servidor, por exemplo `"https://seu-app.discloud.app"`. A documentação da Discloud exige `TYPE=site` e porta `8080` para aplicações externas: [Websites & APIs](https://docs.discloud.com/en/how-to-host/websites-and-apis).
+
+Durante o desenvolvimento local, o botão `Logs` mostra o diagnóstico do polling e `game3/multiplayer.log` recebe as mesmas linhas.
 
 ## Modloader
 

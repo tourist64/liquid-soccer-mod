@@ -2,6 +2,7 @@
 """Local game server that also receives multiplayer debug logs."""
 
 from argparse import ArgumentParser
+import http.client
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Lock
@@ -21,6 +22,9 @@ class Handler(SimpleHTTPRequestHandler):
         self.connection.settimeout(5)
 
     def do_POST(self):
+        if self.path.startswith("/signal/"):
+            self.proxy_signal("POST")
+            return
         if self.path != "/__sls_log":
             self.send_error(404)
             return
@@ -32,8 +36,44 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Content-Length", "0")
         self.end_headers()
 
+    def do_GET(self):
+        if self.path == "/signal" or self.path.startswith("/signal/"):
+            self.proxy_signal("GET")
+            return
+        super().do_GET()
+
+    def end_headers(self):
+        if getattr(self, "path", "").split("?", 1)[0].endswith((".html", ".js")):
+            self.send_header("Cache-Control", "no-store")
+        super().end_headers()
+
+    def proxy_signal(self, method):
+        client = http.client.HTTPConnection("127.0.0.1", 9000, timeout=5)
+        try:
+            path = self.path[len("/signal"):] or "/"
+            body = None
+            headers = {"Host": "127.0.0.1:9000"}
+            if method == "POST":
+                size = int(self.headers.get("Content-Length", "0"))
+                body = self.rfile.read(size)
+                headers["Content-Type"] = self.headers.get("Content-Type", "application/json")
+                headers["Content-Length"] = str(len(body))
+            client.request(method, path, body=body, headers=headers)
+            response = client.getresponse()
+            body = response.read()
+            self.send_response(response.status, response.reason)
+            for name, value in response.getheaders():
+                if name.lower() not in {"connection", "transfer-encoding"}:
+                    self.send_header(name, value)
+            self.end_headers()
+            self.wfile.write(body)
+        except OSError:
+            self.send_error(502, "PeerServer indisponível")
+        finally:
+            client.close()
+
     def log_message(self, format, *args):
-        if self.path != "/__sls_log":
+        if getattr(self, "path", "") != "/__sls_log":
             super().log_message(format, *args)
 
 

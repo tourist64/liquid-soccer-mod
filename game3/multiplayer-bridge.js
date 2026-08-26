@@ -15,18 +15,16 @@
     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
     "KeyH", "KeyJ", "KeyK", "KeyL", "KeyU", "KeyI", "KeyO"
   ]);
-  let peer = null;
-  let connection = null;
-  let streamSent = false;
-  let peerLoading = null;
-  let peerLoadingTimer = null;
   const logs = [];
   const localLogEndpoint = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname) ? "/__sls_log" : null;
-  const peerServerOptions = Object.assign({
-    host: "1.peerjs.com", port: 443, secure: true, path: "/", key: "peerjs"
-  }, window.SLS_PEER_SERVER || {});
-  const peerjsVersion = "1.5.5";
+  const signalServer = window.SLS_SIGNAL_SERVER || null;
+  const signalServerUrl = typeof signalServer === "string" ? signalServer.replace(/\/$/, "") : signalServer && signalServer.url;
   let debugOutput = null;
+  let roomSession = null;
+  let pollTimer = null;
+  let rtc = null;
+  let dataChannel = null;
+  let pendingCandidates = [];
 
   function log(message, details) {
     let line = "[SLS " + new Date().toISOString() + "] " + message;
@@ -77,80 +75,61 @@
     document.body.appendChild(toggle);
   }
 
-  const roomSlug = (room) => room.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 24) || "sala";
-
-  const peerIdFor = (room) => {
-    let hash = 2166136261;
-    for (const char of room.trim().toLowerCase()) {
-      hash ^= char.charCodeAt(0);
-      hash = Math.imul(hash, 16777619);
-    }
-    return "sls-" + (hash >>> 0).toString(36) + "-" + roomSlug(room);
-  };
-
-  const roomNameFromId = (id) => id.split("-").slice(2).join("-").replace(/-/g, " ") || id;
-
   function setStatus(message) {
     if (state.status !== message) log("status:", message);
     state.status = message;
   }
 
-  function ensurePeer(callback) {
-    if (window.Peer) {
-      log("PeerJS já carregado");
-      callback();
-      return;
+  async function signalRequest(path, payload, method) {
+    if (!signalServerUrl) throw new Error("Servidor de sinalização não configurado");
+    const options = {method: method || (payload === undefined ? "GET" : "POST"), headers: {}};
+    if (payload !== undefined) {
+      options.headers["Content-Type"] = "application/json";
+      options.body = JSON.stringify(payload);
     }
-    if (peerLoading) {
-      log("PeerJS ainda carregando; callback enfileirado");
-      peerLoading.push(callback);
-      return;
-    }
-    peerLoading = [callback];
-    log("iniciando carregamento do PeerJS");
-    const script = document.createElement("script");
-    script.src = "https://unpkg.com/peerjs@" + peerjsVersion + "/dist/peerjs.min.js";
-    script.dataset.slsPeer = "true";
-    peerLoadingTimer = window.setTimeout(() => {
-      if (!peerLoading) return;
-      peerLoading = null;
-      peerLoadingTimer = null;
-      state.busy = false;
-      state.rooms_busy = false;
-      log("timeout carregando PeerJS");
-      setStatus("O serviço multiplayer demorou para carregar. Tente novamente.");
-    }, 10000);
-    script.onload = () => {
-      window.clearTimeout(peerLoadingTimer);
-      peerLoadingTimer = null;
-      const callbacks = peerLoading;
-      peerLoading = null;
-      log("PeerJS carregado");
-      if (callbacks) callbacks.forEach((done) => done());
-    };
-    script.onerror = () => {
-      window.clearTimeout(peerLoadingTimer);
-      peerLoadingTimer = null;
-      peerLoading = null;
-      state.busy = false;
-      state.rooms_busy = false;
-      log("erro carregando PeerJS", {message: script.src});
-      setStatus("Não foi possível carregar o serviço multiplayer.");
-    };
-    document.head.appendChild(script);
+    const response = await window.fetch(signalServerUrl + path, options);
+    const text = await response.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch (_error) { data = {error: text}; }
+    if (!response.ok) throw new Error(data.error || ("HTTP " + response.status));
+    return data;
   }
 
-  function send(message) {
-    if (connection && connection.open) connection.send(message);
+  function roomData() {
+    return {room: roomSession.room, client: roomSession.client};
+  }
+
+  async function sendSignal(message, to) {
+    if (!roomSession) return;
+    await signalRequest("/send", Object.assign(roomData(), {to, message}));
+  }
+
+  function stopPolling() {
+    if (pollTimer) window.clearTimeout(pollTimer);
+    pollTimer = null;
+  }
+
+  function startPolling() {
+    stopPolling();
+    const poll = async () => {
+      if (!roomSession) return;
+      try {
+        const result = await signalRequest("/poll", roomData());
+        for (const message of result.messages || []) await handleSignal(message);
+      } catch (error) {
+        log("erro no polling", {message: error.message});
+        if (roomSession) setStatus("O servidor multiplayer não respondeu.");
+      }
+      if (roomSession) pollTimer = window.setTimeout(poll, 300);
+    };
+    poll();
   }
 
   function dispatchKey(code, down) {
     const canvas = document.querySelector("canvas");
     if (!canvas) return;
     const key = code.startsWith("Key") ? code.slice(3).toLowerCase() : code;
-    const event = new KeyboardEvent(down ? "keydown" : "keyup", {
-      key, code, bubbles: true, cancelable: true
-    });
+    const event = new KeyboardEvent(down ? "keydown" : "keyup", {key, code, bubbles: true, cancelable: true});
     canvas.dispatchEvent(event);
     window.dispatchEvent(event);
   }
@@ -162,284 +141,219 @@
       video.id = "sls-multiplayer-video";
       video.autoplay = true;
       video.playsInline = true;
-      video.style.position = "fixed";
-      video.style.inset = "0";
-      video.style.width = "100vw";
-      video.style.height = "100vh";
-      video.style.objectFit = "contain";
-      video.style.background = "#092b31";
-      video.style.zIndex = "10000";
-      video.style.pointerEvents = "none";
+      video.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#092b31;z-index:10000;pointer-events:none";
       document.body.appendChild(video);
     }
     video.srcObject = stream;
     setStatus("Partida em andamento.");
   }
 
-  function startHostStream() {
-    if (!state.host || !state.started || streamSent || !connection || !connection.open) return;
-    const canvas = document.querySelector("canvas");
-    if (!canvas || !canvas.captureStream || !peer) return;
-    streamSent = true;
-    const call = peer.call(connection.peer, canvas.captureStream(30));
-    call.on("error", () => { streamSent = false; });
-  }
-
-  function pollHostStream() {
-    startHostStream();
-    if (state.host) window.setTimeout(pollHostStream, 800);
-  }
-
-  function setupConnection(conn, info, isHost) {
-    connection = conn;
-    log("conexão criada", {peer: conn.peer, host: isHost});
-    const timeout = window.setTimeout(() => {
-      if (!conn.open) {
-        log("timeout aguardando conexão", {peer: conn.peer});
-        state.busy = false;
-        setStatus("A sala não respondeu. Verifique o nome e tente novamente.");
-        conn.close();
-      }
-    }, 8000);
-    conn.on("open", () => {
-      window.clearTimeout(timeout);
-      log("conexão aberta", {peer: conn.peer, host: isHost});
-      if (!isHost) {
-        conn.send({ type: "hello", nickname: info.nickname, password: info.password });
-        setStatus("Validando a senha da sala...");
-      }
-    });
-    conn.on("data", (message) => {
-      if (!message || typeof message !== "object") return;
-      log("mensagem recebida", {type: message.type});
-      if (isHost && message.type === "hello") {
-        if (message.password !== info.password) {
-          log("senha incorreta", {peer: conn.peer});
-          conn.send({ type: "error", message: "Senha incorreta." });
-          window.setTimeout(() => conn.close(), 200);
-          return;
-        }
-        state.busy = false;
-        state.connected = true;
-        state.guest = message.nickname;
-        conn.send({ type: "welcome", nickname: info.nickname });
-        setStatus(message.nickname + " entrou na sala. Clique em iniciar partida.");
-      } else if (!isHost && message.type === "welcome") {
-        state.busy = false;
-        state.connected = true;
-        setStatus("Conectado com " + message.nickname + ". Aguardando o início.");
-      } else if (!isHost && message.type === "start") {
+  function bindDataChannel(channel, isHost) {
+    dataChannel = channel;
+    channel.onopen = () => {
+      log("canal de controle aberto", {host: isHost});
+      state.connected = true;
+      state.busy = false;
+      setStatus(isHost ? state.guest + " conectado. Clique em iniciar partida." : "Conectado. Aguardando o início.");
+    };
+    channel.onmessage = (event) => {
+      let message;
+      try { message = JSON.parse(event.data); } catch (_error) { return; }
+      if (isHost && message.type === "key") dispatchKey(message.code, message.down);
+      if (!isHost && message.type === "start") {
         state.started = true;
         setStatus("Partida iniciando...");
-      } else if (!isHost && message.type === "error") {
-        state.busy = false;
-        setStatus(message.message);
-      } else if (isHost && message.type === "key") {
-        dispatchKey(message.code, message.down);
       }
-    });
-    conn.on("close", () => {
-      log("conexão encerrada", {peer: conn.peer});
-      state.busy = false;
+    };
+    channel.onclose = () => {
+      dataChannel = null;
       state.connected = false;
-      streamSent = false;
+      state.started = false;
       setStatus("A conexão foi encerrada.");
-    });
-    conn.on("error", (error) => {
-      window.clearTimeout(timeout);
-      log("erro na conexão", {type: error && error.type, message: error && error.message});
-      state.busy = false;
-      setStatus("Não foi possível conectar à sala.");
-    });
-  }
-
-  function setupPeer(info, isHost) {
-    state.busy = true;
-    state.host = isHost;
-    state.connected = false;
-    state.started = false;
-    state.guest = "";
-    const id = isHost ? peerIdFor(info.room) : undefined;
-    log("abrindo peer", {id: id || "automático", host: isHost});
-    probePeerSocket();
-    try {
-      peer = new window.Peer(id, {
-        ...peerServerOptions,
-        debug: 3,
-        logFunction: (...args) => log("PeerJS debug", args.map((value) => String(value)).join(" "))
-      });
-    } catch (error) {
-      log("exceção criando peer", {message: error.message, stack: error.stack});
-      state.busy = false;
-      state.host = false;
-      setStatus("Não foi possível iniciar a conexão multiplayer.");
-      return;
-    }
-    const currentPeer = peer;
-    log("opções do peer", {
-      host: currentPeer.options && currentPeer.options.host,
-      port: currentPeer.options && currentPeer.options.port,
-      secure: currentPeer.options && currentPeer.options.secure,
-      path: currentPeer.options && currentPeer.options.path
-    });
-    const openTimeout = window.setTimeout(() => {
-      if (peer !== currentPeer || currentPeer.open || currentPeer.destroyed) return;
-      const socket = currentPeer._socket;
-      state.busy = false;
-      state.host = false;
-      state.connected = false;
-      log("timeout abrindo peer", {
-        id: id || "automático",
-        disconnected: currentPeer.disconnected,
-        socket_disconnected: socket && socket.disconnected,
-        socket_ready_state: socket && socket._socket && socket._socket.readyState
-      });
-      setStatus("A conexão demorou demais. Verifique sua internet e tente novamente.");
-      currentPeer.destroy();
-    }, 10000);
-    peer.on("open", () => {
-      window.clearTimeout(openTimeout);
-      log("peer aberto", {id: peer.id, host: isHost});
-      if (isHost) {
-        state.busy = false;
-        setStatus("Sala criada. Aguardando seu amigo entrar.");
-        pollHostStream();
-      } else {
-        setupConnection(peer.connect(info.peer_id || peerIdFor(info.room), { reliable: true }), info, false);
-      }
-    });
-    peer.on("connection", (conn) => {
-      log("conexão recebida", {peer: conn.peer});
-      if (isHost && !connection) setupConnection(conn, info, true);
-      else conn.close();
-    });
-    peer.on("call", (call) => {
-      if (!isHost) {
-        call.answer();
-        call.on("stream", showRemoteVideo);
-      }
-    });
-    peer.on("error", (error) => {
-      window.clearTimeout(openTimeout);
-      log("erro no peer", {type: error && error.type, message: error && error.message});
-      state.busy = false;
-      state.host = false;
-      state.connected = false;
-      const message = error.type === "unavailable-id" ? "Essa sala já existe." : "Falha na conexão: " + error.type;
-      setStatus(message);
-    });
-    peer.on("disconnected", () => log("peer desconectado", {id: peer.id}));
-    peer.on("close", () => log("peer fechado", {id: peer.id}));
-  }
-
-  function probePeerSocket() {
-    if (!window.WebSocket) {
-      log("WebSocket indisponível no navegador");
-      return;
-    }
-    const protocol = peerServerOptions.secure ? "wss" : "ws";
-    const path = (peerServerOptions.path || "/").replace(/\/?$/, "/");
-    const id = "sls-probe-" + Math.random().toString(36).slice(2, 10);
-    const url = protocol + "://" + peerServerOptions.host + ":" + peerServerOptions.port + path +
-      "peerjs?key=" + encodeURIComponent(peerServerOptions.key || "peerjs") +
-      "&id=" + id + "&token=" + id + "&version=" + peerjsVersion;
-    log("testando handshake WebSocket", {host: peerServerOptions.host, port: peerServerOptions.port, path});
-    let socket;
-    try {
-      socket = new WebSocket(url);
-    } catch (error) {
-      log("exceção abrindo WebSocket", {message: error.message});
-      return;
-    }
-    const timer = window.setTimeout(() => {
-      log("timeout no handshake WebSocket", {ready_state: socket.readyState});
-      socket.close();
-    }, 7000);
-    socket.onopen = () => log("handshake WebSocket aberto");
-    socket.onmessage = (event) => {
-      let message = "mensagem não identificada";
-      try { message = JSON.parse(event.data).type || message; } catch (_error) {}
-      log("resposta do WebSocket", {type: message});
-      socket.close();
-    };
-    socket.onerror = () => log("erro no handshake WebSocket", {ready_state: socket.readyState});
-    socket.onclose = (event) => {
-      window.clearTimeout(timer);
-      log("WebSocket de diagnóstico fechado", {code: event.code, clean: event.wasClean});
     };
   }
 
-  function listRooms() {
+  async function addCandidate(candidate) {
+    if (!rtc) return;
+    if (!rtc.remoteDescription) {
+      pendingCandidates.push(candidate);
+      return;
+    }
+    try { await rtc.addIceCandidate(candidate); } catch (error) { log("erro adicionando candidato ICE", {message: error.message}); }
+  }
+
+  async function flushCandidates() {
+    const candidates = pendingCandidates;
+    pendingCandidates = [];
+    for (const candidate of candidates) await addCandidate(candidate);
+  }
+
+  function createRtc(isHost) {
+    if (!window.RTCPeerConnection) throw new Error("WebRTC não disponível neste navegador");
+    rtc = new RTCPeerConnection({iceServers: [{urls: "stun:stun.l.google.com:19302"}]});
+    rtc.onicecandidate = (event) => {
+      if (event.candidate) sendSignal({type: "candidate", candidate: event.candidate}, isHost ? "guest" : "host").catch((error) => log("erro enviando ICE", {message: error.message}));
+    };
+    rtc.onconnectionstatechange = () => {
+      log("estado WebRTC", {state: rtc.connectionState});
+      if (rtc.connectionState === "failed" || rtc.connectionState === "closed") {
+        state.connected = false;
+        setStatus("A conexão WebRTC falhou.");
+      }
+    };
+    rtc.ontrack = (event) => showRemoteVideo(event.streams[0]);
+    if (isHost) {
+      const canvas = document.querySelector("canvas");
+      if (canvas && canvas.captureStream) {
+        for (const track of canvas.captureStream(30).getTracks()) rtc.addTrack(track);
+      }
+      bindDataChannel(rtc.createDataChannel("controls"), true);
+    } else {
+      rtc.ondatachannel = (event) => bindDataChannel(event.channel, false);
+    }
+  }
+
+  async function createOffer() {
+    try {
+      createRtc(true);
+      const offer = await rtc.createOffer();
+      await rtc.setLocalDescription(offer);
+      await sendSignal({type: "offer", description: rtc.localDescription}, "guest");
+      setStatus("Conectando com seu amigo...");
+    } catch (error) {
+      log("erro criando oferta", {message: error.message, stack: error.stack});
+      setStatus("Não foi possível preparar a partida.");
+    }
+  }
+
+  async function handleSignal(message) {
+    log("mensagem de sinalização", {type: message.type});
+    if (message.type === "join" && state.host) {
+      state.guest = message.nickname;
+      await createOffer();
+    } else if (message.type === "offer" && !state.host) {
+      try {
+        createRtc(false);
+        await rtc.setRemoteDescription(message.description);
+        await flushCandidates();
+        const answer = await rtc.createAnswer();
+        await rtc.setLocalDescription(answer);
+        await sendSignal({type: "answer", description: rtc.localDescription}, "host");
+      } catch (error) {
+        log("erro respondendo oferta", {message: error.message, stack: error.stack});
+        setStatus("Não foi possível entrar na partida.");
+      }
+    } else if (message.type === "answer" && state.host && rtc) {
+      try {
+        await rtc.setRemoteDescription(message.description);
+        await flushCandidates();
+      } catch (error) { log("erro aceitando resposta", {message: error.message}); }
+    } else if (message.type === "candidate") {
+      await addCandidate(message.candidate);
+    } else if (message.type === "left") {
+      state.connected = false;
+      state.started = false;
+      setStatus("O outro jogador saiu da sala.");
+    }
+  }
+
+  async function listRooms() {
     log("solicitando lista de salas");
-    ensurePeer(() => {
-      state.rooms_busy = true;
-      const browserPeer = new window.Peer(undefined, peerServerOptions);
-      browserPeer.on("open", () => {
-        browserPeer.listAllPeers((ids) => {
-          state.rooms = ids.filter((id) => id.indexOf("sls-") === 0).map((id) => ({ id, name: roomNameFromId(id) }));
-          log("salas recebidas", {total: state.rooms.length});
-          state.rooms_busy = false;
-          setStatus(state.rooms.length ? "Selecione uma sala e digite a senha para entrar." : "Nenhuma sala encontrada.");
-          browserPeer.destroy();
-        });
-      });
-      browserPeer.on("error", (error) => {
-        log("erro listando salas", {type: error && error.type, message: error && error.message});
-        state.rooms_busy = false;
-        setStatus("Não foi possível buscar as salas.");
-        browserPeer.destroy();
-      });
-    });
+    state.rooms_busy = true;
+    try {
+      const result = await signalRequest("/rooms");
+      state.rooms = (result.rooms || []).map(room => Object.assign({id: room.name}, room));
+      setStatus(state.rooms.length ? "Selecione uma sala e digite a senha para entrar." : "Nenhuma sala encontrada.");
+      log("salas recebidas", {total: state.rooms.length});
+    } catch (error) {
+      log("erro listando salas", {message: error.message});
+      setStatus("Não foi possível buscar as salas.");
+    } finally {
+      state.rooms_busy = false;
+    }
   }
 
-  window.slsMultiplayerEnsure = () => ensurePeer(() => {});
+  async function createRoom(nickname, room, password) {
+    log("pedido para criar sala", {nickname, room});
+    state.busy = true;
+    setStatus("Criando sala...");
+    try {
+      const result = await signalRequest("/create", {nickname, room, password});
+      roomSession = {room: result.room, client: result.client};
+      state.host = true;
+      state.busy = false;
+      setStatus("Sala criada. Aguardando seu amigo entrar.");
+      startPolling();
+    } catch (error) {
+      log("erro criando sala", {message: error.message});
+      state.busy = false;
+      setStatus(error.message === "Sala já existe." ? error.message : "Não foi possível criar a sala.");
+    }
+  }
+
+  async function joinRoom(nickname, room, password) {
+    log("pedido para entrar na sala", {nickname, room});
+    state.busy = true;
+    setStatus("Entrando na sala...");
+    try {
+      const result = await signalRequest("/join", {nickname, room, password});
+      roomSession = {room: result.room, client: result.client};
+      state.host = false;
+      state.busy = false;
+      setStatus("Sala encontrada. Negociando conexão...");
+      startPolling();
+    } catch (error) {
+      log("erro entrando na sala", {message: error.message});
+      state.busy = false;
+      setStatus(error.message || "Não foi possível entrar na sala.");
+    }
+  }
+
+  window.slsMultiplayerEnsure = () => {
+    if (!signalServerUrl) setStatus("Servidor multiplayer não configurado.");
+  };
   window.slsMultiplayerState = () => JSON.stringify(state);
   window.slsMultiplayerGetLogs = () => logs.join("\n");
   window.slsMultiplayerListRooms = listRooms;
-  window.slsMultiplayerCreate = (nickname, room, password) => {
-    log("pedido para criar sala", {nickname, room});
-    state.busy = true;
-    setStatus("Carregando conexão segura...");
-    ensurePeer(() => setupPeer({ nickname, room, password }, true));
-  };
-  window.slsMultiplayerJoin = (nickname, room, password) => {
-    log("pedido para entrar na sala", {nickname, room});
-    state.busy = true;
-    setStatus("Carregando conexão segura...");
-    ensurePeer(() => setupPeer({ nickname, room, password, peer_id: room }, false));
-  };
+  window.slsMultiplayerCreate = createRoom;
+  window.slsMultiplayerJoin = joinRoom;
   window.slsMultiplayerStart = () => {
-    if (!state.host || !state.connected) return;
+    if (!state.host || !state.connected || !dataChannel || dataChannel.readyState !== "open") return;
     state.started = true;
-    send({ type: "start" });
+    dataChannel.send(JSON.stringify({type: "start"}));
     setStatus("Partida iniciando...");
   };
   window.slsMultiplayerLeave = () => {
     log("saindo da sala");
-    if (connection) connection.close();
-    if (peer) peer.destroy();
+    if (roomSession) signalRequest("/leave", roomData()).catch(() => {});
+    stopPolling();
+    if (dataChannel) dataChannel.close();
+    if (rtc) rtc.close();
     const video = document.getElementById("sls-multiplayer-video");
     if (video) video.remove();
-    peer = null;
-    connection = null;
+    roomSession = null;
+    rtc = null;
+    dataChannel = null;
+    pendingCandidates = [];
     state.busy = false;
     state.host = false;
     state.connected = false;
     state.started = false;
+    state.guest = "";
   };
 
   document.addEventListener("keydown", (event) => {
     if (state.host || !state.started || !keys.has(event.code)) return;
     event.preventDefault();
-    send({ type: "key", code: event.code, down: true });
+    if (dataChannel && dataChannel.readyState === "open") dataChannel.send(JSON.stringify({type: "key", code: event.code, down: true}));
   });
   document.addEventListener("keyup", (event) => {
     if (state.host || !state.started || !keys.has(event.code)) return;
     event.preventDefault();
-    send({ type: "key", code: event.code, down: false });
+    if (dataChannel && dataChannel.readyState === "open") dataChannel.send(JSON.stringify({type: "key", code: event.code, down: false}));
   });
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", installDebugPanel);
   else installDebugPanel();
-  log("bridge multiplayer inicializado", {url: window.location.href});
+  log("bridge multiplayer inicializado", {url: window.location.href, signal_server: signalServerUrl || "não configurado"});
 })();
