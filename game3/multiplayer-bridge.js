@@ -19,6 +19,7 @@
   let connection = null;
   let streamSent = false;
   let peerLoading = null;
+  let peerLoadingTimer = null;
 
   const roomSlug = (room) => room.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 24) || "sala";
 
@@ -50,12 +51,24 @@
     const script = document.createElement("script");
     script.src = "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js";
     script.dataset.slsPeer = "true";
+    peerLoadingTimer = window.setTimeout(() => {
+      if (!peerLoading) return;
+      peerLoading = null;
+      peerLoadingTimer = null;
+      state.busy = false;
+      state.rooms_busy = false;
+      setStatus("O serviço multiplayer demorou para carregar. Tente novamente.");
+    }, 10000);
     script.onload = () => {
+      window.clearTimeout(peerLoadingTimer);
+      peerLoadingTimer = null;
       const callbacks = peerLoading;
       peerLoading = null;
-      callbacks.forEach((done) => done());
+      if (callbacks) callbacks.forEach((done) => done());
     };
     script.onerror = () => {
+      window.clearTimeout(peerLoadingTimer);
+      peerLoadingTimer = null;
       peerLoading = null;
       state.busy = false;
       state.rooms_busy = false;
@@ -178,7 +191,17 @@
     state.guest = "";
     const id = isHost ? peerIdFor(info.room) : undefined;
     peer = new window.Peer(id);
+    const currentPeer = peer;
+    const openTimeout = window.setTimeout(() => {
+      if (peer !== currentPeer || currentPeer.open || currentPeer.destroyed) return;
+      state.busy = false;
+      state.host = false;
+      state.connected = false;
+      setStatus("A conexão demorou demais. Verifique sua internet e tente novamente.");
+      currentPeer.destroy();
+    }, 10000);
     peer.on("open", () => {
+      window.clearTimeout(openTimeout);
       if (isHost) {
         state.busy = false;
         setStatus("Sala criada. Aguardando seu amigo entrar.");
@@ -198,6 +221,7 @@
       }
     });
     peer.on("error", (error) => {
+      window.clearTimeout(openTimeout);
       state.busy = false;
       state.host = false;
       state.connected = false;
