@@ -39,6 +39,11 @@
       "path": "res://Scenes/Multiplayer.tscn",
       "source": "files/Scenes/Multiplayer.tscn",
       "overwrite": true
+    },
+    {
+      "path": "res://Scenes/TeamSelect.gdc",
+      "source": "files/Scenes/TeamSelect.gdc",
+      "overwrite": true
     }
   ]
 }

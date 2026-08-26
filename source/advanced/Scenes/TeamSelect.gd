@@ -15,6 +15,10 @@ var t1level = 0
 var t2level = 0
 var lc = [0, 0, 0, 0]
 var gogoGame = false
+var mp_host = false
+var mp_elapsed = 0.0
+var mp_started = false
+var mp_applying = false
 
 func _ready():
 	_readTeams()
@@ -60,6 +64,103 @@ func _ready():
 		$TextureRect / P2Controller / T2C.text = "CPU"
 	if not Global.p1human:
 		$TextureRect / P1Controller / T1C.text = "CPU"
+
+	if Global.multiplayer_mode and OS.has_feature("HTML5"):
+		_setup_multiplayer()
+
+
+func _process(delta):
+	if not Global.multiplayer_mode or not OS.has_feature("HTML5"):
+		return
+	mp_elapsed += delta
+	if mp_elapsed < 0.25:
+		return
+	mp_elapsed = 0.0
+	var raw_state = JavaScript.eval("window.slsMultiplayerState ? window.slsMultiplayerState() : '{}'", true)
+	if typeof(raw_state) != TYPE_STRING:
+		return
+	var state = parse_json(raw_state)
+	if typeof(state) != TYPE_DICTIONARY:
+		return
+	mp_host = bool(state.get("host", false))
+	var remote_team = str(state.get("team2" if mp_host else "team1", ""))
+	var remote_alt = bool(state.get("team2_alt" if mp_host else "team1_alt", false))
+	var current_remote_team = Global.team2 if mp_host else Global.team1
+	var current_remote_alt = p2alt if mp_host else p1alt
+	if remote_team != "" and (remote_team != current_remote_team or remote_alt != current_remote_alt):
+		_mp_apply_team("team2" if mp_host else "team1", remote_team, remote_alt)
+	var own_ready = bool(state.get("team1_ready" if mp_host else "team2_ready", false))
+	var other_ready = bool(state.get("team2_ready" if mp_host else "team1_ready", false))
+	if mp_host:
+		$TextureRect / GoGame.disabled = own_ready and not other_ready
+		$TextureRect / GoGame.text = "Iniciar partida" if other_ready and own_ready else ("Aguardando adversário" if own_ready else "Confirmar time")
+		$TextureRect / Label2.text = "Convidado pronto" if other_ready else "Aguardando convidado"
+	else:
+		$TextureRect / GoGame.disabled = own_ready
+		$TextureRect / GoGame.text = "Pronto" if own_ready else "Confirmar time"
+		$TextureRect / Label2.text = "Host pronto" if other_ready else "Aguardando host"
+	if bool(state.get("match_started", false)) and not mp_started:
+		mp_started = true
+		_start_multiplayer_game()
+
+
+func _setup_multiplayer():
+	var raw_state = JavaScript.eval("window.slsMultiplayerState ? window.slsMultiplayerState() : '{}'", true)
+	var state = parse_json(raw_state) if typeof(raw_state) == TYPE_STRING else {}
+	mp_host = bool(state.get("host", false))
+	$TextureRect / T1Levels / T1Level.disabled = true
+	$TextureRect / T2Levels / T2Level.disabled = true
+	$TextureRect / RandomButton.disabled = true
+	$TextureRect / HomeTeams.disabled = not mp_host
+	$TextureRect / AwayTeams.disabled = mp_host
+	$TextureRect / T1Alt.disabled = not mp_host
+	$TextureRect / T2Alt.disabled = mp_host
+	$TextureRect / GoGame.text = "Confirmar time"
+	$TextureRect / Label2.text = "Aguardando host"
+	if mp_host:
+		$TextureRect / Label2.text = "Aguardando convidado"
+	_mp_send_team(Global.team1 if mp_host else Global.team2, Global.p1alt if mp_host else Global.p2alt)
+
+
+func _mp_send_team(path, alt):
+	if not mp_applying:
+		var call = "window.slsMultiplayerSetTeam && window.slsMultiplayerSetTeam(%s,%s)" % [_js_string(path), str(alt).to_lower()]
+		JavaScript.eval(call, true)
+
+
+func _mp_apply_team(side, path, alt):
+	var team_index = teamfiles.find(path)
+	if team_index < lc[2]:
+		return
+	var shown_index = team_index - lc[2]
+	var list = $TextureRect / HomeTeams if side == "team1" else $TextureRect / AwayTeams
+	if shown_index < 0 or shown_index >= list.get_item_count():
+		return
+	mp_applying = true
+	if side == "team1":
+		p1alt = alt
+		$TextureRect / T1Alt.pressed = alt
+		$TextureRect / HomeTeams.select(shown_index)
+		_on_HomeTeams_item_selected(shown_index)
+	else:
+		p2alt = alt
+		$TextureRect / T2Alt.pressed = alt
+		$TextureRect / AwayTeams.select(shown_index)
+		_on_AwayTeams_item_selected(shown_index)
+	mp_applying = false
+
+
+func _start_multiplayer_game():
+	Global._loadTeams(p1alt, p2alt)
+	Global.toLoad = 1
+	Global.stadium = 3 - int(Global.t1.level)
+	Global._musicOff()
+	Global.final = false
+	get_tree().change_scene("res://Scenes/Game.tscn")
+
+
+func _js_string(value):
+	return to_json(str(value))
 	
 	
 	
@@ -201,6 +302,8 @@ func _on_HomeTeams_item_selected(index):
 		
 	p1sel = index
 	Global.team1 = teamfiles[lev + ti]
+	if Global.multiplayer_mode and mp_host:
+		_mp_send_team(Global.team1, p1alt)
 
 
 func _on_AwayTeams_item_selected(index):
@@ -240,9 +343,17 @@ func _on_AwayTeams_item_selected(index):
 		p2mat.set_shader_param("Shirt3", t.altShirt3Color)
 	p2sel = index
 	Global.team2 = teamfiles[lev + ti]
+	if Global.multiplayer_mode and not mp_host:
+		_mp_send_team(Global.team2, p2alt)
 	
 
 func _on_TextureButton_pressed():
+	if Global.multiplayer_mode:
+		if not gogoGame:
+			gogoGame = true
+			$TextureRect / GoGame.disabled = true
+			JavaScript.eval("window.slsMultiplayerReady && window.slsMultiplayerReady()", true)
+		return
 	
 	
 	if not gogoGame:

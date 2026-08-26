@@ -9,7 +9,14 @@
     host: false,
     connected: false,
     started: false,
-    guest: ""
+    match_started: false,
+    guest: "",
+    team1: "",
+    team2: "",
+    team1_alt: false,
+    team2_alt: false,
+    team1_ready: false,
+    team2_ready: false
   };
   const keys = new Set([
     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
@@ -138,7 +145,7 @@
 
   function showRemoteVideo(stream) {
     remoteStream = stream;
-    if (!state.started) return;
+    if (!state.match_started) return;
     let video = document.getElementById("sls-multiplayer-video");
     if (!video) {
       video = document.createElement("video");
@@ -168,8 +175,25 @@
       if (isHost && message.type === "key") dispatchKey(message.code, message.down);
       if (!isHost && message.type === "start") {
         state.started = true;
-        showRemoteVideo(remoteStream);
         setStatus("Partida iniciando...");
+      }
+      if (message.type === "team") {
+        const side = message.side === "team1" ? "team1" : "team2";
+        if (side !== (state.host ? "team1" : "team2")) {
+          state[side] = String(message.path || "");
+          state[side + "_alt"] = !!message.alt;
+          state[side + "_ready"] = false;
+        }
+      }
+      if (message.type === "ready") {
+        const side = message.side === "team1" ? "team1" : "team2";
+        if (side !== (state.host ? "team1" : "team2")) state[side + "_ready"] = true;
+        maybeStartMatch();
+      }
+      if (message.type === "match_start") {
+        state.match_started = true;
+        showRemoteVideo(remoteStream);
+        setStatus("Partida em andamento.");
       }
     };
     channel.onclose = () => {
@@ -242,6 +266,14 @@
       log("erro criando oferta", {message: error.message, stack: error.stack});
       setStatus("Não foi possível preparar a partida.");
     }
+  }
+
+  function maybeStartMatch() {
+    if (!state.host || state.match_started || !state.team1_ready || !state.team2_ready) return;
+    state.match_started = true;
+    localVideoTracks.forEach((track) => { track.enabled = true; });
+    if (dataChannel && dataChannel.readyState === "open") dataChannel.send(JSON.stringify({type: "match_start"}));
+    setStatus("Partida em andamento.");
   }
 
   async function handleSignal(message) {
@@ -335,10 +367,31 @@
   window.slsMultiplayerListRooms = listRooms;
   window.slsMultiplayerCreate = createRoom;
   window.slsMultiplayerJoin = joinRoom;
+  window.slsMultiplayerSetTeam = (path, alt) => {
+    if (!dataChannel || dataChannel.readyState !== "open") return;
+    const side = state.host ? "team1" : "team2";
+    state[side] = String(path || "");
+    state[side + "_alt"] = !!alt;
+    state[side + "_ready"] = false;
+    dataChannel.send(JSON.stringify({type: "team", side, path: state[side], alt: state[side + "_alt"]}));
+  };
+  window.slsMultiplayerReady = () => {
+    if (!dataChannel || dataChannel.readyState !== "open") return;
+    const side = state.host ? "team1" : "team2";
+    state[side + "_ready"] = true;
+    dataChannel.send(JSON.stringify({type: "ready", side}));
+    maybeStartMatch();
+  };
   window.slsMultiplayerStart = () => {
     if (!state.host || !state.connected || !dataChannel || dataChannel.readyState !== "open") return;
     state.started = true;
-    localVideoTracks.forEach((track) => { track.enabled = true; });
+    state.match_started = false;
+    state.team1 = "";
+    state.team2 = "";
+    state.team1_alt = false;
+    state.team2_alt = false;
+    state.team1_ready = false;
+    state.team2_ready = false;
     dataChannel.send(JSON.stringify({type: "start"}));
     setStatus("Partida iniciando...");
   };
@@ -361,7 +414,14 @@
     state.host = false;
     state.connected = false;
     state.started = false;
+    state.match_started = false;
     state.guest = "";
+    state.team1 = "";
+    state.team2 = "";
+    state.team1_alt = false;
+    state.team2_alt = false;
+    state.team1_ready = false;
+    state.team2_ready = false;
   };
 
   document.addEventListener("keydown", (event) => {
