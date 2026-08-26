@@ -69,6 +69,23 @@ Para a Discloud, envie apenas a pasta `multiplayer-server/`, que já contém `di
 
 Durante o desenvolvimento local, o botão `Logs` mostra o diagnóstico do polling e `game3/multiplayer.log` recebe as mesmas linhas.
 
+## Testes locais
+
+Os testes não precisam abrir o jogo nem usar duas abas. Eles validam o protocolo multiplayer e as regras de conflito do modloader:
+
+```powershell
+node --test tests/multiplayer-protocol.test.js
+py -m unittest discover -s tests -p "test_*.py" -v
+```
+
+Antes de publicar uma build, valide também o pacote aplicado:
+
+```powershell
+py modloader.py validate
+py modloader.py apply
+py modloader.py verify
+```
+
 ## Modloader
 
 O mod multiplayer é o padrão do comando `apply`:

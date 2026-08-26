@@ -1,6 +1,9 @@
 (function () {
   "use strict";
 
+  const protocol = window.SLSMultiplayerProtocol;
+  if (!protocol) throw new Error("Núcleo do protocolo multiplayer não carregado");
+
   const state = {
     status: "Digite seu nickname para começar.",
     busy: false,
@@ -140,11 +143,7 @@
     const canvas = document.querySelector("canvas");
     if (!canvas) return;
     const key = code.startsWith("Key") ? code.slice(3).toLowerCase() : code;
-    const keyCode = {
-      ArrowUp: 38, ArrowDown: 40, ArrowLeft: 37, ArrowRight: 39,
-      KeyH: 72, KeyJ: 74, KeyK: 75, KeyL: 76,
-      KeyU: 85, KeyI: 73, KeyO: 79
-    }[code] || 0;
+    const keyCode = protocol.keyCodeFor(code);
     const event = new KeyboardEvent(down ? "keydown" : "keyup", {key, code, bubbles: true, cancelable: true});
     for (const property of ["keyCode", "which", "charCode"]) {
       try { Object.defineProperty(event, property, {get: () => keyCode}); } catch (_error) {}
@@ -194,19 +193,8 @@
         state.started = true;
         setStatus("Partida iniciando...");
       }
-      if (message.type === "teams" && !state.host) {
-        state.team1 = String(message.team1 || "");
-        state.team2 = String(message.team2 || "");
-        state.team1_alt = !!message.team1_alt;
-        state.team2_alt = !!message.team2_alt;
-        state.team1_ready = false;
-        state.team2_ready = false;
-      }
-      if (message.type === "team_request" && state.host) {
-        state.team2 = String(message.path || "");
-        state.team2_alt = !!message.alt;
-        state.team1_ready = false;
-        state.team2_ready = false;
+      if (message.type === "teams" && !state.host) protocol.applyTeamsMessage(state, message);
+      if (message.type === "team_request" && protocol.applyGuestTeamRequest(state, message)) {
         pendingHostTeams = true;
         if (sendTeamsSnapshot()) pendingHostTeams = false;
       }
@@ -308,7 +296,7 @@
   }
 
   function maybeStartMatch() {
-    if (!state.host || state.match_started || !state.team1 || !state.team2 || !state.team1_ready || !state.team2_ready) return;
+    if (!protocol.canStartMatch(state)) return;
     state.match_started = true;
     localVideoTracks.forEach((track) => { track.enabled = true; });
     if (dataChannel && dataChannel.readyState === "open") dataChannel.send(JSON.stringify({type: "match_start"}));
@@ -317,13 +305,7 @@
 
   function sendTeamsSnapshot() {
     if (!state.host || !dataChannel || dataChannel.readyState !== "open") return false;
-    dataChannel.send(JSON.stringify({
-      type: "teams",
-      team1: state.team1,
-      team2: state.team2,
-      team1_alt: state.team1_alt,
-      team2_alt: state.team2_alt
-    }));
+    dataChannel.send(JSON.stringify(protocol.teamMessage(state)));
     return true;
   }
 
