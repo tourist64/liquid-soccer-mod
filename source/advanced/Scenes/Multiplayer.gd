@@ -8,7 +8,6 @@ var current_screen = "nickname"
 var nickname = ""
 var selected_room_id = ""
 var room_signature = ""
-var continue_requested = false
 
 
 func _ready():
@@ -19,15 +18,6 @@ func _ready():
 	else:
 		$Status.text = "O multiplayer funciona na versão publicada no navegador."
 	last_status = $Status.text
-
-
-func _input(event):
-	if current_screen != "nickname":
-		return
-	if event is InputEventMouseButton and event.pressed and event.button_index == BUTTON_LEFT:
-		if $Screens/NicknameScreen/Continue.get_global_rect().has_point(event.position):
-			get_viewport().set_input_as_handled()
-			_on_Continue_pressed()
 
 
 func _process(_delta):
@@ -79,17 +69,10 @@ func _js_string(value):
 
 
 func _on_Continue_pressed():
-	if continue_requested:
-		return
 	nickname = $Screens/NicknameScreen/Nickname.text.strip_edges()
 	if nickname == "":
 		_set_status("Digite um nickname para continuar.")
 		return
-	continue_requested = true
-	call_deferred("_open_choice_screen")
-
-
-func _open_choice_screen():
 	_show_screen("ChoiceScreen")
 	_set_status("Escolha se deseja criar uma sala ou entrar em uma sala existente.")
 
