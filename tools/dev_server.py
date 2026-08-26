@@ -4,10 +4,12 @@
 from argparse import ArgumentParser
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from threading import Lock
 
 
 ROOT = Path(__file__).resolve().parents[1] / "game3"
 LOG_FILE = ROOT / "multiplayer.log"
+LOG_LOCK = Lock()
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -24,7 +26,7 @@ class Handler(SimpleHTTPRequestHandler):
             return
         size = int(self.headers.get("Content-Length", "0"))
         message = self.rfile.read(size).decode("utf-8", "replace")
-        with LOG_FILE.open("a", encoding="utf-8") as log_file:
+        with LOG_LOCK, LOG_FILE.open("a", encoding="utf-8") as log_file:
             log_file.write(message)
         self.send_response(204)
         self.send_header("Content-Length", "0")

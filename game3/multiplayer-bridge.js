@@ -270,12 +270,24 @@
       return;
     }
     const currentPeer = peer;
+    log("opções do peer", {
+      host: currentPeer.options && currentPeer.options.host,
+      port: currentPeer.options && currentPeer.options.port,
+      secure: currentPeer.options && currentPeer.options.secure,
+      path: currentPeer.options && currentPeer.options.path
+    });
     const openTimeout = window.setTimeout(() => {
       if (peer !== currentPeer || currentPeer.open || currentPeer.destroyed) return;
+      const socket = currentPeer._socket;
       state.busy = false;
       state.host = false;
       state.connected = false;
-      log("timeout abrindo peer", {id: id || "automático"});
+      log("timeout abrindo peer", {
+        id: id || "automático",
+        disconnected: currentPeer.disconnected,
+        socket_disconnected: socket && socket.disconnected,
+        socket_ready_state: socket && socket._socket && socket._socket.readyState
+      });
       setStatus("A conexão demorou demais. Verifique sua internet e tente novamente.");
       currentPeer.destroy();
     }, 10000);
