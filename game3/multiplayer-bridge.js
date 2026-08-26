@@ -34,6 +34,8 @@
   let pendingCandidates = [];
   let localVideoTracks = [];
   let remoteStream = null;
+  let pendingHostTeams = false;
+  let pendingGuestTeam = null;
 
   function log(message, details) {
     let line = "[SLS " + new Date().toISOString() + "] " + message;
@@ -138,9 +140,16 @@
     const canvas = document.querySelector("canvas");
     if (!canvas) return;
     const key = code.startsWith("Key") ? code.slice(3).toLowerCase() : code;
+    const keyCode = {
+      ArrowUp: 38, ArrowDown: 40, ArrowLeft: 37, ArrowRight: 39,
+      KeyH: 72, KeyJ: 74, KeyK: 75, KeyL: 76,
+      KeyU: 85, KeyI: 73, KeyO: 79
+    }[code] || 0;
     const event = new KeyboardEvent(down ? "keydown" : "keyup", {key, code, bubbles: true, cancelable: true});
+    for (const property of ["keyCode", "which", "charCode"]) {
+      try { Object.defineProperty(event, property, {get: () => keyCode}); } catch (_error) {}
+    }
     canvas.dispatchEvent(event);
-    window.dispatchEvent(event);
   }
 
   function showRemoteVideo(stream) {
@@ -152,8 +161,8 @@
       video.id = "sls-multiplayer-video";
       video.autoplay = true;
       video.playsInline = true;
-      video.style.cssText = "display:none;position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#092b31;z-index:10000;pointer-events:none";
-      video.onplaying = () => { video.style.display = "block"; };
+      video.muted = true;
+      video.style.cssText = "display:block;position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#092b31;z-index:10000;pointer-events:none";
       document.body.appendChild(video);
     }
     video.srcObject = stream;
@@ -167,6 +176,14 @@
       log("canal de controle aberto", {host: isHost});
       state.connected = true;
       state.busy = false;
+      if (isHost && pendingHostTeams) {
+        sendTeamsSnapshot();
+        pendingHostTeams = false;
+      }
+      if (!isHost && pendingGuestTeam) {
+        channel.send(JSON.stringify({type: "team_request", path: pendingGuestTeam.path, alt: pendingGuestTeam.alt}));
+        pendingGuestTeam = null;
+      }
       setStatus(isHost ? state.guest + " conectado. Clique em iniciar partida." : "Conectado. Aguardando o início.");
     };
     channel.onmessage = (event) => {
@@ -184,6 +201,14 @@
         state.team2_alt = !!message.team2_alt;
         state.team1_ready = false;
         state.team2_ready = false;
+      }
+      if (message.type === "team_request" && state.host) {
+        state.team2 = String(message.path || "");
+        state.team2_alt = !!message.alt;
+        state.team1_ready = false;
+        state.team2_ready = false;
+        pendingHostTeams = true;
+        if (sendTeamsSnapshot()) pendingHostTeams = false;
       }
       if (message.type === "ready") {
         const side = message.side === "team1" ? "team1" : "team2";
@@ -255,8 +280,22 @@
     }
   }
 
+  function waitForHostCanvas() {
+    return new Promise((resolve, reject) => {
+      const started = Date.now();
+      const check = () => {
+        const canvas = document.querySelector("canvas");
+        if (canvas && canvas.captureStream) return resolve();
+        if (Date.now() - started >= 5000) return reject(new Error("Canvas do jogo não ficou disponível"));
+        window.setTimeout(check, 100);
+      };
+      check();
+    });
+  }
+
   async function createOffer() {
     try {
+      await waitForHostCanvas();
       createRtc(true);
       const offer = await rtc.createOffer();
       await rtc.setLocalDescription(offer);
@@ -274,6 +313,18 @@
     localVideoTracks.forEach((track) => { track.enabled = true; });
     if (dataChannel && dataChannel.readyState === "open") dataChannel.send(JSON.stringify({type: "match_start"}));
     setStatus("Partida em andamento.");
+  }
+
+  function sendTeamsSnapshot() {
+    if (!state.host || !dataChannel || dataChannel.readyState !== "open") return false;
+    dataChannel.send(JSON.stringify({
+      type: "teams",
+      team1: state.team1,
+      team2: state.team2,
+      team1_alt: state.team1_alt,
+      team2_alt: state.team2_alt
+    }));
+    return true;
   }
 
   async function handleSignal(message) {
@@ -368,20 +419,23 @@
   window.slsMultiplayerCreate = createRoom;
   window.slsMultiplayerJoin = joinRoom;
   window.slsMultiplayerSetTeams = (team1, team1Alt, team2, team2Alt) => {
-    if (!state.host || !dataChannel || dataChannel.readyState !== "open") return;
+    if (!state.host) return;
     state.team1 = String(team1 || "");
     state.team2 = String(team2 || "");
     state.team1_alt = !!team1Alt;
     state.team2_alt = !!team2Alt;
     state.team1_ready = false;
     state.team2_ready = false;
-    dataChannel.send(JSON.stringify({
-      type: "teams",
-      team1: state.team1,
-      team2: state.team2,
-      team1_alt: state.team1_alt,
-      team2_alt: state.team2_alt
-    }));
+    pendingHostTeams = true;
+    if (sendTeamsSnapshot()) pendingHostTeams = false;
+  };
+  window.slsMultiplayerRequestTeam = (path, alt) => {
+    if (state.host) return;
+    pendingGuestTeam = {path: String(path || ""), alt: !!alt};
+    if (dataChannel && dataChannel.readyState === "open") {
+      dataChannel.send(JSON.stringify({type: "team_request", path: pendingGuestTeam.path, alt: pendingGuestTeam.alt}));
+      pendingGuestTeam = null;
+    }
   };
   window.slsMultiplayerReady = () => {
     if (!dataChannel || dataChannel.readyState !== "open") return;
@@ -418,6 +472,8 @@
     pendingCandidates = [];
     localVideoTracks = [];
     remoteStream = null;
+    pendingHostTeams = false;
+    pendingGuestTeam = null;
     state.busy = false;
     state.host = false;
     state.connected = false;

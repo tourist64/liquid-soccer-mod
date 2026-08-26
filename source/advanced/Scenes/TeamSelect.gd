@@ -97,7 +97,14 @@ func _process(delta):
 		var host_team2 = str(state.get("team2", ""))
 		var host_alt1 = bool(state.get("team1_alt", false))
 		var host_alt2 = bool(state.get("team2_alt", false))
-		if host_team1 != Global.team1 or host_team2 != Global.team2 or host_alt1 != p1alt or host_alt2 != p2alt:
+		var host_sync_needed = host_team1 == "" or host_team2 == ""
+		if host_team1 != "" and (host_team1 != Global.team1 or host_alt1 != p1alt):
+			_mp_apply_team("team1", host_team1, host_alt1)
+			host_sync_needed = true
+		if host_team2 != "" and (host_team2 != Global.team2 or host_alt2 != p2alt):
+			_mp_apply_team("team2", host_team2, host_alt2)
+			host_sync_needed = true
+		if host_sync_needed:
 			_mp_send_teams()
 	var own_ready = bool(state.get("team1_ready" if mp_host else "team2_ready", false))
 	var other_ready = bool(state.get("team2_ready" if mp_host else "team1_ready", false))
@@ -121,21 +128,28 @@ func _setup_multiplayer():
 	mp_host = bool(state.get("host", false))
 	$TextureRect / T1Levels / T1Level.disabled = true
 	$TextureRect / T2Levels / T2Level.disabled = true
-	$TextureRect / RandomButton.disabled = not mp_host
+	$TextureRect / RandomButton.disabled = true
 	$TextureRect / HomeTeams.disabled = not mp_host
-	$TextureRect / AwayTeams.disabled = not mp_host
+	$TextureRect / AwayTeams.disabled = mp_host
 	$TextureRect / T1Alt.disabled = not mp_host
-	$TextureRect / T2Alt.disabled = not mp_host
+	$TextureRect / T2Alt.disabled = mp_host
 	$TextureRect / GoGame.text = "Confirmar time"
 	$TextureRect / Label2.text = "Aguardando host"
 	if mp_host:
 		$TextureRect / Label2.text = "Aguardando convidado"
-		_mp_send_teams()
+	else:
+		_mp_request_team(Global.team2, p2alt)
 
 
 func _mp_send_teams():
 	if not mp_applying:
 		var call = "window.slsMultiplayerSetTeams && window.slsMultiplayerSetTeams(%s,%s,%s,%s)" % [_js_string(Global.team1), str(p1alt).to_lower(), _js_string(Global.team2), str(p2alt).to_lower()]
+		JavaScript.eval(call, true)
+
+
+func _mp_request_team(path, alt):
+	if not mp_applying:
+		var call = "window.slsMultiplayerRequestTeam && window.slsMultiplayerRequestTeam(%s,%s)" % [_js_string(path), str(alt).to_lower()]
 		JavaScript.eval(call, true)
 
 
@@ -162,6 +176,8 @@ func _mp_apply_team(side, path, alt):
 
 
 func _start_multiplayer_game():
+	if not mp_host:
+		return
 	Global._loadTeams(p1alt, p2alt)
 	Global.toLoad = 1
 	Global.stadium = 3 - int(Global.t1.level)
@@ -354,8 +370,11 @@ func _on_AwayTeams_item_selected(index):
 		p2mat.set_shader_param("Shirt3", t.altShirt3Color)
 	p2sel = index
 	Global.team2 = teamfiles[lev + ti]
-	if Global.multiplayer_mode and mp_host:
-		_mp_send_teams()
+	if Global.multiplayer_mode:
+		if mp_host:
+			_mp_send_teams()
+		else:
+			_mp_request_team(Global.team2, p2alt)
 	
 
 func _on_TextureButton_pressed():
