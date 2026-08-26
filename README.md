@@ -18,14 +18,21 @@ Modloader e mods para a versão web do **Super Liquid Soccer** — agora com uma
 É necessário usar um servidor HTTP porque o navegador bloqueia alguns recursos quando o jogo é aberto diretamente pelo explorador de arquivos.
 
 ```powershell
-cd game3
-py -m http.server 8000
+py tools/dev_server.py --port 8000
 ```
 
 Depois abra:
 
 - Jogo normal: `http://localhost:8000/index-mod.html`
 - O multiplayer fica no próprio menu do jogo, no botão `Multiplayer`.
+
+O servidor local salva os logs do multiplayer em `game3/multiplayer.log`. Para acompanhar em tempo real em outro terminal PowerShell:
+
+```powershell
+Get-Content .\game3\multiplayer.log -Wait
+```
+
+Esses logs são apenas para desenvolvimento local e não são usados no GitHub Pages.
 
 No multiplayer, o anfitrião cria a sala, o segundo jogador entra com o mesmo nome e senha, e os dois seguem o fluxo normal do jogo para escolher os times. O visitante controla o segundo time com:
 

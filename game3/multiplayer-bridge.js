@@ -21,6 +21,7 @@
   let peerLoading = null;
   let peerLoadingTimer = null;
   const logs = [];
+  const localLogEndpoint = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname) ? "/__sls_log" : null;
   let debugOutput = null;
 
   function log(message, details) {
@@ -36,6 +37,14 @@
     if (logs.length > 100) logs.shift();
     if (details === undefined) console.info(line);
     else console.info(line, details);
+    if (localLogEndpoint && window.fetch) {
+      window.fetch(localLogEndpoint, {
+        method: "POST",
+        headers: {"Content-Type": "text/plain;charset=utf-8"},
+        body: line + "\n",
+        keepalive: true
+      }).catch(() => {});
+    }
     if (debugOutput) {
       debugOutput.textContent = logs.join("\n");
       debugOutput.scrollTop = debugOutput.scrollHeight;
