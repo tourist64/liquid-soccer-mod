@@ -21,7 +21,7 @@ func _ready():
 
 
 func _process(_delta):
-	if not OS.has_feature("HTML5") or match_started or current_screen == "nickname":
+	if not OS.has_feature("HTML5") or match_started or (current_screen != "create" and current_screen != "rooms"):
 		return
 
 	var raw_state = JavaScript.eval("window.slsMultiplayerState ? window.slsMultiplayerState() : '{}'", true)
@@ -44,7 +44,8 @@ func _process(_delta):
 	$Screens/CreateScreen/Start.disabled = not bool(state.get("connected", false))
 	$Screens/RoomsScreen/JoinSelected.disabled = bool(state.get("busy", false))
 	$Screens/RoomsScreen/Refresh.disabled = bool(state.get("rooms_busy", false))
-	_update_rooms(state.get("rooms", []))
+	if current_screen == "rooms":
+		_update_rooms(state.get("rooms", []))
 
 	if bool(state.get("started", false)):
 		_start_match()
