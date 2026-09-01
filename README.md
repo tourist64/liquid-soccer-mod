@@ -103,6 +103,13 @@ Para escolher outro mod, informe o caminho do manifesto:
 py modloader.py apply mods/super-mod-soccer
 ```
 
+O mod de teste do Neymar Jr deixa os seis atributos dele no máximo suportado pelo jogo:
+
+```powershell
+py modloader.py apply mods/multiplayer mods/neymar-overpowered
+py modloader.py verify mods/multiplayer mods/neymar-overpowered
+```
+
 A Copa do Mundo de 2026 já faz parte da base avançada, então não existe mais um mod separado para ela. Para conferir conflitos entre mods instalados:
 
 ```powershell
