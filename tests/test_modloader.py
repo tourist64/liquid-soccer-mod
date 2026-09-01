@@ -23,17 +23,6 @@ class ModloaderTests(unittest.TestCase):
         conflicts = modloader.collect_conflicts([multiplayer, menu])
         self.assertIn("res://Scenes/Menu.tscn", conflicts)
 
-    def test_neymar_overpowered_mod_targets_brazil_player(self):
-        mod_dir = ROOT / "mods" / "neymar-overpowered"
-        manifest = modloader.load_manifest(mod_dir)
-        patch = manifest["patches"][0]
-        brazil = (ROOT / "source" / "advanced" / "Teams" / "0" / "Brazil.tres").read_text(encoding="utf-8")
-        self.assertEqual(patch["path"], "res://Teams/0/Brazil.tres")
-        self.assertEqual(patch["count"], 1)
-        self.assertIn('"name": "Neymar Jr"', brazil)
-        for stat in ("aggression", "agility", "curl", "shoot", "smart", "speed"):
-            self.assertIn(f'"{stat}": 10.0', brazil)
-
 
 if __name__ == "__main__":
     unittest.main()

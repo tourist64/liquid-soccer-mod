@@ -90,17 +90,17 @@ player4 = {
 "speed": 4
 }
 player5 = {
-"aggression": 10.0,
-"agility": 10.0,
-"curl": 10.0,
+"aggression": 5.0,
+"agility": 5.0,
+"curl": 8.0,
 "facehair": 0,
 "hair": Color( 0.109804, 0.0588235, 0.0588235, 1 ),
 "hairtype": 6,
 "name": "Neymar Jr",
-"shoot": 10.0,
+"shoot": 8.0,
 "skin": Color( 0.592157, 0.4, 0.34902, 1 ),
-"smart": 10.0,
-"speed": 10.0
+"smart": 7.0,
+"speed": 6.0
 }
 player6 = {
 "aggression": 5,
