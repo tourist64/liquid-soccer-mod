@@ -31,6 +31,25 @@ class GameReplicaSourceTests(unittest.TestCase):
         source = SOURCE.read_text(encoding="utf-8")
         self.assertIn("_mp_apply_referee_state", source)
 
+    def test_replica_does_not_reset_camera_on_every_snapshot(self):
+        source = SOURCE.read_text(encoding="utf-8")
+        presentation = source[source.index("func _mp_apply_replica_presentation():"):source.index("func _noop():")]
+        self.assertIn("mp_last_presented_state", source)
+        self.assertIn("if mp_last_presented_state == state:", presentation)
+
+    def test_replica_applies_state_on_render_process(self):
+        source = SOURCE.read_text(encoding="utf-8")
+        process = source[source.index("func _process(delta):"):source.index("func _physics_process(delta):")]
+        self.assertIn("if mp_replica:", process)
+        self.assertIn("_mp_apply_replica_state()", process)
+
+    def test_player_keeps_movement_animation_synced_after_physics(self):
+        player_source = SOURCE.parent.joinpath("Player.gd").read_text(encoding="utf-8")
+        self.assertIn("func _update_movement_animation():", player_source)
+        physics = player_source[player_source.index("func _physics_process(delta):"):player_source.index("func _mp_apply_visual_state(animation):")]
+        self.assertIn("_update_movement_animation()", physics)
+        self.assertIn("myATree.active = true", player_source)
+
     def test_host_consumes_client_controls_without_synthetic_keyboard_events(self):
         source = SOURCE.read_text(encoding="utf-8")
         self.assertIn("MP_REMOTE_KEYS_EXPRESSION", source)

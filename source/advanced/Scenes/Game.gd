@@ -96,6 +96,7 @@ var worldEnv = null
 var mp_replica = false
 var mp_snapshot_elapsed = 0.0
 var mp_last_snapshot_version = 0
+var mp_last_presented_state = -1
 func initTeams():
 	team1 = $VPC / VP / GameGroup / Team
 	team1.opponent = $VPC / VP / GameGroup / Team2
@@ -379,6 +380,8 @@ func _mp_enable_replica():
 	mp_replica = true
 	recording = false
 	Global.gameOn = false
+	mp_last_presented_state = -1
+	mainCam.set_process(true)
 	for timer in $Timers.get_children():
 		if timer.has_method("stop"):
 			timer.stop()
@@ -388,6 +391,7 @@ func _mp_enable_replica():
 	ref.set_physics_process(false)
 	for current_team in [team1, team2]:
 		for player in current_team.players:
+			player.myATree.active = true
 			player.set_process(false)
 			player.set_physics_process(false)
 			player.AI.set_process(false)
@@ -522,6 +526,9 @@ func _mp_apply_referee_state(referee_state):
 
 
 func _mp_apply_replica_presentation():
+	if mp_last_presented_state == state:
+		return
+	mp_last_presented_state = state
 	if state == gameState.REPLAY:
 		ball.visible = false
 		replayBall.visible = true
@@ -657,6 +664,10 @@ func checkInput():
 			doLap()
 
 func _process(delta):
+	if mp_replica:
+		_mp_apply_replica_state()
+		_mp_update_blobs()
+		return
 	_mp_apply_remote_controls()
 	_mp_publish_replica_state(delta)
 
@@ -741,7 +752,8 @@ func _mp_update_blobs():
 			tt = team2.players[m - 7].translation
 		tt.y = 0.1
 		blobs.multimesh.set_instance_transform(m, Transform(Basis(), tt))
-	tt = ball.translation
+	var rendered_ball = replayBall if mp_replica and state == gameState.REPLAY else ball
+	tt = rendered_ball.translation
 	tt.y = 0.1
 	blobs.multimesh.set_instance_transform(14, Transform(Basis(), tt))
 	tt = ref.translation
@@ -751,8 +763,6 @@ func _mp_update_blobs():
 
 func _physics_process(delta):
 	if mp_replica:
-		_mp_apply_replica_state()
-		_mp_update_blobs()
 		return
 	_mp_update_blobs()
 	if state == gameState.REPLAY:

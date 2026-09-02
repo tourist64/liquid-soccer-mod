@@ -832,6 +832,7 @@ func _physics_process(delta):
 		
 		myHeadArea.translation = myHead.translation * myHeadFix + headoffset
 		velocity = move_and_slide(velocity, up, false, 4)
+		_update_movement_animation()
 		
 		var newt = transform.looking_at(translation + view * 5.0, up.normalized())
 		transform = transform.interpolate_with(newt, delta * 18)
@@ -881,9 +882,28 @@ func _physics_process(delta):
 
 
 func _mp_apply_visual_state(animation):
-	if animation == "" or myAState == null or myAState.get_current_node() == animation:
+	if animation == "" or myAState == null:
 		return
-	myAState.travel(animation)
+	myATree.active = true
+	if myAState.get_current_node() != animation:
+		myAState.travel(animation)
+
+
+func _update_movement_animation():
+	if replay or myAState == null or not AI._moving():
+		return
+	if not ["idle", "walk", "sprint", "sprinthard"].has(AI.astate):
+		return
+	myATree.active = true
+	var speed = velocity.length()
+	var animation = "idle"
+	if speed > 18:
+		animation = "sprinthard" if pSpeed > pOSpeed else "sprint"
+	elif speed > 1.5:
+		animation = "walk"
+	if myAState.get_current_node() != animation:
+		myAState.travel(animation)
+	AI.astate = animation
 
 func _on_TrapArea_body_entered(body):
 	if not (Global.gameOn):
