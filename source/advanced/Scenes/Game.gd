@@ -379,7 +379,6 @@ func _mp_enable_replica():
 	mp_replica = true
 	recording = false
 	Global.gameOn = false
-	_mp_stop_replica_simulation(self)
 	for timer in $Timers.get_children():
 		if timer.has_method("stop"):
 			timer.stop()
@@ -393,20 +392,8 @@ func _mp_enable_replica():
 			player.set_physics_process(false)
 			player.AI.set_process(false)
 			player.AI.set_physics_process(false)
-	set_process(false)
+	set_process(true)
 	set_physics_process(true)
-
-
-func _mp_stop_replica_simulation(node):
-	for child in node.get_children():
-		if child is Timer:
-			child.stop()
-			child.set_process(false)
-			child.set_physics_process(false)
-		else:
-			_mp_stop_replica_simulation(child)
-		if child != $Hud and child != mainCam:
-			child.set_physics_process(false)
 
 
 func _mp_apply_remote_controls():
@@ -454,13 +441,19 @@ func _mp_publish_replica_state(delta):
 		return
 	mp_snapshot_elapsed = 0.0
 	var players = []
+	var rendered_ball = replayBall if state == gameState.REPLAY else ball
 	for current_team in [team1, team2]:
 		for player_index in range(min(7, current_team.players.size())):
 			var player = current_team.players[player_index]
-			players.append([player.translation.x, player.translation.y, player.translation.z, player.rotation.x, player.rotation.y, player.rotation.z])
+			var animation = player.AI.astate
+			if state == gameState.REPLAY:
+				animation = player.myRoot._getState()
+			players.append([player.translation.x, player.translation.y, player.translation.z, player.rotation.x, player.rotation.y, player.rotation.z, animation])
+	var referee_state = [ref.translation.x, ref.translation.y, ref.translation.z, ref.rotation.x, ref.rotation.y, ref.rotation.z, ref.state, ref.myAPlayer.current_animation]
 	var snapshot = {
-		"ball": [ball.translation.x, ball.translation.y, ball.translation.z, ball.rotation.x, ball.rotation.y, ball.rotation.z, ball.linear_velocity.x, ball.linear_velocity.y, ball.linear_velocity.z],
+		"ball": [rendered_ball.translation.x, rendered_ball.translation.y, rendered_ball.translation.z, rendered_ball.rotation.x, rendered_ball.rotation.y, rendered_ball.rotation.z, rendered_ball.linear_velocity.x, rendered_ball.linear_velocity.y, rendered_ball.linear_velocity.z],
 		"players": players,
+		"referee": referee_state,
 		"score": [score.x, score.y],
 		"state": state,
 		"time": gametimer.time_left,
@@ -481,11 +474,13 @@ func _mp_apply_replica_state():
 	if typeof(snapshot) != TYPE_DICTIONARY:
 		return
 	mp_last_snapshot_version = version
+	var remote_state = int(snapshot.get("state", state))
+	var rendered_ball = replayBall if remote_state == gameState.REPLAY else ball
 	var ball_state = snapshot.get("ball", [])
 	if typeof(ball_state) == TYPE_ARRAY and ball_state.size() >= 9:
-		ball.translation = Vector3(ball_state[0], ball_state[1], ball_state[2])
-		ball.rotation = Vector3(ball_state[3], ball_state[4], ball_state[5])
-		ball.linear_velocity = Vector3(ball_state[6], ball_state[7], ball_state[8])
+		rendered_ball.translation = Vector3(ball_state[0], ball_state[1], ball_state[2])
+		rendered_ball.rotation = Vector3(ball_state[3], ball_state[4], ball_state[5])
+		rendered_ball.linear_velocity = Vector3(ball_state[6], ball_state[7], ball_state[8])
 	var player_states = snapshot.get("players", [])
 	if typeof(player_states) == TYPE_ARRAY:
 		var player_number = 0
@@ -498,19 +493,45 @@ func _mp_apply_replica_state():
 					var player = current_team.players[player_index]
 					player.translation = Vector3(player_state[0], player_state[1], player_state[2])
 					player.rotation = Vector3(player_state[3], player_state[4], player_state[5])
+					if player_state.size() >= 7:
+						player._mp_apply_visual_state(str(player_state[6]))
 				player_number += 1
+	_mp_apply_referee_state(snapshot.get("referee", []))
 	var remote_score = snapshot.get("score", [])
 	if typeof(remote_score) == TYPE_ARRAY and remote_score.size() >= 2:
 		score = Vector2(remote_score[0], remote_score[1])
 		hud._setScore(score.x, score.y)
-	state = int(snapshot.get("state", state))
+	state = remote_state
 	half = int(snapshot.get("half", half))
 	Global.gameOn = bool(snapshot.get("game_on", false))
-	Global.ballpos = ball.translation
-	Global.ballvel = ball.linear_velocity
+	_mp_apply_replica_presentation()
+	Global.ballpos = rendered_ball.translation
+	Global.ballvel = rendered_ball.linear_velocity
 	var time_left = float(snapshot.get("time", gametimer.time_left))
 	hud._updateTime(time_left / 60.0, fmod(time_left, 60.0))
-	emit_signal("ballpos", ball.translation)
+	emit_signal("ballpos", rendered_ball.translation)
+func _mp_apply_referee_state(referee_state):
+	if typeof(referee_state) != TYPE_ARRAY or referee_state.size() < 8:
+		return
+	ref.translation = Vector3(referee_state[0], referee_state[1], referee_state[2])
+	ref.rotation = Vector3(referee_state[3], referee_state[4], referee_state[5])
+	ref.state = int(referee_state[6])
+	var animation = str(referee_state[7])
+	if animation != "" and ref.myAPlayer.current_animation != animation:
+		ref.myAPlayer.play(animation)
+
+
+func _mp_apply_replica_presentation():
+	if state == gameState.REPLAY:
+		ball.visible = false
+		replayBall.visible = true
+		mainCam.current = true
+		mainCam._setTarget(replayBall)
+	else:
+		ball.visible = true
+		replayBall.visible = false
+		mainCam.current = true
+		mainCam._setTarget(ball)
 	
 func _noop():
 	pass

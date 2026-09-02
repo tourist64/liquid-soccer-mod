@@ -878,6 +878,13 @@ func _physics_process(delta):
 					myATree["parameters/BlendCelebrate/blend_amount"] = 1
 				else:
 					myATree["parameters/BlendCelebrate/blend_amount"] = 0
+
+
+func _mp_apply_visual_state(animation):
+	if animation == "" or myAState == null or myAState.get_current_node() == animation:
+		return
+	myAState.travel(animation)
+
 func _on_TrapArea_body_entered(body):
 	if not (Global.gameOn):
 		return
