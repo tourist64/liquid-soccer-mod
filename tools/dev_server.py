@@ -83,7 +83,7 @@ def main():
     args = parser.parse_args()
     LOG_FILE.touch(exist_ok=True)
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
-    print(f"Game: http://127.0.0.1:{args.port}/index-mod.html")
+    print(f"Game: http://127.0.0.1:{args.port}/index.html")
     print(f"Logs: {LOG_FILE}")
     try:
         server.serve_forever()

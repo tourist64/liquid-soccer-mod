@@ -1,5 +1,9 @@
 
 extends Spatial
+const MP_SNAPSHOT_INTERVAL = 0.033
+const MP_GAME_STATE_EXPRESSION = "window.slsMultiplayerGetGameState ? window.slsMultiplayerGetGameState() : '{}'"
+const MP_GAME_STATE_VERSION_EXPRESSION = "window.slsMultiplayerGetGameStateVersion ? window.slsMultiplayerGetGameStateVersion() : '0'"
+const MP_REMOTE_KEYS_EXPRESSION = "window.slsMultiplayerDrainRemoteKeys ? window.slsMultiplayerDrainRemoteKeys() : '[]'"
 
 
 var ball
@@ -89,6 +93,9 @@ var awayFans = null
 
 
 var worldEnv = null
+var mp_replica = false
+var mp_snapshot_elapsed = 0.0
+var mp_last_snapshot_version = 0
 func initTeams():
 	team1 = $VPC / VP / GameGroup / Team
 	team1.opponent = $VPC / VP / GameGroup / Team2
@@ -188,10 +195,6 @@ func _ready():
 	Global._fadeOut()
 	Global.game = self
 	Global.isTutorial = false
-	if Global.multiplayer_mode and not Global.multiplayer_host:
-		set_process(false)
-		set_physics_process(false)
-		return
 	frame = 0
 	fframe = 0.0
 	set_process(false)
@@ -364,6 +367,150 @@ func _ready():
 	mainCam.current = true
 	
 	PokiSDK.gameplayStart()
+	if _mp_is_replica():
+		_mp_enable_replica()
+
+
+func _mp_is_replica():
+	return Global.multiplayer_mode and not Global.multiplayer_host
+
+
+func _mp_enable_replica():
+	mp_replica = true
+	recording = false
+	Global.gameOn = false
+	_mp_stop_replica_simulation(self)
+	for timer in $Timers.get_children():
+		if timer.has_method("stop"):
+			timer.stop()
+	ball.mode = RigidBody.MODE_STATIC
+	ball.linear_velocity = Vector3.ZERO
+	ball.set_physics_process(false)
+	ref.set_physics_process(false)
+	for current_team in [team1, team2]:
+		for player in current_team.players:
+			player.set_process(false)
+			player.set_physics_process(false)
+			player.AI.set_process(false)
+			player.AI.set_physics_process(false)
+	set_process(false)
+	set_physics_process(true)
+
+
+func _mp_stop_replica_simulation(node):
+	for child in node.get_children():
+		if child is Timer:
+			child.stop()
+			child.set_process(false)
+			child.set_physics_process(false)
+		else:
+			_mp_stop_replica_simulation(child)
+		if child != $Hud and child != mainCam:
+			child.set_physics_process(false)
+
+
+func _mp_apply_remote_controls():
+	if not Global.multiplayer_mode or not Global.multiplayer_host:
+		return
+	var raw_keys = JavaScript.eval(MP_REMOTE_KEYS_EXPRESSION, true)
+	if typeof(raw_keys) != TYPE_STRING:
+		return
+	var keys = parse_json(raw_keys)
+	if typeof(keys) != TYPE_ARRAY:
+		return
+	for key_event in keys:
+		if typeof(key_event) != TYPE_DICTIONARY:
+			continue
+		var action = _mp_action_for_key(str(key_event.get("code", "")))
+		if action == "":
+			continue
+		if bool(key_event.get("down", false)):
+			Input.action_press(action)
+		else:
+			Input.action_release(action)
+
+
+func _mp_action_for_key(code):
+	match code:
+		"ArrowUp": return "p2_up"
+		"ArrowDown": return "p2_down"
+		"ArrowLeft": return "p2_left"
+		"ArrowRight": return "p2_right"
+		"KeyH": return "p2_pass"
+		"KeyJ": return "p2_shoot"
+		"KeyK": return "p2_chip"
+		"KeyL": return "p2_thru"
+		"KeyU": return "p2_burst"
+		"KeyI": return "p2_switch"
+		"KeyO": return "p2_low"
+	return ""
+
+
+func _mp_publish_replica_state(delta):
+	if not Global.multiplayer_mode or not Global.multiplayer_host:
+		return
+	mp_snapshot_elapsed += delta
+	if mp_snapshot_elapsed < MP_SNAPSHOT_INTERVAL:
+		return
+	mp_snapshot_elapsed = 0.0
+	var players = []
+	for current_team in [team1, team2]:
+		for player_index in range(min(7, current_team.players.size())):
+			var player = current_team.players[player_index]
+			players.append([player.translation.x, player.translation.y, player.translation.z, player.rotation.x, player.rotation.y, player.rotation.z])
+	var snapshot = {
+		"ball": [ball.translation.x, ball.translation.y, ball.translation.z, ball.rotation.x, ball.rotation.y, ball.rotation.z, ball.linear_velocity.x, ball.linear_velocity.y, ball.linear_velocity.z],
+		"players": players,
+		"score": [score.x, score.y],
+		"state": state,
+		"time": gametimer.time_left,
+		"game_on": Global.gameOn,
+		"half": half
+	}
+	JavaScript.eval("window.slsMultiplayerPublishGameState && window.slsMultiplayerPublishGameState(" + to_json(snapshot) + ")", true)
+
+
+func _mp_apply_replica_state():
+	var version = int(JavaScript.eval(MP_GAME_STATE_VERSION_EXPRESSION, true))
+	if version <= mp_last_snapshot_version:
+		return
+	var raw_state = JavaScript.eval(MP_GAME_STATE_EXPRESSION, true)
+	if typeof(raw_state) != TYPE_STRING:
+		return
+	var snapshot = parse_json(raw_state)
+	if typeof(snapshot) != TYPE_DICTIONARY:
+		return
+	mp_last_snapshot_version = version
+	var ball_state = snapshot.get("ball", [])
+	if typeof(ball_state) == TYPE_ARRAY and ball_state.size() >= 9:
+		ball.translation = Vector3(ball_state[0], ball_state[1], ball_state[2])
+		ball.rotation = Vector3(ball_state[3], ball_state[4], ball_state[5])
+		ball.linear_velocity = Vector3(ball_state[6], ball_state[7], ball_state[8])
+	var player_states = snapshot.get("players", [])
+	if typeof(player_states) == TYPE_ARRAY:
+		var player_number = 0
+		for current_team in [team1, team2]:
+			for player_index in range(min(7, current_team.players.size())):
+				if player_number >= player_states.size():
+					break
+				var player_state = player_states[player_number]
+				if typeof(player_state) == TYPE_ARRAY and player_state.size() >= 6:
+					var player = current_team.players[player_index]
+					player.translation = Vector3(player_state[0], player_state[1], player_state[2])
+					player.rotation = Vector3(player_state[3], player_state[4], player_state[5])
+				player_number += 1
+	var remote_score = snapshot.get("score", [])
+	if typeof(remote_score) == TYPE_ARRAY and remote_score.size() >= 2:
+		score = Vector2(remote_score[0], remote_score[1])
+		hud._setScore(score.x, score.y)
+	state = int(snapshot.get("state", state))
+	half = int(snapshot.get("half", half))
+	Global.gameOn = bool(snapshot.get("game_on", false))
+	Global.ballpos = ball.translation
+	Global.ballvel = ball.linear_velocity
+	var time_left = float(snapshot.get("time", gametimer.time_left))
+	hud._updateTime(time_left / 60.0, fmod(time_left, 60.0))
+	emit_signal("ballpos", ball.translation)
 	
 func _noop():
 	pass
@@ -489,6 +636,8 @@ func checkInput():
 			doLap()
 
 func _process(delta):
+	_mp_apply_remote_controls()
+	_mp_publish_replica_state(delta)
 
 	if recording:
 		frame += 1
@@ -559,7 +708,7 @@ func _process(delta):
 	
 	
 	
-func _physics_process(delta):
+func _mp_update_blobs():
 	var tt
 	for m in range(0, 14):
 		if m < 7:
@@ -576,8 +725,15 @@ func _physics_process(delta):
 	blobs.multimesh.set_instance_transform(14, Transform(Basis(), tt))
 	tt = ref.translation
 	tt.y = 0.1
-	
 	blobs.multimesh.set_instance_transform(15, Transform(Basis(), tt))
+
+
+func _physics_process(delta):
+	if mp_replica:
+		_mp_apply_replica_state()
+		_mp_update_blobs()
+		return
+	_mp_update_blobs()
 	if state == gameState.REPLAY:
 		
 		checkInput()

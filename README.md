@@ -1,6 +1,6 @@
-# Super Liquid Soccer Modloader
+# Super Liquid Soccer Remaster
 
-Modloader e mods para a versão web do **Super Liquid Soccer** — agora com uma base avançada que já inclui a Copa do Mundo de 2026 e um modo multiplayer casual para dois jogadores.
+Remaster da versão web do **Super Liquid Soccer**, com uma base avançada que já inclui a Copa do Mundo de 2026 e um modo multiplayer casual para dois jogadores.
 
 > Projeto experimental/meme para jogar com amigos. A publicação planejada é pelo GitHub Pages.
 
@@ -9,7 +9,7 @@ Modloader e mods para a versão web do **Super Liquid Soccer** — agora com uma
 - Base avançada do jogo em Godot 3.5.1.
 - Copa 2026 com 48 seleções, 12 grupos e mata-mata.
 - Seleções novas com jogadores atuais e históricos.
-- Modloader com validação, aplicação, verificação, restauração e detecção de conflitos.
+- Build remaster nativa publicada diretamente pelo GitHub Pages.
 - Multiplayer 1×1 com sala, senha e nickname.
 - Publicação automática da build web pelo GitHub Pages.
 
@@ -23,7 +23,7 @@ py tools/dev_server.py --port 8000
 
 Depois abra:
 
-- Jogo normal: `http://localhost:8000/index-mod.html`
+- Jogo remaster: `http://localhost:8000/index.html`
 - O multiplayer fica no próprio menu do jogo, no botão `Multiplayer`.
 
 O servidor local salva os logs do multiplayer em `game3/multiplayer.log`. Para acompanhar em tempo real em outro terminal PowerShell:
@@ -46,7 +46,7 @@ No multiplayer, o anfitrião cria a sala, o segundo jogador entra com o mesmo no
 | Corrida | `U` |
 | Trocar jogador | `I` |
 
-O multiplayer usa sinalização HTTP por polling e WebRTC nativo para conectar os jogadores. O anfitrião executa a partida e transmite a tela, mantendo a sincronização simples para esse projeto pequeno.
+O multiplayer usa sinalização HTTP por polling e WebRTC nativo para conectar os jogadores. O anfitrião executa a simulação e envia snapshots do estado; o cliente renderiza a própria cena 3D e aplica posições, bola, placar e tempo.
 
 O multiplayer usa sinalização HTTP por polling e WebRTC nativo, sem depender do PeerJS público. No modo local, o servidor do jogo encaminha `/signal` para o servidor de sinalização na porta 9000. Para iniciar os dois processos:
 
@@ -71,7 +71,7 @@ Durante o desenvolvimento local, o botão `Logs` mostra o diagnóstico do pollin
 
 ## Testes locais
 
-Os testes não precisam abrir o jogo nem usar duas abas. Eles validam o protocolo multiplayer e as regras de conflito do modloader:
+Os testes não precisam abrir o jogo nem usar duas abas. Eles validam o protocolo multiplayer, a réplica do jogo e as regras de compatibilidade:
 
 ```powershell
 node --test tests/multiplayer-protocol.test.js tests/multiplayer-server.test.js
@@ -86,7 +86,9 @@ py modloader.py apply
 py modloader.py verify
 ```
 
-## Modloader
+## Ferramenta de recuperação
+
+O `modloader.py` permanece apenas para recuperar/aplicar mods em uma cópia vanilla. Ele não é usado pela build remaster nem pelo GitHub Pages.
 
 O mod multiplayer é o padrão do comando `apply`:
 

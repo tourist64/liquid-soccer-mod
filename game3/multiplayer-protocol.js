@@ -40,14 +40,33 @@
     return true;
   }
 
+  function applyGuestTeamPreview(state, path, alt) {
+    if (state.host) return false;
+    state.team2 = String(path || "");
+    state.team2_alt = !!alt;
+    state.team1_ready = false;
+    state.team2_ready = false;
+    return true;
+  }
+
+  function gameStateMessage(snapshot) {
+    return {type: "game_state", snapshot};
+  }
+
+  function applyGameStateMessage(state, message) {
+    if (state.host || !message || message.type !== "game_state" || !message.snapshot || typeof message.snapshot !== "object") return false;
+    state.remote_game_state = message.snapshot;
+    state.remote_game_state_version = Number(state.remote_game_state_version || 0) + 1;
+    return true;
+  }
+
   function canStartMatch(state) {
     return !!(
       state.host &&
+      state.started &&
       !state.match_started &&
       state.team1 &&
-      state.team2 &&
-      state.team1_ready &&
-      state.team2_ready
+      state.team2
     );
   }
 
@@ -59,5 +78,9 @@
     return Object.prototype.hasOwnProperty.call(KEY_CODES, code);
   }
 
-  return {teamMessage, applyTeamsMessage, applyGuestTeamRequest, canStartMatch, keyCodeFor, isControlKey};
+  function controlMessage(code, down) {
+    return {type: "key", code: String(code || ""), down: !!down};
+  }
+
+  return {teamMessage, applyTeamsMessage, applyGuestTeamRequest, applyGuestTeamPreview, gameStateMessage, applyGameStateMessage, canStartMatch, keyCodeFor, isControlKey, controlMessage};
 });

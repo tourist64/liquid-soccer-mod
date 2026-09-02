@@ -35,8 +35,9 @@
   let rtc = null;
   let dataChannel = null;
   let pendingCandidates = [];
-  let localVideoTracks = [];
-  let remoteStream = null;
+  let remoteGameState = null;
+  let remoteGameStateVersion = 0;
+  const remoteKeyQueue = [];
   let pendingHostTeams = false;
   let pendingGuestTeam = null;
 
@@ -139,36 +140,6 @@
     poll();
   }
 
-  function dispatchKey(code, down) {
-    const canvas = document.querySelector("canvas");
-    if (!canvas) return;
-    const key = code.startsWith("Key") ? code.slice(3).toLowerCase() : code;
-    const keyCode = protocol.keyCodeFor(code);
-    const event = new KeyboardEvent(down ? "keydown" : "keyup", {key, code, bubbles: true, cancelable: true});
-    for (const property of ["keyCode", "which", "charCode"]) {
-      try { Object.defineProperty(event, property, {get: () => keyCode}); } catch (_error) {}
-    }
-    canvas.dispatchEvent(event);
-  }
-
-  function showRemoteVideo(stream) {
-    remoteStream = stream;
-    if (!state.match_started) return;
-    let video = document.getElementById("sls-multiplayer-video");
-    if (!video) {
-      video = document.createElement("video");
-      video.id = "sls-multiplayer-video";
-      video.autoplay = true;
-      video.playsInline = true;
-      video.muted = true;
-      video.style.cssText = "display:block;position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#092b31;z-index:10000;pointer-events:none";
-      document.body.appendChild(video);
-    }
-    video.srcObject = stream;
-    video.play().catch(() => {});
-    setStatus("Partida em andamento.");
-  }
-
   function bindDataChannel(channel, isHost) {
     dataChannel = channel;
     channel.onopen = () => {
@@ -188,12 +159,22 @@
     channel.onmessage = (event) => {
       let message;
       try { message = JSON.parse(event.data); } catch (_error) { return; }
-      if (isHost && message.type === "key") dispatchKey(message.code, message.down);
+      if (isHost && message.type === "key" && protocol.isControlKey(message.code)) {
+        remoteKeyQueue.push(protocol.controlMessage(message.code, message.down));
+        if (remoteKeyQueue.length > 128) remoteKeyQueue.shift();
+      }
       if (!isHost && message.type === "start") {
         state.started = true;
         setStatus("Partida iniciando...");
       }
       if (message.type === "teams" && !state.host) protocol.applyTeamsMessage(state, message);
+      if (message.type === "game_state") {
+        const replicaState = {host: state.host, remote_game_state: remoteGameState, remote_game_state_version: remoteGameStateVersion};
+        if (protocol.applyGameStateMessage(replicaState, message)) {
+          remoteGameState = replicaState.remote_game_state;
+          remoteGameStateVersion = replicaState.remote_game_state_version;
+        }
+      }
       if (message.type === "team_request" && protocol.applyGuestTeamRequest(state, message)) {
         pendingHostTeams = true;
         if (sendTeamsSnapshot()) pendingHostTeams = false;
@@ -205,7 +186,6 @@
       }
       if (message.type === "match_start") {
         state.match_started = true;
-        showRemoteVideo(remoteStream);
         setStatus("Partida em andamento.");
       }
     };
@@ -213,7 +193,10 @@
       dataChannel = null;
       state.connected = false;
       state.started = false;
-      setStatus("A conexão foi encerrada.");
+    remoteGameState = null;
+    remoteGameStateVersion = 0;
+    remoteKeyQueue.length = 0;
+    setStatus("A conexão foi encerrada.");
     };
   }
 
@@ -245,45 +228,15 @@
         setStatus("A conexão WebRTC falhou.");
       }
     };
-    rtc.ontrack = (event) => showRemoteVideo(event.streams[0]);
     if (isHost) {
-      const canvas = document.querySelector("canvas");
-      if (canvas && canvas.captureStream) {
-        localVideoTracks = canvas.captureStream(15).getVideoTracks();
-        for (const track of localVideoTracks) {
-          track.enabled = false;
-          track.contentHint = "motion";
-          const sender = rtc.addTrack(track);
-          const parameters = sender.getParameters();
-          parameters.encodings = parameters.encodings || [{}];
-          parameters.encodings[0].maxBitrate = 700000;
-          parameters.encodings[0].maxFramerate = 15;
-          parameters.encodings[0].scaleResolutionDownBy = 1.5;
-          sender.setParameters(parameters).catch(() => {});
-        }
-      }
       bindDataChannel(rtc.createDataChannel("controls"), true);
     } else {
       rtc.ondatachannel = (event) => bindDataChannel(event.channel, false);
     }
   }
 
-  function waitForHostCanvas() {
-    return new Promise((resolve, reject) => {
-      const started = Date.now();
-      const check = () => {
-        const canvas = document.querySelector("canvas");
-        if (canvas && canvas.captureStream) return resolve();
-        if (Date.now() - started >= 5000) return reject(new Error("Canvas do jogo não ficou disponível"));
-        window.setTimeout(check, 100);
-      };
-      check();
-    });
-  }
-
   async function createOffer() {
     try {
-      await waitForHostCanvas();
       createRtc(true);
       const offer = await rtc.createOffer();
       await rtc.setLocalDescription(offer);
@@ -298,7 +251,6 @@
   function maybeStartMatch() {
     if (!protocol.canStartMatch(state)) return;
     state.match_started = true;
-    localVideoTracks.forEach((track) => { track.enabled = true; });
     if (dataChannel && dataChannel.readyState === "open") dataChannel.send(JSON.stringify({type: "match_start"}));
     setStatus("Partida em andamento.");
   }
@@ -397,6 +349,9 @@
   };
   window.slsMultiplayerState = () => JSON.stringify(state);
   window.slsMultiplayerGetLogs = () => logs.join("\n");
+  window.slsMultiplayerGetGameState = () => JSON.stringify(remoteGameState || {});
+  window.slsMultiplayerGetGameStateVersion = () => String(remoteGameStateVersion);
+  window.slsMultiplayerDrainRemoteKeys = () => JSON.stringify(remoteKeyQueue.splice(0));
   window.slsMultiplayerListRooms = listRooms;
   window.slsMultiplayerCreate = createRoom;
   window.slsMultiplayerJoin = joinRoom;
@@ -414,6 +369,7 @@
   window.slsMultiplayerRequestTeam = (path, alt) => {
     if (state.host) return;
     pendingGuestTeam = {path: String(path || ""), alt: !!alt};
+    protocol.applyGuestTeamPreview(state, pendingGuestTeam.path, pendingGuestTeam.alt);
     if (dataChannel && dataChannel.readyState === "open") {
       dataChannel.send(JSON.stringify({type: "team_request", path: pendingGuestTeam.path, alt: pendingGuestTeam.alt}));
       pendingGuestTeam = null;
@@ -421,10 +377,22 @@
   };
   window.slsMultiplayerReady = () => {
     if (!dataChannel || dataChannel.readyState !== "open") return;
-    const side = state.host ? "team1" : "team2";
-    state[side + "_ready"] = true;
-    dataChannel.send(JSON.stringify({type: "ready", side}));
+    if (!state.host) {
+      setStatus("Aguardando o host iniciar a partida.");
+      return;
+    }
+    if (!state.started || !state.team1 || !state.team2) {
+      setStatus("Aguardando a escolha dos dois times.");
+      return;
+    }
+    state.team1_ready = true;
     maybeStartMatch();
+  };
+  window.slsMultiplayerPublishGameState = (snapshot) => {
+    if (!state.host || !snapshot || typeof snapshot !== "object" || !dataChannel || dataChannel.readyState !== "open") return false;
+    if (dataChannel.bufferedAmount > 131072) return false;
+    dataChannel.send(JSON.stringify(protocol.gameStateMessage(snapshot)));
+    return true;
   };
   window.slsMultiplayerStart = () => {
     if (!state.host || !state.connected || !dataChannel || dataChannel.readyState !== "open") return;
@@ -436,6 +404,9 @@
     state.team2_alt = false;
     state.team1_ready = false;
     state.team2_ready = false;
+    remoteGameState = null;
+    remoteGameStateVersion = 0;
+    remoteKeyQueue.length = 0;
     dataChannel.send(JSON.stringify({type: "start"}));
     setStatus("Partida iniciando...");
   };
@@ -445,15 +416,12 @@
     stopPolling();
     if (dataChannel) dataChannel.close();
     if (rtc) rtc.close();
-    localVideoTracks.forEach((track) => track.stop());
-    const video = document.getElementById("sls-multiplayer-video");
-    if (video) video.remove();
     roomSession = null;
     rtc = null;
     dataChannel = null;
     pendingCandidates = [];
-    localVideoTracks = [];
-    remoteStream = null;
+    remoteGameState = null;
+    remoteGameStateVersion = 0;
     pendingHostTeams = false;
     pendingGuestTeam = null;
     state.busy = false;
