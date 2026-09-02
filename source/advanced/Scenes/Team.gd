@@ -122,6 +122,7 @@ func loadPlayers():
 
 func setupFormation():
 	formation.clear()
+	cformation.clear()
 	tdata = Global.t1
 	if (teamID != 1):
 		tdata = Global.t2
