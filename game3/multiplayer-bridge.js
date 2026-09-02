@@ -140,6 +140,11 @@
     poll();
   }
 
+  function resetRemoteControls(isHost) {
+    if (!isHost) return;
+    for (const code of keys) remoteKeyQueue.push(protocol.controlMessage(code, false));
+  }
+
   function bindDataChannel(channel, isHost) {
     dataChannel = channel;
     channel.onopen = () => {
@@ -190,13 +195,14 @@
       }
     };
     channel.onclose = () => {
+      resetRemoteControls(isHost);
       dataChannel = null;
       state.connected = false;
       state.started = false;
-    remoteGameState = null;
-    remoteGameStateVersion = 0;
-    remoteKeyQueue.length = 0;
-    setStatus("A conexão foi encerrada.");
+      state.match_started = false;
+      remoteGameState = null;
+      remoteGameStateVersion = 0;
+      setStatus("A conexão foi encerrada.");
     };
   }
 
