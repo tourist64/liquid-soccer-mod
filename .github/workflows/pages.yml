@@ -35,7 +35,8 @@ jobs:
 
       - name: Compilar remaster a partir da fonte
         run: |
-          /tmp/godot/Godot_v3.5.3-stable_linux_headless.64 --path source/advanced --export-pack "Linux/X11" game3/index.pck
+          /tmp/godot/Godot_v3.5.3-stable_linux_headless.64 --path source/advanced --export-pack "Linux/X11" /tmp/remaster-source.pck
+          python3 tools/build_remaster.py --base game3/index-mod.pck --source /tmp/remaster-source.pck --output game3/index.pck
           pck_size=$(stat -c %s game3/index.pck)
           sed -i -E "s/(\\\"fileSizes\\\":\\\{\\\"index\\.pck\\\":)[0-9]+/\\1${pck_size}/" game3/index.html
           rm -f game3/index-mod.html game3/index-mod.pck

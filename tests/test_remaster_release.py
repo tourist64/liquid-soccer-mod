@@ -19,6 +19,8 @@ class RemasterReleaseTests(unittest.TestCase):
         workflow = (ROOT / ".github/workflows/pages.yml").read_text(encoding="utf-8")
         self.assertIn("source/advanced", workflow)
         self.assertIn("--export-pack", workflow)
+        self.assertIn("tools/build_remaster.py", workflow)
+        self.assertIn("game3/index-mod.pck", workflow)
         self.assertIn("game3/index.pck", workflow)
 
 
