@@ -15,6 +15,12 @@ class RemasterReleaseTests(unittest.TestCase):
         self.assertIn('"executable":"index"', html)
         self.assertNotIn("index-mod.pck", html)
 
+    def test_pages_builds_the_pack_from_the_canonical_source(self):
+        workflow = (ROOT / ".github/workflows/pages.yml").read_text(encoding="utf-8")
+        self.assertIn("source/advanced", workflow)
+        self.assertIn("--export-pack", workflow)
+        self.assertIn("game3/index.pck", workflow)
+
 
 if __name__ == "__main__":
     unittest.main()
