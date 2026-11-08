@@ -1136,3 +1136,71 @@ func _checkGoalThreat():
 	threatCooldownUntil = OS.get_ticks_msec() + 1500
 	ball.isShot = true
 	_shotIncoming(bp, bv, Vector3.ZERO, 0)
+
+# --- Crash guards --------------------------------------------------------------
+# This web build uses a release engine, where calling a method that doesn't
+# exist crashes the whole game ("RuntimeError: null function" = the freeze).
+# Several outfield-only methods can be reached on the goalkeeper, so give him
+# harmless versions of them.
+func _blockShot(_bpos, _dir):
+	pass
+
+func _bookMe():
+	pass
+
+func _celebratePen():
+	pass
+
+func _forceAttack():
+	pass
+
+func _mark():
+	pass
+
+func _markThrowtarget(_t):
+	pass
+
+func _marking():
+	return false
+
+func _missed():
+	pass
+
+func _moving():
+	return true
+
+func _offField(_pid):
+	return false
+
+func _onField():
+	return true
+
+func _penaltyTaker():
+	pass
+
+func _receivePass(_ppos, _dir, _ptype):
+	pass
+
+func _sentOff():
+	pass
+
+func _setBenched(_i):
+	pass
+
+func _subOff(_pid):
+	pass
+
+func _subOn(_pid):
+	pass
+
+func _takeThrow(_ppos):
+	pass
+
+func _throwTaker(_ktype, _ifk):
+	pass
+
+func _updatePosition():
+	pass
+
+func _forcePickup(_ppos):
+	pass

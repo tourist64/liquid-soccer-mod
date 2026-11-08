@@ -974,6 +974,9 @@ func _on_TrapArea_body_entered(body):
 					if b == ball:
 						fouled = false
 						break
+					# Only other footballers can be fouled (anything else would crash the engine).
+					if b == myCollider or b.get_parent() == null or b.get_parent().get("myTeam") == null or b.get_parent().get("AI") == null:
+						continue
 					if b.get_parent().myTeam.teamID != myTeam.teamID and not ball._isShooting():
 						fouled = true
 						b.get_parent().AI._fouled()
@@ -983,7 +986,7 @@ func _on_TrapArea_body_entered(body):
 			if not (fouled):
 				for b in bods:
 					if b != ball:
-						if b != myCollider and b.get_parent().AI._hasBall():
+						if b != myCollider and b.get_parent() != null and b.get_parent().get("AI") != null and b.get_parent().AI._hasBall():
 							b.get_parent().AI._tackled()
 							
 				

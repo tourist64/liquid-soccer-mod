@@ -1249,7 +1249,7 @@ func playState():
 		else:
 			close = closest
 		if (close != closest) and close:
-			if closest:
+			if closest and closest.myID != 0:
 				closest.AI._forceAttack()
 		
 		closest = close

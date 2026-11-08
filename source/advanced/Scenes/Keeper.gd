@@ -524,3 +524,20 @@ func _savePenalty():
 	AI.view = AI.dview
 	AI.shotview = AI.view
 	AI._penaltyDive(mov)
+
+# --- Crash guards --------------------------------------------------------------
+# This web build uses a release engine, where calling a method that doesn't
+# exist crashes the whole game ("RuntimeError: null function" = the freeze).
+# Several outfield-only methods can be reached on the goalkeeper, so give him
+# harmless versions of them.
+func _burst():
+	pass
+
+func _say(_saying):
+	pass
+
+func _shush():
+	pass
+
+func _push(_v):
+	pass
