@@ -807,4 +807,4 @@ var ps = 1.0
 func setElevenMode(on):
 	elevenMode = on
 	squad = 11 if on else 7
-	ps = 1.4 if on else 1.0
+	ps = 1.25 if on else 1.0

@@ -57,10 +57,10 @@ func _setupCamera():
 			translation.y = Global.config.get_value("gfx", "camLRheight")
 	if Global.elevenMode and Global.config.get_value("gfx", "camtype") == 0:
 		# 11v11 broadcast view: higher, further back and flatter so most of the pitch is visible.
-		zoffset = 135.0
-		translation.y = 80.0
-		rotation_degrees.x = - 31.0
-		mfov = 44.0
+		zoffset = 105.0
+		translation.y = 95.0
+		rotation_degrees.x = - 40.0
+		mfov = 42.0
 		fov = mfov
 		mlimitz = 30
 	targetfov = mfov
