@@ -710,6 +710,8 @@ func unlockNormal():
 	return ut
 	
 func _unlockTeam( var isPrem):
+	# All teams start unlocked, so there is never anything new to unlock.
+	return "false"
 	var t = - 1
 	var uteam = null
 	var udir = "res://Teams/1/"
@@ -745,6 +747,8 @@ func _unlockTeam( var isPrem):
 		return "false"
 	
 func _checkLocked( var tm, var lev):
+	# Every club team is unlocked from the start (no need to win matches or watch ads).
+	return true
 	var lt = teamprem
 	if lev == 2:
 		lt = teamnormal

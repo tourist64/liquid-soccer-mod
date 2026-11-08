@@ -1394,6 +1394,11 @@ func _fouled( var position):
 		
 	
 	
+	# A fouled goalkeeper (AIKeeper._fouled does nothing) leaves Game.kickTaker pointing at
+	# whoever took the last restart, possibly on the other team, and the free kick never
+	# gets set up. Fall back to our closest available outfield player.
+	if not _isValidKickTaker(Game.kickTaker):
+		Game.kickTaker = _closestFreeKickTaker()
 	Game.kickTaker.AI.isSP = true
 	Game.kickTaker.AI.setTarget(position + dGoal * 0.06)
 	state = teamState.LINEUP
@@ -1749,3 +1754,25 @@ func _updateCamChange():
 		player.cud = cud
 		player.clr = clr
 		player.jflip = jflip
+
+func _isValidKickTaker(p):
+	if p == null or not is_instance_valid(p):
+		return false
+	if p.myTeam != self or p == players[0]:
+		return false
+	return p.carded < 2
+
+func _closestFreeKickTaker():
+	var best = null
+	var dist = INF
+	for i in range(1, 7):
+		var p = players[i]
+		if p.carded > 1:
+			continue
+		var d = (p.translation - Game.resetPos).length_squared()
+		if d < dist:
+			best = p
+			dist = d
+	if best == null:
+		best = players[1]
+	return best

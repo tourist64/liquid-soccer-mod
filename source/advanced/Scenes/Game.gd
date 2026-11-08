@@ -78,6 +78,8 @@ var cplayer = 1
 var splayer = 7
 var needSub = false
 var nextState = 0
+var fkWaitTicks = 0
+var bookingWaitTicks = 0
 var subteam = null
 
 signal ballpos(pos)
@@ -839,6 +841,7 @@ func kickOff():
 	$Timers / Timer.start()
 	
 func freeKick():
+	fkWaitTicks = 0
 	$VPC / VP / GameGroup / Stadium._relax()
 	ball._reset()
 	
@@ -1318,6 +1321,11 @@ func fkSetup():
 		
 		$Timers / Timer.start()
 	else:
+		# Safety net: if a player can't reach his free-kick spot, don't wait forever.
+		fkWaitTicks += 1
+		if fkWaitTicks > 8:
+			Global.teamsReady[0] = true
+			Global.teamsReady[1] = true
 		$Timers / Timer.start()
 
 func throwSetup():
@@ -2255,6 +2263,7 @@ func checkBooking( var cstate, var offender):
 		
 	
 	if ref._bookPlayer(offender):
+		bookingWaitTicks = 0
 		nextState = cstate
 		offender.AI._bookMe()
 		state = gameState.BOOKING
@@ -2263,7 +2272,9 @@ func checkBooking( var cstate, var offender):
 	
 	
 func _doneBooking():
-	
+	# Called by the referee (yellow) or the sent-off player (red); only act once.
+	if state != gameState.BOOKING:
+		return
 	state = nextState
 	mainCam._setLimits()
 	mainCam._setTarget(ball)
@@ -2271,8 +2282,18 @@ func _doneBooking():
 	$Timers / Timer.start()
 	
 func bookingPlayer():
-	
-	
+	# Safety net: if the card scene stalls (~12 s), finish the booking and play on.
+	bookingWaitTicks += 1
+	if bookingWaitTicks > 24:
+		bookingWaitTicks = 0
+		if ref.offender:
+			ref.card.visible = false
+			ref.anim = false
+			ref.changeState(ref.tostate)
+			ref.offender._loseControl()
+			ref.offender = null
+		_doneBooking()
+		return
 	$Timers / Timer.wait_time = 0.5
 	$Timers / Timer.start()
 func doWinner():

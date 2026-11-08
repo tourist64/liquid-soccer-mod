@@ -944,7 +944,8 @@ func _on_TrapArea_body_entered(body):
 			
 			var r = rand_range(0.0, 9.0)
 			if r > ball.player.pAgility:
-				ball.player._push(velocity)
+				if ball.player.has_method("_push"):
+					ball.player._push(velocity)
 				ball._tapBall((Vector3(0, 0.5, 0) + ( - transform.basis.z + rand_range( - 0.5, 0.5) * transform.basis.x)) * 30, self)
 			
 			
@@ -960,7 +961,8 @@ func _on_TrapArea_body_entered(body):
 				yield(get_tree().create_timer(0.1), "timeout")
 				canControl = true
 			else:
-				ball.player._push(velocity)
+				if ball.player.has_method("_push"):
+					ball.player._push(velocity)
 	else:
 		
 		
