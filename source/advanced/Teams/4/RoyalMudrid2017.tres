@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource( 1 )
-teamname = "Royal Mudrid 2017"
+teamname = "Mudrid 2017"
 shortname = "MAD"
 Shirt1Color = Color( 0.956863, 0.956863, 0.956863, 1 )
 Shirt2Color = Color( 0.772549, 0.552941, 0.129412, 1 )

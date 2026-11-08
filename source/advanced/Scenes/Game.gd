@@ -171,10 +171,10 @@ func initStadium():
 	$VPC / VP / GameGroup.add_child(gs)
 	if Global.elevenMode:
 		# 11v11: a bigger pitch (stadium, lines and zones scale; goals move out but keep their size).
-		gs.scale = Vector3(Global.ps, Global.ps, Global.ps)
+		gs.scale *= Global.ps
 		$VPC / VP / GameGroup / Goal.translation.x *= Global.ps
 		$VPC / VP / GameGroup / Goal2.translation.x *= Global.ps
-		$Zones.scale = Vector3(Global.ps, 1.0, Global.ps)
+		$Zones.scale *= Vector3(Global.ps, 1.0, Global.ps)
 	awayFans = gs.find_node("AwayFans")
 	
 	
