@@ -28,6 +28,7 @@ func _ready():
 	Global.game = self
 	Global.isTutorial = true
 	hud = $Hud
+	Global.enterFullWindow(self)
 	Global.gameOn = false
 	ball = $Ball
 
@@ -205,3 +206,6 @@ func _on_Timer_timeout():
 	currI = (currI + 1) % 8
 	instructions[currI].visible = true
 	
+
+func _exit_tree():
+	Global.exitFullWindow(self)

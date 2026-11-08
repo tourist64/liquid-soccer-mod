@@ -753,3 +753,43 @@ func _checkLocked( var tm, var lev):
 		return false
 	else:
 		return true
+
+# --- Full-window gameplay ----------------------------------------------------
+# Menus are laid out for a fixed 1031x580 screen, so the project keeps the
+# "keep" stretch aspect (letterboxed). Gameplay scenes (Game, training) call
+# enterFullWindow() so the 3D view fills the browser window; the fixed-size HUD
+# stays centred. exitFullWindow() restores "keep" when the scene is left.
+const FULLWINDOW_BASE = Vector2(1031, 580)
+var _fwScene = null
+
+func enterFullWindow(scene):
+	_fwScene = scene
+	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_EXPAND, FULLWINDOW_BASE)
+	if not get_viewport().is_connected("size_changed", self, "_fitFullWindow"):
+		get_viewport().connect("size_changed", self, "_fitFullWindow")
+	_fitFullWindow()
+
+func _fitFullWindow():
+	if _fwScene == null or not is_instance_valid(_fwScene):
+		return
+	var vs = get_viewport().get_visible_rect().size
+	if _fwScene.has_node("VPC"):
+		var vpc = _fwScene.get_node("VPC")
+		vpc.rect_position = Vector2.ZERO
+		vpc.rect_size = vs
+		# The container resizes its viewport to the 2D size; render at window resolution instead.
+		var rt = get_tree().get_root()
+		if rt.size.x != vpRes[0]:
+			vpc.get_node("VP").size = rt.size
+		else:
+			vpc.get_node("VP").size = Vector2(vpRes[0], vpRes[1])
+	if _fwScene.has_node("Hud"):
+		_fwScene.get_node("Hud").rect_position = ((vs - FULLWINDOW_BASE) * 0.5).floor()
+
+func exitFullWindow(scene):
+	if scene != _fwScene:
+		return
+	_fwScene = null
+	if get_viewport().is_connected("size_changed", self, "_fitFullWindow"):
+		get_viewport().disconnect("size_changed", self, "_fitFullWindow")
+	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_KEEP, FULLWINDOW_BASE)
