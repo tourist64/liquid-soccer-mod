@@ -176,6 +176,7 @@ func initStadium():
 		$VPC / VP / GameGroup / Goal.translation.x *= Global.ps
 		$VPC / VP / GameGroup / Goal2.translation.x *= Global.ps
 		$Zones.scale *= Vector3(Global.ps, 1.0, Global.ps)
+		_hideNearStand(gs)
 	awayFans = gs.find_node("AwayFans")
 	
 	
@@ -2434,3 +2435,14 @@ func _setupStuck(limit_ms):
 		setupWaitStart = 0
 		return true
 	return false
+
+# 11v11 broadcast camera sits on the near (+z) side: hide stadium pieces that lie
+# entirely beyond the near touchline so they never block the pitch at any zoom.
+func _hideNearStand(node):
+	for c in node.get_children():
+		if c is GeometryInstance:
+			var a = c.get_transformed_aabb()
+			if a.position.z > 92.0 * Global.ps:
+				c.visible = false
+				continue
+		_hideNearStand(c)

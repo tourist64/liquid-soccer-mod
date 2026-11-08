@@ -149,8 +149,8 @@ func _setupElevenCamera():
 		mfov = clamp(22.3 + _camDelta("camfov") * 0.5, 8.0, 90.0)
 		fov = mfov
 		mlimitz = 50
-		# Don't draw the near stand between the camera and the pitch.
-		near = clamp(95.0 + back, 0.05, 1000.0)
+		# The near stand is hidden in Game._hideNearStand, so no near-plane clipping needed.
+		near = 1.0
 	else:
 		translation.y *= Global.ps
 		xoffset *= Global.ps
