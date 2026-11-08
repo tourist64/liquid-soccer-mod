@@ -905,7 +905,7 @@ func _getPlayPos(pid):
 
 func _getSupportPos(pid):
 	
-	var posid = pid + (zone - 1) * 7
+	var posid = pid + (zone - 1) * Global.squad
 	
 	
 	
@@ -950,7 +950,7 @@ func _getPosessionPos( var pid, var pos, var tforce):
 
 func _getDefendPos(pid):
 	
-	var posid = pid + (zone - 1) * 7
+	var posid = pid + (zone - 1) * Global.squad
 	var ppos
 	var bp = Global.ballpos + Global.ballvel * 0.2
 	if zone == 3:
@@ -982,7 +982,7 @@ func _getDefendPos(pid):
 
 func _getDefendFKPos(pid):
 	
-	var posid = pid + (zone - 1) * 7
+	var posid = pid + (zone - 1) * Global.squad
 	
 	if Game.fkend == playDir:
 		
@@ -992,7 +992,7 @@ func _getDefendFKPos(pid):
 				return _getDefendPos(pid)
 				
 				
-			3, 4, 5, 6:
+			_:
 				
 				var cb = Game.resetPos - dGoal
 				
@@ -1012,24 +1012,25 @@ func _getPenPosition(pid):
 		1, 2:
 			return _getSupportPos(pid)
 		3:
-			return Vector3(Game.penend * - 81, 0, 25)
+			return Vector3(Game.penend * - 81 * Global.ps, 0, 25)
 		4:
-			return Vector3(Game.penend * - 66, 0, 0)
+			return Vector3(Game.penend * - 66 * Global.ps, 0, 0)
 		5:
-			return Vector3(Game.penend * - 81, 0, - 25)
+			return Vector3(Game.penend * - 81 * Global.ps, 0, - 25)
 		6:
 			return Vector3(Game.penend * - 91 * Global.ps, 0, 0)
 	
-
+		_:
+			return _getSupportPos(pid)
 func _getPenDPosition( var pid):
 	match pid:
 		1:
-			return Vector3(Game.penend * - 82, 0, 23)
+			return Vector3(Game.penend * - 82 * Global.ps, 0, 23)
 		2:
-			return Vector3(Game.penend * - 67, 0, 3)
+			return Vector3(Game.penend * - 67 * Global.ps, 0, 3)
 		3:
-			return Vector3(Game.penend * - 82, 0, - 23)
-		4, 5, 6:
+			return Vector3(Game.penend * - 82 * Global.ps, 0, - 23)
+		_:
 			return _getDefendPos(pid)
 
 func _getShootoutPosition( var pid):
@@ -1504,7 +1505,7 @@ func _defendCorner():
 			1, 2, 3, 4:
 				players[i].AI._mark()
 				players[i].indicator.visible = false
-			5, 6:
+			_:
 				players[i].AI._kickoff()
 				players[i].AI.target = _getDefendPos(players[i].myID)
 				players[i].indicator.visible = false
