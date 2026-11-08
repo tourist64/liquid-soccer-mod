@@ -34,7 +34,7 @@ var sas = null
 func _ready():
 	if Global.elevenMode:
 		# Closer to a real ball at the 11v11 pitch scale (still a touch big so it reads on screen).
-		$MeshInstance.scale *= 0.82
+		$MeshInstance.scale *= 0.9
 	
 	
 	state = bstate.OPEN
