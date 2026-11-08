@@ -138,14 +138,19 @@ func _camDelta(key):
 func _setupElevenCamera():
 	far = max(far, 1500.0)
 	if Global.config.get_value("gfx", "camtype") == 0:
-		zoffset = 197.0 + _camDelta("camoffset") * Global.ps
-		translation.y = max(10.0, 66.0 + _camDelta("camheight") * Global.ps)
-		rotation_degrees.x = clamp( - 22.6 + _camDelta("camtilt"), - 89.0, - 5.0)
+		var tilt = clamp( - 22.6 + _camDelta("camtilt"), - 89.0, - 5.0)
+		rotation_degrees.x = tilt
+		# Distance slider: back away along the line of sight (rising as it goes), like a
+		# broadcast camera, so the view always clears the near stand.
+		var back = _camDelta("camoffset") * Global.ps
+		var t = deg2rad( - tilt)
+		zoffset = 197.0 + back * cos(t)
+		translation.y = max(10.0, 66.0 + back * sin(t) + _camDelta("camheight") * Global.ps)
 		mfov = clamp(22.3 + _camDelta("camfov") * 0.5, 8.0, 90.0)
 		fov = mfov
 		mlimitz = 50
-		# Behind the near stand: don't draw anything closer than the stand's front edge.
-		near = max(0.05, zoffset - 120.0)
+		# Don't draw the near stand between the camera and the pitch.
+		near = clamp(95.0 + back, 0.05, 1000.0)
 	else:
 		translation.y *= Global.ps
 		xoffset *= Global.ps
