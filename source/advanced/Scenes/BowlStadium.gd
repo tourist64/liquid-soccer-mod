@@ -1,12 +1,14 @@
 extends Spatial
 
 # 11v11 stadium: a steep three-tier rounded bowl under a pale roof, generated in world units
-# (about 3.3 units per metre; the pitch is 347 x 225). The near side only keeps its lowest
-# tier so the sideline cameras always have a clear view of the pitch.
+# (about 3.3 units per metre; the pitch is 347 x 225). The upper tiers in the middle of the near
+# side are a separate mesh, shown only while the active camera is in front of them, so the
+# sideline cameras always see the pitch and every other camera sees a complete stadium.
 
 const SEGMENTS = 120
 const CORNER_POWER = 6.0
-const NEAR_CUT = 30.0
+const NEAR_CUT_Z = 130.0
+const NEAR_CUT_X = 190.0
 
 const SEAT_A = Color(0.10, 0.20, 0.47)
 const SEAT_B = Color(0.14, 0.27, 0.58)
@@ -24,23 +26,49 @@ var tiers = [
 ]
 
 var st
+var stMain
+var stNear
+var nearMesh
+var nearCrowd = null
+var nearShown = false
 
 func _ready():
 	var m = SpatialMaterial.new()
 	m.vertex_color_use_as_albedo = true
 	m.flags_unshaded = true
 	m.params_cull_mode = SpatialMaterial.CULL_DISABLED
-	st = SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	st.set_material(m)
+	stMain = _newSurface(m)
+	stNear = _newSurface(m)
+	st = stMain
 	for t in range(tiers.size()):
 		_buildTier(t)
 	_buildRoof()
+	_addMesh("BowlMesh", stMain)
+	nearMesh = _addMesh("BowlNearUpper", stNear)
+	nearMesh.visible = false
+
+func _newSurface(m):
+	var s = SurfaceTool.new()
+	s.begin(Mesh.PRIMITIVE_TRIANGLES)
+	s.set_material(m)
+	return s
+
+func _addMesh(n, s):
 	var mi = MeshInstance.new()
-	mi.name = "BowlMesh"
+	mi.name = n
 	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_OFF
-	mi.mesh = st.commit()
+	mi.mesh = s.commit()
 	add_child(mi)
+	return mi
+
+func _process(_delta):
+	var cam = get_viewport().get_camera()
+	var show = cam != null and cam.global_transform.origin.z < NEAR_CUT_Z
+	if show != nearShown:
+		nearShown = show
+		nearMesh.visible = show
+		if nearCrowd:
+			nearCrowd.visible = show
 
 func _ring(hx, hz, i):
 	var t = TAU * float(i) / SEGMENTS
@@ -48,16 +76,18 @@ func _ring(hx, hz, i):
 	var s = sin(t)
 	return Vector2(hx * sign(c) * pow(abs(c), 2.0 / CORNER_POWER), hz * sign(s) * pow(abs(s), 2.0 / CORNER_POWER))
 
-func _skip(i, hz, nearAllowed):
+func _blocksView(p):
+	return p.y > NEAR_CUT_Z and abs(p.x) < NEAR_CUT_X
+
+func _skip(i, hx, hz, nearAllowed):
 	if nearAllowed:
 		return false
-	return _ring(1.0, hz, float(i) + 0.5).y > NEAR_CUT
+	return _blocksView(_ring(hx, hz, float(i) + 0.5))
 
 # One band of the bowl between two (half length, half width, height) profiles.
 func _band(p, q, col, nearAllowed):
 	for i in range(SEGMENTS):
-		if _skip(i, q[1], nearAllowed):
-			continue
+		st = stNear if _skip(i, q[0], q[1], nearAllowed) else stMain
 		var c = col
 		if typeof(col) == TYPE_ARRAY:
 			c = col[int(i / 5) % col.size()]
@@ -101,8 +131,9 @@ func _buildTier(t):
 		_nearCap(b)
 
 func _nearCap(b):
+	st = stMain
 	for i in range(SEGMENTS):
-		if not _skip(i, b[1], false):
+		if not _skip(i, b[0], b[1], false):
 			continue
 		var a0 = _ring(b[0], b[1], i)
 		var a1 = _ring(b[0], b[1], i + 1)
@@ -116,7 +147,7 @@ func _buildRoof():
 	_band([232.0, 162.0, 176.0], [232.0, 162.0, 169.0], ROOF_EDGE, false)
 
 # Random crowd positions in world space. The away end sits behind the -x goal.
-func seats(count, away):
+func seats(count, away, nearUpper = false):
 	var out = []
 	var guard = 0
 	while out.size() < count and guard < count * 40:
@@ -131,7 +162,7 @@ func seats(count, away):
 		var hx = lerp(a[0], b[0], f)
 		var hz = lerp(a[1], b[1], f)
 		var p = _ring(hx, hz, rand_range(0.0, SEGMENTS))
-		if not d["near"] and p.y > NEAR_CUT:
+		if (not d["near"] and _blocksView(p)) != nearUpper:
 			continue
 		var inAway = (p.x < - hx * 0.82)
 		if inAway != away:

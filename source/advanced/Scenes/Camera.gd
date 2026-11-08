@@ -169,10 +169,10 @@ func _setupElevenCamera():
 	targetfov = mfov
 	elevenLook = Vector3.ZERO
 	if _elevenView() == VIEW_COOP:
-		var coopTilt = deg2rad(33.0)
-		zoffset = 185.0 + back * cos(coopTilt)
-		translation.y = max(30.0, 118.0 + back * sin(coopTilt) + height)
-		elevenTilt = clamp( - 33.0 + _camDelta("camtilt"), - 80.0, - 10.0)
+		var coopTilt = deg2rad(26.0)
+		zoffset = 215.0 + back * cos(coopTilt)
+		translation.y = max(30.0, 105.0 + back * sin(coopTilt) + height)
+		elevenTilt = clamp( - 26.0 + _camDelta("camtilt"), - 80.0, - 10.0)
 		rotation_degrees = Vector3(elevenTilt, 0.0, 0.0)
 	else:
 		var broadcastTilt = deg2rad(20.0)

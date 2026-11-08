@@ -20,6 +20,10 @@ export (float) var tictacs = 5.0
 export (int) var aggression = 2
 export (float) var approach = 0.5
 export (int) var League = 0
+# 11v11 style: counter = how hard the team looks forward right after winning the ball (0-1);
+# cornerOutlets = players left upfield when defending a corner (0 = everyone back).
+export (float) var counter = 0.0
+export (int) var cornerOutlets = 1
 
 
 export var player0 = {

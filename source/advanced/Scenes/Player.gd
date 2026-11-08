@@ -11,6 +11,8 @@ var dSmart = 0.16
 var pTSmart = 10
 var pShoot = 0.75
 var pCurl = 0.75
+var pLongShot = 0.0
+var pPressRes = 0.0
 var pAcc = 3
 var pBurst = 44
 var dBurst = 44
@@ -320,6 +322,7 @@ func shoot( var targ):
 	
 	var coffset = smoothstep(0.0, 130.0 * Global.ps, abs(Global.ballpos.x))
 	shotV.z += - shotcurl.z * lerp(35.0, 2.0, coffset) * pCurl
+	var longRange = pLongShot * smoothstep(55.0, 110.0, shotV.length())
 	shotV = shotV.normalized()
 	shotcurl.z *= 1.1
 	var yadd = range_lerp(pShoot, 0.0, 1.0, 0.35, 0.075)
@@ -328,13 +331,13 @@ func shoot( var targ):
 		shotcurl.y *= 0.05
 	shotV += Vector3(0, yadd * (1.0 - shotcharge), 0)
 	
-	shotV.z += rand_range( - 0.2, 0.2) * (1.0 - pShoot)
+	shotV.z += rand_range( - 0.2, 0.2) * (1.0 - pShoot) * (1.0 - longRange)
 	
 	if (shotcurl.y > 0):
 		shotV.y += 0.05
 		shotcurl.y = shotcurl.y * - 2.1
 		shotcharge *= 1.1
-	shotV = shotV * lerp(100, lerp(130, 165, pShoot), 1.0 - shotcharge)
+	shotV = shotV * lerp(100, lerp(130, 165, pShoot), 1.0 - shotcharge) * (1.0 + 0.2 * longRange)
 	
 	
 	canControl = false
@@ -943,7 +946,8 @@ func _on_TrapArea_body_entered(body):
 		elif ball._isTrapped() and myTeam.opponent.posession:
 			
 			var r = rand_range(0.0, 9.0)
-			if r > ball.player.pAgility:
+			var pressRes = ball.player.get("pPressRes")
+			if r > ball.player.pAgility + (pressRes if pressRes else 0.0) * 2.0:
 				if ball.player.has_method("_push"):
 					ball.player._push(velocity)
 				ball._tapBall((Vector3(0, 0.5, 0) + ( - transform.basis.z + rand_range( - 0.5, 0.5) * transform.basis.x)) * 30, self)
@@ -987,6 +991,9 @@ func _on_TrapArea_body_entered(body):
 				for b in bods:
 					if b != ball:
 						if b != myCollider and b.get_parent() != null and b.get_parent().get("AI") != null and b.get_parent().AI._hasBall():
+							var slideRes = b.get_parent().get("pPressRes")
+							if slideRes and randf() < slideRes * 0.9:
+								continue
 							b.get_parent().AI._tackled()
 							
 				

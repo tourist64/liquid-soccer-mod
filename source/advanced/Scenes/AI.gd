@@ -871,7 +871,8 @@ func _corner( var end, var side):
 	marking = null
 	changeState(pstate.IDLE)
 		
-	target = myTeam.cformation[myPlayer.myID] + Vector3(rand_range( - 12.0, 12.0), 0.0, rand_range( - 12.0, 12.0))
+	var spread = 3.0 if Global.elevenMode else 12.0
+	target = myTeam.cformation[myPlayer.myID] + Vector3(rand_range( - spread, spread), 0.0, rand_range( - spread, spread))
 	if end < 1:
 		target.x *= - 1
 	if side < 1:
@@ -1203,7 +1204,7 @@ func findPass():
 					largestd = dpl
 				
 				if dgl < closest2goal:
-					pscore += 1
+					pscore += 1 + myTeam._counterBonus()
 					closest2goal = dgl
 	
 				
@@ -1326,6 +1327,7 @@ func _updatePosition():
 					if px > 50.0:
 						var deltashot = Helper.biLerp(2.0, 0.1, 0.75, 0.25, smoothstep(0, 40 * Global.ps, pz), smoothstep(50 * Global.ps, 110 * Global.ps, px))
 						var ds = rand_range(0.0, 1.0)
+						deltashot = max(deltashot, 0.45 * myPlayer.pLongShot)
 					
 						if ds < deltashot:
 							tryShot()

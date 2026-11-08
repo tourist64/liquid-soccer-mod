@@ -149,6 +149,9 @@ func setupFormation():
 		formation.append(Vector2(110 * Global.ps, 0))
 		for i in range(Global.squad - 1):
 			formation.append(Vector2(range_lerp(tdata.att[i].y, 0, 1, - 150 * Global.ps, 150 * Global.ps), range_lerp(tdata.att[i].x, 0, 1, 100 * Global.ps, - 100 * Global.ps)))
+	if Global.elevenMode:
+		# Corner spots are looked up by player id, and id 0 is the keeper.
+		cformation.append(Vector3.ZERO)
 	for i in range(Global.squad - 1):
 		cformation.append(Vector3(range_lerp(tdata.cor[i].y, 0, 1, - 150 * Global.ps, 150 * Global.ps), 0, range_lerp(tdata.cor[i].x, 0, 1, 100 * Global.ps, - 100 * Global.ps)))
 		
@@ -197,6 +200,8 @@ func setPlayerParams( var p, var i):
 	p.pAcc = pp["speed"] * 0.1
 	p.pShoot = pp["shoot"] * 0.1
 	p.pCurl = pp["curl"] * 0.1
+	p.set("pLongShot", pp.get("longShot", 0.0))
+	p.set("pPressRes", pp.get("pressRes", 0.0))
 	cpdata = pp
 	
 	if i == 0:
@@ -830,6 +835,8 @@ func _closestDPToBallNew():
 	
 func setAttack():
 	
+	if state != teamState.ATTACK:
+		wonBallAt = OS.get_ticks_msec()
 	state = teamState.ATTACK
 	
 	for i in range(1, Global.squad):
@@ -1040,6 +1047,10 @@ func _getShootoutPosition( var pid):
 	return Vector3(0.0, 0.0, 10 + pid * 4.5) * pt
 func _getMarkPosition( var pid):
 	
+	if Global.elevenMode and isCorner:
+		if cornerMark.has(pid):
+			return opponent.players[cornerMark[pid]].translation + Vector3(playDir * - 4, 0, 0)
+		return _getDefendPos(pid)
 	
 	var op = pid + 1
 	
@@ -1487,8 +1498,8 @@ func _corner( var side, var e):
 		if players[i].carded < 2:
 			Game.kickTaker = players[i]
 	
-	
-	
+	if Global.elevenMode:
+		Game.kickTaker = _bestCornerTaker(Game.kickTaker)
 	
 	Game.kickTaker.AI.setTarget(posi + posi * 0.04)
 	state = teamState.LINEUP
@@ -1498,6 +1509,10 @@ func _defendCorner():
 	Global.teamsReady[teamID - 1] = false
 	ball._ballFree()
 	isCorner = true
+	if Global.elevenMode:
+		_elevenDefendCorner()
+		state = teamState.LINEUP
+		return
 	for i in range(0, Global.squad):
 		match i:
 			0:
@@ -1777,3 +1792,72 @@ func _closestFreeKickTaker():
 	if best == null:
 		best = players[1]
 	return best
+
+# --- 11v11 tactics --------------------------------------------------------------------
+const CORNER_MARKERS = [3, 4, 6, 8, 7, 1, 2, 5, 9, 10]
+const CORNER_OUTLET_POOL = [5, 9, 10]
+# Zonal spots as [distance from the goal line, distance toward the corner taker's side].
+const CORNER_ZONES = [[3.0, 11.0], [3.0, - 11.0], [18.0, 0.0], [18.0, 16.0], [18.0, - 16.0], [36.0, 8.0], [36.0, - 8.0], [58.0, 14.0], [58.0, - 14.0], [46.0, 0.0]]
+const COUNTER_WINDOW_MS = 6000
+
+var wonBallAt = 0
+var cornerMark = {}
+
+# Extra pull toward the most advanced runner in the seconds after winning the ball.
+func _counterBonus():
+	if tdata.counter <= 0.0 or OS.get_ticks_msec() - wonBallAt > COUNTER_WINDOW_MS:
+		return 0.0
+	return tdata.counter * 2.5
+
+# Best delivery among the players not assigned to the box.
+func _bestCornerTaker(fallback):
+	var best = null
+	for i in range(1, Global.squad):
+		var p = players[i]
+		if p.carded < 2 and tdata.cor[i - 1].y >= 0.2 and (best == null or p.pCurl > best.pCurl):
+			best = p
+	return best if best else fallback
+
+func _cornerOutletIds():
+	var pool = []
+	for id in CORNER_OUTLET_POOL:
+		if players[id].carded < 2:
+			pool.append(id)
+	pool.sort_custom(self, "_fasterFirst")
+	return pool.slice(0, tdata.cornerOutlets - 1) if tdata.cornerOutlets > 0 else []
+
+func _fasterFirst(a, b):
+	return players[a].pSpeed > players[b].pSpeed
+
+func _elevenDefendCorner():
+	var attackers = []
+	for i in range(1, Global.squad):
+		var o = opponent.players[i]
+		if o != Game.kickTaker and o.carded < 2 and opponent.tdata.cor[i - 1].y < 0.2:
+			attackers.append(i)
+	var outlets = _cornerOutletIds()
+	var inward = - sign(dGoal.x)
+	var kickSide = sign(Game.resetPos.z)
+	var zone = 0
+	var outlet = 0
+	cornerMark.clear()
+	players[0].AI._defendCorner()
+	for pid in CORNER_MARKERS:
+		var p = players[pid]
+		p.indicator.visible = false
+		if outlets.has(pid):
+			p.AI._kickoff()
+			p.AI.target = Vector3(sign(dGoal.x) * 8.0, 0.0, 40.0 * (1 - 2 * outlet))
+			p.AI.atarget = p.AI.target
+			outlet += 1
+		elif attackers.size() > 0:
+			cornerMark[pid] = attackers.pop_front()
+			p.AI._mark()
+		else:
+			p.AI._kickoff()
+			if zone < CORNER_ZONES.size():
+				p.AI.target = Vector3(dGoal.x + inward * CORNER_ZONES[zone][0], 0.0, kickSide * CORNER_ZONES[zone][1])
+			else:
+				p.AI.target = _getDefendPos(pid)
+			p.AI.atarget = p.AI.target
+			zone += 1
