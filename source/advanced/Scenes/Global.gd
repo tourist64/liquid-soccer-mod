@@ -800,6 +800,9 @@ func exitFullWindow(scene):
 
 # --- 11v11 mode -------------------------------------------------------------------
 # squad = players on the pitch per team (keeper included); ps = pitch scale.
+const ELEVEN_PITCH_SCALE = 1.18
+# Camera and stadium distances were tuned at this scale and are sized relative to it.
+const ELEVEN_DESIGN_SCALE = 1.25
 var elevenMode = false
 var squad = 7
 var ps = 1.0
@@ -808,7 +811,7 @@ var elevenPrevCamtype = null
 func setElevenMode(on):
 	elevenMode = on
 	squad = 11 if on else 7
-	ps = 1.25 if on else 1.0
+	ps = ELEVEN_PITCH_SCALE if on else 1.0
 	if on:
 		# 11v11 has its own two views on the main camera; the 7-a-side choice comes back after.
 		if elevenPrevCamtype == null:

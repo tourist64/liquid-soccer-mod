@@ -1919,7 +1919,7 @@ func _crossTarget(crosser):
 		var p = players[i]
 		if p == crosser or p.carded > 1:
 			continue
-		if abs(p.translation.x - goal.x) < 66.0 and abs(p.translation.z) < 62.0:
+		if abs(p.translation.x - goal.x) < 53.0 * Global.ps and abs(p.translation.z) < 50.0 * Global.ps:
 			if best == null or p.pAerial > best.pAerial:
 				best = p
 	if best == null:

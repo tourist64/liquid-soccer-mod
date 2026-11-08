@@ -143,6 +143,9 @@ const CLASSIC_LIMIT_X = 118.0
 var elevenLook = Vector3.ZERO
 var elevenTilt = 0.0
 
+func _pitchRatio():
+	return Global.ps / Global.ELEVEN_DESIGN_SCALE
+
 func _isElevenView():
 	return Global.elevenMode and self == _mainElevenCamera()
 
@@ -172,33 +175,34 @@ func _setupElevenCamera():
 	targetfov = mfov
 	elevenLook = Vector3.ZERO
 	if _elevenView() == VIEW_CLASSIC:
-		var classicTilt = deg2rad(25.0)
-		zoffset = 182.0 + back * cos(classicTilt)
-		translation.y = max(30.0, 85.0 + back * sin(classicTilt) + height)
-		elevenTilt = clamp( - 25.0 + _camDelta("camtilt"), - 80.0, - 10.0)
+		var classicTilt = deg2rad(26.0)
+		zoffset = 197.0 * _pitchRatio() + back * cos(classicTilt)
+		translation.y = max(30.0, 96.0 * _pitchRatio() + back * sin(classicTilt) + height)
+		elevenTilt = clamp( - 26.0 + _camDelta("camtilt"), - 80.0, - 10.0)
 		rotation_degrees = Vector3(elevenTilt, 0.0, 0.0)
 	elif _elevenView() == VIEW_COOP:
 		var coopTilt = deg2rad(26.0)
-		zoffset = 215.0 + back * cos(coopTilt)
-		translation.y = max(30.0, 105.0 + back * sin(coopTilt) + height)
+		zoffset = 215.0 * _pitchRatio() + back * cos(coopTilt)
+		translation.y = max(30.0, 105.0 * _pitchRatio() + back * sin(coopTilt) + height)
 		elevenTilt = clamp( - 26.0 + _camDelta("camtilt"), - 80.0, - 10.0)
 		rotation_degrees = Vector3(elevenTilt, 0.0, 0.0)
 	else:
 		var broadcastTilt = deg2rad(20.0)
-		zoffset = 207.0 + back * cos(broadcastTilt)
-		translation.y = max(30.0, 75.0 + back * sin(broadcastTilt) + height)
+		zoffset = 207.0 * _pitchRatio() + back * cos(broadcastTilt)
+		translation.y = max(30.0, 75.0 * _pitchRatio() + back * sin(broadcastTilt) + height)
 		elevenTilt = clamp(_camDelta("camtilt"), - 40.0, 40.0)
 	translation.x = 0.0
 	translation.z = zoffset
 
 func _elevenStep(delta):
 	var lpos = target_node.translation + Global.ballvel * delta * 4.0
-	var bx = clamp(lpos.x, - GOAL_LINE_X, GOAL_LINE_X)
-	var bz = clamp(lpos.z, - 112.0, 112.0)
+	var ratio = _pitchRatio()
+	var bx = clamp(lpos.x, - GOAL_LINE_X * ratio, GOAL_LINE_X * ratio)
+	var bz = clamp(lpos.z, - 112.0 * ratio, 112.0 * ratio)
 	var jitter = shake * rand_range( - 6, 6) * delta
 	var goal
 	if _elevenView() != VIEW_BROADCAST:
-		var limitX = CLASSIC_LIMIT_X if _elevenView() == VIEW_CLASSIC else COOP_LIMIT_X
+		var limitX = (CLASSIC_LIMIT_X if _elevenView() == VIEW_CLASSIC else COOP_LIMIT_X) * ratio
 		goal = Vector3(clamp(bx, - limitX, limitX) + jitter, translation.y, zoffset + bz * 0.5)
 	else:
 		goal = Vector3(bx * 0.15 + jitter, translation.y, zoffset)

@@ -258,7 +258,7 @@ func chipPass( var human):
 					crossto.x *= 0.95
 			
 			if Global.elevenMode:
-				crossto.x = clamp(crossto.x, - 176.0, 176.0)
+				crossto.x = clamp(crossto.x, - 141.0 * Global.ps, 141.0 * Global.ps)
 			var curl = Vector3( - myTeam.playDir * swing, - 0.2, 0) * pCurl
 			var cp = myTeam._closestPToP(crossto)
 			

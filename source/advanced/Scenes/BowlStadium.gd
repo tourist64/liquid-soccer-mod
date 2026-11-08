@@ -25,6 +25,7 @@ var tiers = [
 	{"a": [278.0, 210.0, 104.0], "b": [324.0, 256.0, 158.0], "rows": 11, "near": false},
 ]
 
+var ratio = 1.0
 var st
 var stMain
 var stNear
@@ -33,6 +34,11 @@ var nearCrowd = null
 var nearShown = false
 
 func _ready():
+	# The bowl is sized for the design pitch scale; keep it the same distance from a smaller pitch.
+	ratio = Global.ps / Global.ELEVEN_DESIGN_SCALE
+	for d in tiers:
+		d["a"] = [d["a"][0] * ratio, d["a"][1] * ratio, d["a"][2]]
+		d["b"] = [d["b"][0] * ratio, d["b"][1] * ratio, d["b"][2]]
 	var m = SpatialMaterial.new()
 	m.vertex_color_use_as_albedo = true
 	m.flags_unshaded = true
@@ -63,7 +69,7 @@ func _addMesh(n, s):
 
 func _process(_delta):
 	var cam = get_viewport().get_camera()
-	var show = cam != null and cam.global_transform.origin.z < NEAR_CUT_Z
+	var show = cam != null and cam.global_transform.origin.z < NEAR_CUT_Z * ratio
 	if show != nearShown:
 		nearShown = show
 		nearMesh.visible = show
@@ -77,7 +83,7 @@ func _ring(hx, hz, i):
 	return Vector2(hx * sign(c) * pow(abs(c), 2.0 / CORNER_POWER), hz * sign(s) * pow(abs(s), 2.0 / CORNER_POWER))
 
 func _blocksView(p):
-	return p.y > NEAR_CUT_Z and abs(p.x) < NEAR_CUT_X
+	return p.y > NEAR_CUT_Z * ratio and abs(p.x) < NEAR_CUT_X * ratio
 
 func _skip(i, hx, hz, nearAllowed):
 	if nearAllowed:
@@ -143,8 +149,10 @@ func _nearCap(b):
 func _buildRoof():
 	var c = tiers[2]["b"]
 	_band([c[0], c[1], c[2]], [c[0] + 6.0, c[1] + 6.0, 170.0], ROOF, false)
-	_band([c[0] + 6.0, c[1] + 6.0, 170.0], [232.0, 162.0, 176.0], ROOF, false)
-	_band([232.0, 162.0, 176.0], [232.0, 162.0, 169.0], ROOF_EDGE, false)
+	var edgeX = 232.0 * ratio
+	var edgeZ = 162.0 * ratio
+	_band([c[0] + 6.0, c[1] + 6.0, 170.0], [edgeX, edgeZ, 176.0], ROOF, false)
+	_band([edgeX, edgeZ, 176.0], [edgeX, edgeZ, 169.0], ROOF_EDGE, false)
 
 # Random crowd positions in world space. The away end sits behind the -x goal.
 func seats(count, away, nearUpper = false):
