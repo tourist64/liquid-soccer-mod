@@ -55,20 +55,8 @@ func _setupCamera():
 			fov = mfov
 			rotation_degrees.x = Global.config.get_value("gfx", "camLRtilt")
 			translation.y = Global.config.get_value("gfx", "camLRheight")
-	if Global.elevenMode and Global.config.get_value("gfx", "camtype") == 0:
-		# 11v11 tele-broadcast view, fitted to FC footage: gantry camera ~25 m up, ~55 m
-		# behind the near touchline, 17.5 deg down, ~15 deg vertical FOV. It pans along the
-		# pitch but never across, so the whole width stays in view.
-		zoffset = 197.0
-		translation.y = 66.0
-		rotation_degrees.x = - 22.6
-		mfov = 22.3
-		fov = mfov
-		mlimitz = 50
-		# The far stands are further away on the bigger pitch; don't clip them (black band).
-		far = max(far, 1500.0)
-		# The camera sits behind the near stand; skip drawing it (the pitch edge is ~195 away).
-		near = 95.0
+	if Global.elevenMode:
+		_setupElevenCamera()
 	targetfov = mfov
 
 func _setTarget( var t):
@@ -99,9 +87,9 @@ func _process(delta: float) -> void :
 	
 	var nx = xoffset + min(max( - limitX, lpos.x), limitX) + (shake * (rand_range( - 6, 6)) * delta)
 	var nz = zoffset + min(max( - limitZ, lpos.z), limitZ) + (shake * (rand_range( - 6, 6)) * delta)
-	if Global.elevenMode:
-		# Broadcast view: stop at the near touchline instead of swinging over the stands.
-		# Stay put across the pitch, but slide toward the near touchline when play goes there.
+	if Global.elevenMode and Global.config.get_value("gfx", "camtype") == 0:
+		# Broadcast view: stay put across the pitch, but slide toward the near touchline
+		# when play goes there (never over the stands).
 		nz = zoffset + clamp(lpos.z - 50.0, 0.0, 40.0)
 	var updatedt = Vector3(nx, translation.y, nz)
 	var updated = updatedt - translation
@@ -120,9 +108,9 @@ func _updateCam( var delta):
 	
 	var nx = xoffset + min(max( - limitX, lpos.x), limitX) + (shake * (rand_range( - 6, 6)) * delta)
 	var nz = zoffset + min(max( - limitZ, lpos.z), limitZ) + (shake * (rand_range( - 6, 6)) * delta)
-	if Global.elevenMode:
-		# Broadcast view: stop at the near touchline instead of swinging over the stands.
-		# Stay put across the pitch, but slide toward the near touchline when play goes there.
+	if Global.elevenMode and Global.config.get_value("gfx", "camtype") == 0:
+		# Broadcast view: stay put across the pitch, but slide toward the near touchline
+		# when play goes there (never over the stands).
 		nz = zoffset + clamp(lpos.z - 50.0, 0.0, 40.0)
 	var updatedt = Vector3(nx, translation.y, nz)
 	var updated = updatedt - translation
@@ -135,3 +123,30 @@ func _updateCam( var delta):
 		
 func set_target_node(node):
 	target_node = node as Spatial
+
+# --- 11v11 camera ---------------------------------------------------------------------
+# The camera settings sliders were tuned for the 7-a-side pitch. In 11v11 the default
+# camera starts from an FC-style tele-broadcast view (fitted to FC footage: ~20 m up,
+# ~25 m behind the near touchline, 22.6 deg down, 22.3 deg FOV) and each slider moves it
+# by how far it is from its default. The top-down cameras scale with the bigger pitch.
+const CAM_DEFAULTS = {"camoffset": 70.0, "camheight": 75.0, "camtilt": - 48.0, "camfov": 45.0}
+
+func _camDelta(key):
+	var v = Global.config.get_value("gfx", key, CAM_DEFAULTS[key])
+	return float(v) - CAM_DEFAULTS[key]
+
+func _setupElevenCamera():
+	far = max(far, 1500.0)
+	if Global.config.get_value("gfx", "camtype") == 0:
+		zoffset = 197.0 + _camDelta("camoffset") * Global.ps
+		translation.y = max(10.0, 66.0 + _camDelta("camheight") * Global.ps)
+		rotation_degrees.x = clamp( - 22.6 + _camDelta("camtilt"), - 89.0, - 5.0)
+		mfov = clamp(22.3 + _camDelta("camfov") * 0.5, 8.0, 90.0)
+		fov = mfov
+		mlimitz = 50
+		# Behind the near stand: don't draw anything closer than the stand's front edge.
+		near = max(0.05, zoffset - 120.0)
+	else:
+		translation.y *= Global.ps
+		xoffset *= Global.ps
+		zoffset *= Global.ps
