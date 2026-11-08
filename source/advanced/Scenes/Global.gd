@@ -803,8 +803,19 @@ func exitFullWindow(scene):
 var elevenMode = false
 var squad = 7
 var ps = 1.0
+var elevenPrevCamtype = null
 
 func setElevenMode(on):
 	elevenMode = on
 	squad = 11 if on else 7
 	ps = 1.25 if on else 1.0
+	if on:
+		# 11v11 has its own two views on the main camera; the 7-a-side choice comes back after.
+		if elevenPrevCamtype == null:
+			elevenPrevCamtype = config.get_value("gfx", "camtype", 0)
+		config.set_value("gfx", "camtype", 0)
+		camtype = 0
+	elif elevenPrevCamtype != null:
+		config.set_value("gfx", "camtype", elevenPrevCamtype)
+		camtype = elevenPrevCamtype
+		elevenPrevCamtype = null

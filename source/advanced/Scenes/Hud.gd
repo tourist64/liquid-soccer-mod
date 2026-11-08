@@ -75,6 +75,10 @@ func _ready():
 	Global.connect("adDone", self, "_adDone")
 	if Global.elevenMode:
 		_broadcastScoreboard()
+		$DialogSettings / CamButton.clear()
+		$DialogSettings / CamButton.add_item("tele broadcast")
+		$DialogSettings / CamButton.add_item("co-op")
+		$DialogSettings / CamButton.select(Global.config.get_value("gfx", "elevenview", 0))
 	
 func _process(_delta):
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -628,6 +632,11 @@ func _on_TiltSlider_value_changed(value):
 
 
 func _on_CamButton_item_selected(index):
+	if Global.elevenMode:
+		Global.config.set_value("gfx", "elevenview", index)
+		game.mainCam._setupCamera()
+		_updateCamUI()
+		return
 	match index:
 		0:
 			_setMap(0)
@@ -734,7 +743,7 @@ func _updateCamUI():
 			$DialogSettings / CamFovValue.text = str(Global.config.get_value("gfx", "camLRfov"))
 			$DialogSettings / CamDOFValue.text = str(Global.config.get_value("gfx", "camLRdof"))
 			$DialogSettings / DOFSlider.value = Global.config.get_value("gfx", "camLRdof")
-	$DialogSettings / CamButton.selected = Global.config.get_value("gfx", "camtype")
+	$DialogSettings / CamButton.selected = Global.config.get_value("gfx", "elevenview", 0) if Global.elevenMode else Global.config.get_value("gfx", "camtype")
 
 
 func _showReplay():

@@ -17,6 +17,7 @@ var cad = 0
 var mdt = null
 var validFaces = []
 var positions = []
+var bowl = null
 
 func _ready():
 	
@@ -145,7 +146,33 @@ func _initStandOld(m, start, xadd, yadd, zadd, lookat, orient, seats):
 		
 
 
+func _initBowlCrowd():
+	amat = $MultiMeshInstance.material_override
+	mat = $MultiMeshInstance7.multimesh.mesh.surface_get_material(0)
+	amat.set_shader_param("Shirt2", Global.t2.Shirt1Color)
+	mat.set_shader_param("Shirt2", Global.t1.Shirt1Color)
+	for c in get_children():
+		if c is MultiMeshInstance and c != $MultiMeshInstance and c != $MultiMeshInstance7:
+			c.visible = false
+	_fillCrowd($MultiMeshInstance7, bowl.seats(4800, false))
+	_fillCrowd($MultiMeshInstance, bowl.seats(700, true))
+	crowd = true
+
+func _fillCrowd(mmi, pts):
+	var mm = mmi.multimesh
+	mm.instance_count = pts.size()
+	var inv = mmi.global_transform.affine_inverse()
+	for i in range(pts.size()):
+		var l = inv.xform(pts[i])
+		var t = Transform(Basis(), l).looking_at(l + Vector3(l.x, 0.0, l.z), Vector3.UP)
+		t.basis = t.basis.scaled(Vector3(0.0075, 0.0075, 0.0075))
+		mm.set_instance_transform(i, t)
+		mm.set_instance_custom_data(i, Color(randf(), randf(), randf(), randf()))
+
 func _initCrowd():
+	if bowl:
+		_initBowlCrowd()
+		return
 	
 	
 	

@@ -170,13 +170,16 @@ func initStadium():
 	gs.name = "Stadium"
 	$VPC / VP / GameGroup.add_child(gs)
 	if Global.elevenMode:
-		# 11v11: a bigger pitch (stadium, lines and zones scale; goals move out but keep their size).
+		# 11v11: a bigger pitch (stadium, lines and zones scale; goals move out).
 		# Only stretch length/width: scaling height raised the grass above the players' feet.
 		gs.scale *= Vector3(Global.ps, 1.0, Global.ps)
 		$VPC / VP / GameGroup / Goal.translation.x *= Global.ps
 		$VPC / VP / GameGroup / Goal2.translation.x *= Global.ps
+		# The goal model is 9.7 m x 3.2 m at this pitch scale; bring it to a real 7.32 m x 2.44 m.
+		$VPC / VP / GameGroup / Goal.scale = ELEVEN_GOAL_SCALE
+		$VPC / VP / GameGroup / Goal2.scale = ELEVEN_GOAL_SCALE
 		$Zones.scale *= Vector3(Global.ps, 1.0, Global.ps)
-		_hideNearStand(gs)
+		_useBowlStadium(gs)
 	awayFans = gs.find_node("AwayFans")
 	
 	
@@ -556,6 +559,8 @@ func _mp_apply_replica_presentation():
 		mainCam.current = true
 		mainCam._setTarget(ball)
 	
+const ELEVEN_GOAL_SCALE = Vector3(0.8, 0.76, 0.74)
+
 func _noop():
 	pass
 func _firstHalf():
@@ -778,6 +783,8 @@ func _mp_update_blobs():
 
 
 func _physics_process(delta):
+	if Global.elevenMode and ball and state != gameState.REPLAY and not ball.visible:
+		ball.visible = true
 	if mp_replica:
 		return
 	_mp_update_blobs()
@@ -2436,13 +2443,21 @@ func _setupStuck(limit_ms):
 		return true
 	return false
 
-# 11v11 broadcast camera sits on the near (+z) side: hide stadium pieces that lie
-# entirely beyond the near touchline so they never block the pitch at any zoom.
-func _hideNearStand(node):
-	for c in node.get_children():
-		if c is GeometryInstance:
-			var a = c.get_transformed_aabb()
-			if a.position.z > 92.0 * Global.ps:
-				c.visible = false
-				continue
-		_hideNearStand(c)
+# 11v11 replaces the 7-a-side stands with the generated bowl (see BowlStadium.gd). Only the
+# pitch, perimeter boards, benches and flags of the small stadium stay.
+func _useBowlStadium(gs):
+	var deco = gs.get_node("SmallStadium/Decoration")
+	for c in deco.get_children():
+		var n = String(c.name)
+		if n.begins_with("Stand") or n.begins_with("EndStand") or n.begins_with("Rail") or n.begins_with("Banner") or n == "corners":
+			c.visible = false
+	deco.get_node("adsg1/big_ads").visible = false
+	deco.get_node("adsg1/big_ads1").visible = false
+	var apron = SpatialMaterial.new()
+	apron.albedo_color = Color(0.20, 0.42, 0.20)
+	apron.flags_unshaded = true
+	deco.get_node("Surround").material_override = apron
+	var bowl = load("res://Scenes/BowlStadium.gd").new()
+	bowl.name = "Bowl"
+	$VPC / VP / GameGroup.add_child(bowl)
+	gs.bowl = bowl
