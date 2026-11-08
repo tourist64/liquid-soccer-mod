@@ -180,7 +180,8 @@ func initStadium():
 			$VPC / VP / GameGroup / Goal.scale = ELEVEN_GOAL_SCALE
 			$VPC / VP / GameGroup / Goal2.scale = ELEVEN_GOAL_SCALE
 		$Zones.scale *= Vector3(Global.ps, 1.0, Global.ps)
-		_useBowlStadium(gs)
+		if Global.ELEVEN_CUSTOM_PRESENTATION:
+			_useBowlStadium(gs)
 	awayFans = gs.find_node("AwayFans")
 	
 	

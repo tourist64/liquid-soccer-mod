@@ -803,6 +803,8 @@ func exitFullWindow(scene):
 const ELEVEN_PITCH_SCALE = 1.0
 # 11v11 uses the standard camera options; true restores the tele broadcast, co-op and classic views.
 const ELEVEN_CUSTOM_CAMERAS = false
+# 11v11 uses the standard ball, stadium and scoreboard; true restores the custom versions.
+const ELEVEN_CUSTOM_PRESENTATION = false
 # Camera and stadium distances were tuned at this scale and are sized relative to it.
 const ELEVEN_DESIGN_SCALE = 1.25
 var elevenMode = false

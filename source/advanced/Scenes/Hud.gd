@@ -73,7 +73,7 @@ func _ready():
 		$Aggregate.visible = true
 		
 	Global.connect("adDone", self, "_adDone")
-	if Global.elevenMode:
+	if Global.elevenMode and Global.ELEVEN_CUSTOM_PRESENTATION:
 		_broadcastScoreboard()
 	if Global.elevenMode and Global.ELEVEN_CUSTOM_CAMERAS:
 		$DialogSettings / CamButton.clear()

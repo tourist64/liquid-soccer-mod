@@ -32,7 +32,7 @@ var sa = null
 var sas = null
 
 func _ready():
-	if Global.elevenMode:
+	if Global.elevenMode and Global.ELEVEN_CUSTOM_PRESENTATION:
 		# Closer to a real ball at the 11v11 pitch scale (still a touch big so it reads on screen).
 		$MeshInstance.scale *= 0.9
 	
