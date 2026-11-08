@@ -1166,7 +1166,7 @@ func findPass():
 	
 	
 	
-	for i in range(6, 0, - 1):
+	for i in range(Global.squad - 1, 0, - 1):
 		if i != myPlayer.myID:
 			var pscore = 0
 			var mdg = myGoal - pos
