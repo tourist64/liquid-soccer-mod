@@ -79,6 +79,7 @@ var splayer = 7
 var needSub = false
 var nextState = 0
 var fkWaitTicks = 0
+var setupWaitStart = 0
 var bookingWaitTicks = 0
 var subteam = null
 
@@ -1026,6 +1027,7 @@ func checkReady():
 		wait = 7.0
 		
 	if Global.teamsReady[0] and Global.teamsReady[1]:
+		setupWaitStart = 0
 		halftime = false
 		yield(get_tree().create_timer(wait), "timeout")
 		
@@ -1046,6 +1048,10 @@ func checkReady():
 			$Timers / Timer.wait_time = 0.5
 			$Timers / Timer.start()
 	else:
+		# Safety net: never wait forever for a player who can't reach his spot.
+		if _setupStuck(8000):
+			Global.teamsReady[0] = true
+			Global.teamsReady[1] = true
 		$Timers / Timer.start()
 		
 func restartPen():
@@ -1254,6 +1260,7 @@ func penSetup():
 		hud._pressToRestartPen()
 	replayCam.current = true
 	if Global.teamsReady[0] and Global.teamsReady[1]:
+		setupWaitStart = 0
 		
 		$Sounds / WhistleSounds.play()
 		if fkai:
@@ -1266,6 +1273,10 @@ func penSetup():
 		$Timers / Timer.start()
 		penTarget.visible = true
 	else:
+		# Safety net: never wait forever for a player who can't reach his spot.
+		if _setupStuck(8000):
+			Global.teamsReady[0] = true
+			Global.teamsReady[1] = true
 		$Timers / Timer.start()
 
 func fkSetup():
@@ -1336,8 +1347,7 @@ func throwSetup():
 	
 	
 	if kickTaker.AI.state == kickTaker.AI.pstate.HOLDING:
-		
-		
+		setupWaitStart = 0
 		yield(get_tree().create_timer(0.5), "timeout")
 		if fkai:
 			kickTaker.myTeam._activateThrow(kickTaker)
@@ -1352,14 +1362,20 @@ func throwSetup():
 			$Timers / Timer.wait_time = 0.1
 			$Timers / Timer.start()
 	elif kickTaker.AI.state == kickTaker.AI.pstate.IDLE:
-		
 		kickTaker.AI._takeThrow(resetPos)
+		if _setupStuck(6000):
+			kickTaker.AI._forcePickup(resetPos)
 		$Timers / Timer.wait_time = 0.5
-	
 		$Timers / Timer.start()
 	else:
+		# The thrower's PICKUP order is dropped while he is mid-slide/getting up
+		# (AI.changeState ignores non-moving states) and he then returns to his old
+		# state, so this used to wait forever. Re-issue it; after ~6 s hand him the ball.
+		if _setupStuck(6000):
+			kickTaker.AI._forcePickup(resetPos)
+		elif kickTaker.AI.state != kickTaker.AI.pstate.PICKUP and kickTaker.AI._moving():
+			kickTaker.AI._takeThrow(resetPos)
 		$Timers / Timer.wait_time = 0.5
-	
 		$Timers / Timer.start()
 func goalkickSetup():
 	
@@ -1369,6 +1385,7 @@ func goalkickSetup():
 	
 	
 	if Global.teamsReady[0] and Global.teamsReady[1]:
+		setupWaitStart = 0
 		
 		ball.oob = false
 		$Sounds / WhistleSounds.play()
@@ -1386,6 +1403,10 @@ func goalkickSetup():
 			$Timers / Timer.start()
 			
 	else:
+		# Safety net: never wait forever for a player who can't reach his spot.
+		if _setupStuck(8000):
+			Global.teamsReady[0] = true
+			Global.teamsReady[1] = true
 		$Timers / Timer.wait_time = 0.25
 	
 		$Timers / Timer.start()
@@ -1396,6 +1417,7 @@ func cornerSetup():
 	
 	
 	if Global.teamsReady[0] and Global.teamsReady[1]:
+		setupWaitStart = 0
 		
 		
 		$Sounds / WhistleSounds.play()
@@ -1413,6 +1435,10 @@ func cornerSetup():
 			$Timers / Timer.start()
 			
 	else:
+		# Safety net: never wait forever for a player who can't reach his spot.
+		if _setupStuck(8000):
+			Global.teamsReady[0] = true
+			Global.teamsReady[1] = true
 		$Timers / Timer.wait_time = 1
 	
 		$Timers / Timer.start()
@@ -2386,3 +2412,14 @@ func _shushCrowd():
 
 func _exit_tree():
 	Global.exitFullWindow(self)
+
+# True once a set-piece setup has been waiting longer than limit_ms (then resets).
+func _setupStuck(limit_ms):
+	var now = OS.get_ticks_msec()
+	if setupWaitStart == 0:
+		setupWaitStart = now
+		return false
+	if now - setupWaitStart > limit_ms:
+		setupWaitStart = 0
+		return true
+	return false

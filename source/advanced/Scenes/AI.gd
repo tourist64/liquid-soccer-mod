@@ -2008,3 +2008,19 @@ func _idle():
 	else:
 		astate = "idle"
 		myPlayer.myAState.travel("idle")
+
+# Used by Game.throwSetup when the thrower never reaches the ball: put him on the
+# spot holding it, exactly as pickupState does when he arrives.
+func _forcePickup(ppos):
+	var inward = Vector3(0, 0, - sign(ppos.z)) * 1.5
+	myPlayer.translation = Vector3(ppos.x, myPlayer.translation.y, ppos.z) + inward
+	myPlayer.velocity = Vector3.ZERO
+	myPlayer.acc = Vector3.ZERO
+	movin = false
+	myPlayer.ball._initialize()
+	myPlayer.myAState.travel("pickup")
+	astate = "pickup"
+	state = pstate.HOLDING
+	target = ppos
+	atarget = myPlayer.ball.translation
+	slidevel = pos.normalized()
