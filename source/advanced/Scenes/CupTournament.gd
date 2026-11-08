@@ -3,6 +3,10 @@ extends Node
 
 
 var cup
+# Single-leg cup: Game/Hud/CupViewer read these on every tournament type, and a
+# missing property errors out of _halfOver, freezing the match at full time.
+var leg = 0
+var aggscore = Vector2.ZERO
 
 var pteam
 

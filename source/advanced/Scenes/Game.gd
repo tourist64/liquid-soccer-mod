@@ -1655,7 +1655,9 @@ func _halfOver():
 			score.y += Global.tournament.aggscore.x
 
 		
-		if score.x != score.y or not Global.doShootout or Global.tournament.leg == 1:
+		# No tournament (e.g. a friendly after a cup set doShootout) means no shootout;
+		# reading .leg on null here used to freeze the game at full time.
+		if score.x != score.y or not Global.doShootout or Global.tournament == null or Global.tournament.leg == 1:
 			
 			_gameOver()
 			ball._initialize()

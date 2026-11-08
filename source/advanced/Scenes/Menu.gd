@@ -41,6 +41,7 @@ func _ready():
 	if Global.tournament:
 		Global.tournament.queue_free()
 		Global.tournament = null
+	Global.doShootout = false
 	
 	
 	setStats()
