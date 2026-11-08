@@ -13,6 +13,7 @@ var pShoot = 0.75
 var pCurl = 0.75
 var pLongShot = 0.0
 var pPressRes = 0.0
+var pBallWin = 0.0
 var pStrength = 0.5
 var pBlock = 0.0
 var pAerial = 0.5
@@ -200,6 +201,7 @@ func passBall( var dir):
 
 func _clearBall():
 	ball._passBall(Vector3(myTeam.playDir * 3.0, 1.0, rand_range( - 0.5, 0.5)) * 5.0, self)
+	ball.passGuard = false
 	
 	myTeam.posession = false
 	AI._losePosession()
@@ -962,11 +964,7 @@ func _on_TrapArea_body_entered(body):
 				emit_signal("posession", myID)
 		elif ball._isTrapped() and myTeam.opponent.posession:
 			
-			var r = rand_range(0.0, 9.0)
-			var pressRes = ball.player.get("pPressRes")
-			var holderStr = ball.player.get("pStrength")
-			var duel = ((holderStr - pStrength) * 4.0) if (Global.elevenMode and holderStr != null) else 0.0
-			if r > ball.player.pAgility + (pressRes if pressRes else 0.0) * 2.0 + duel:
+			if rand_range(0.0, TACKLE_ROLL) > _holdScore(ball.player):
 				if ball.player.has_method("_push"):
 					ball.player._push(velocity)
 				ball._tapBall((Vector3(0, 0.5, 0) + ( - transform.basis.z + rand_range( - 0.5, 0.5) * transform.basis.x)) * 30, self)
@@ -1000,7 +998,7 @@ func _on_TrapArea_body_entered(body):
 					# Only other footballers can be fouled (anything else would crash the engine).
 					if b == myCollider or b.get_parent() == null or b.get_parent().get("myTeam") == null or b.get_parent().get("AI") == null:
 						continue
-					if b.get_parent().myTeam.teamID != myTeam.teamID and not ball._isShooting():
+					if b.get_parent().myTeam.teamID != myTeam.teamID and not ball._isShooting() and randf() >= pBallWin * 0.7:
 						fouled = true
 						b.get_parent().AI._fouled()
 			
@@ -1011,7 +1009,7 @@ func _on_TrapArea_body_entered(body):
 					if b != ball:
 						if b != myCollider and b.get_parent() != null and b.get_parent().get("AI") != null and b.get_parent().AI._hasBall():
 							var slideRes = b.get_parent().get("pPressRes")
-							if slideRes and randf() < slideRes * 0.9:
+							if slideRes and randf() < slideRes * 0.85 * (1.0 - pBallWin * 0.25):
 								continue
 							b.get_parent().AI._tackled()
 							
@@ -1026,6 +1024,24 @@ func _on_TrapArea_body_entered(body):
 				
 				
 
+
+# How well the man on the ball keeps it from this challenge, out of TACKLE_ROLL.
+const TACKLE_ROLL = 9.0
+const BALL_WIN_BONUS = 2.0
+
+func _holdScore(holder):
+	var hold = holder.pAgility
+	if not Global.elevenMode:
+		return hold
+	var res = holder.get("pPressRes")
+	res = res if res else 0.0
+	var holderStr = holder.get("pStrength")
+	hold += res * 2.0
+	if holderStr != null:
+		hold += (holderStr - pStrength) * 4.0
+	# Nobody is untackleable: press resistance only lowers the chance to about one in eight.
+	var chance = lerp(0.25, 0.12, res)
+	return min(hold, TACKLE_ROLL * (1.0 - chance)) - pBallWin * BALL_WIN_BONUS
 
 func _on_HeadArea_body_entered(_body):
 	if (_body != ball) or ( not Global.gameOn) or not ball._isFree() or not canHead:
@@ -1153,16 +1169,20 @@ func _push( var v):
 func _loftFlightTime(distance):
 	# Short and medium lobs fly lower and quicker; long ones keep their full flight.
 	var quicker = lerp(0.93, 1.0, smoothstep(130.0, 200.0, distance))
-	return clamp((0.95 + distance / 95.0) / 1.07 * quicker, 0.95, 3.0)
+	var flight = clamp((0.95 + distance / 95.0) / 1.07 * quicker, 0.95, 3.0)
+	# The longest balls hang a little longer rather than leaving the boot too fast.
+	return clamp(max(flight, distance / 80.0), 0.95, 3.9)
 
-func _loftAt(target):
+func _loftAt(target, mate = null):
 	var skill = clamp(pCurl * 0.6 + pShoot * 0.4, 0.0, 1.0)
 	var miss = lerp(8.0, 1.2, skill)
 	var offset = target - translation
 	offset.y = 0.0
 	offset += Vector3(rand_range( - miss, miss), 0.0, rand_range( - miss, miss))
+	offset = myTeam._safePassSpot(translation + offset, mate) - translation
+	offset.y = 0.0
 	var hang = _loftFlightTime(offset.length())
-	ball._loftBall(ball._loftVelocity(offset, hang), self)
+	ball._loftBall(ball._lobVelocity(offset, hang), self)
 	return offset
 
 # Where a lob should come down: at a stationary receiver's feet, or short of a runner so it
@@ -1184,14 +1204,17 @@ func _lobLanding(mate):
 	# Near a touchline or byline, always bounce it in so it can't run out of play.
 	var lineGap = min(140.0 * Global.ps - abs(spot.x), 90.0 * Global.ps - abs(spot.z))
 	var nearLine = 1.0 - smoothstep(6.0, 30.0, lineGap)
+	# A receiver already out on the line gets it just in front of him.
+	var mateGap = min(140.0 * Global.ps - abs(mate.translation.x), 90.0 * Global.ps - abs(mate.translation.z))
+	if mateGap < myTeam.PASS_LINE_MARGIN:
+		nearLine = 0.0
+		short = max(short, 8.0)
 	short = max(short, nearLine * clamp(distance * 0.23, 12.0, 95.0))
 	var land = spot - flat / distance * short
-	land.x = clamp(land.x, - 128.0 * Global.ps, 128.0 * Global.ps)
-	land.z = clamp(land.z, - 82.0 * Global.ps, 82.0 * Global.ps)
-	return land
+	return myTeam._safePassSpot(land, mate)
 
 func _lobTo(mate):
-	return _loftAt(_lobLanding(mate))
+	return _loftAt(_lobLanding(mate), mate)
 
 # Long ball to a teammate, sent wherever he can actually reach it.
 func chipTo(mate):

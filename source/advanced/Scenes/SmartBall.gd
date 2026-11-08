@@ -10,6 +10,17 @@ var drag = Vector3.ZERO
 var Game = null
 var oob = false
 var oobpos = Vector3.ZERO
+# 11v11: a pass nobody has touched yet dies on the grass instead of running out of play.
+var passGuard = false
+const LINE_BRAKE_LOOK = 0.6
+const LINE_STOP_GAP = 3.0
+# Lobs keep their pace in the air, so long ones needn't be struck absurdly hard, and check up on landing.
+var loftFlight = false
+const LOB_AIR_DAMP = 0.05
+const LOB_DRAG_CANCEL = 0.25
+const LOB_LANDS_AT = 0.87
+const LOB_LANDING_KEEP = 0.75
+const LOB_LANDING_BOUNCE = 0.4
 var trail = null
 var minPassSpeed = 80
 var maxPassSpeed = 100
@@ -148,9 +159,46 @@ func _integrate_forces(pstate):
 		
 	elif state == bstate.SHOOTING:
 		pstate.linear_velocity *= drag
+	elif passGuard and state == bstate.OPEN and Global.gameOn:
+		if loftFlight:
+			_carryLob(pstate)
+		_brakeAtLines(pstate)
 		
 	pstate.transform.origin.y = max(0.0, pstate.transform.origin.y)
+func _lineBrake(along, speed, line, step):
+	var outward = speed * sign(along)
+	var gap = line - abs(along) - LINE_STOP_GAP
+	if outward <= 0.0 or gap > outward * LINE_BRAKE_LOOK:
+		return speed
+	if gap <= 0.0:
+		return 0.0
+	return speed * max(0.0, 1.0 - outward / (2.0 * gap) * step)
+
+func _carryLob(pstate):
+	var v = pstate.linear_velocity
+	var keep = exp(LOB_DRAG_CANCEL * pstate.step)
+	if translation.y < 1.0 and v.y < 0.0:
+		keep = LOB_LANDING_KEEP
+		v.y *= LOB_LANDING_BOUNCE
+		loftFlight = false
+	pstate.linear_velocity = Vector3(v.x * keep, v.y, v.z * keep)
+
+func _brakeAtLines(pstate):
+	if loftFlight:
+		return
+	var v = pstate.linear_velocity
+	var before = Vector2(v.x, v.z).length()
+	# Leave the goal mouth alone so a pass can still roll into an empty net.
+	if abs(translation.z) > abs(Game.team1.goalL.z) + 3.0:
+		v.x = _lineBrake(translation.x, v.x, 140.0 * Global.ps, pstate.step)
+	v.z = _lineBrake(translation.z, v.z, 90.0 * Global.ps, pstate.step)
+	var after = Vector2(v.x, v.z).length()
+	if after < before:
+		pstate.linear_velocity = v
+		pstate.angular_velocity *= after / before
+
 func _ballTrapped( var cplayer):
+	passGuard = false
 	if _callOffside(cplayer):
 		return
 	offsideFlags.clear()
@@ -164,6 +212,7 @@ func _ballTrapped( var cplayer):
 		linear_velocity = player.velocity * 2.0
 		
 func _ballFree():
+	passGuard = false
 	
 	
 	
@@ -172,6 +221,7 @@ func _ballFree():
 	isShot = false
 		
 func _ballCaught( var cplayer):
+	passGuard = false
 	
 	if not canSave:
 		return false
@@ -189,6 +239,7 @@ func _ballCaught( var cplayer):
 	
 
 func _shootBall( var shootr, var direction, var curldirection):
+	passGuard = false
 	if state == bstate.CAUGHT or _callOffside(shootr):
 		return
 	_recordOffside(shootr)
@@ -238,9 +289,12 @@ func _passBall( var direction, var passer):
 	isShot = false
 	$BallPassed.play()
 	apply_central_impulse(dr * (ddl / dl) + Vector3(0, 5, 0))
+	passGuard = Global.elevenMode
+	loftFlight = false
 	
 	
 func _crossBall( var direction, var passer, var curld, var islow):
+	passGuard = false
 	if _callOffside(passer):
 		return
 	_recordOffside(passer)
@@ -275,6 +329,7 @@ func _crossBall( var direction, var passer, var curld, var islow):
 
 
 func _tapBall( var direction, var passer):
+	passGuard = false
 	if _callOffside(passer):
 		return
 	_recordOffside(passer)
@@ -308,6 +363,8 @@ func _loftBall( var flight, var passer):
 	isShot = false
 	$BallPassed.play()
 	apply_central_impulse(flight)
+	passGuard = Global.elevenMode
+	loftFlight = Global.elevenMode
 
 func _reset():
 	
@@ -370,6 +427,9 @@ func _canHead():
 	return state == bstate.OPEN or state == bstate.CROSSING
 	
 func _on_Ball_body_entered(body):
+	# A deflection off anyone but the passer is a new ball: it can go out like any other.
+	if passGuard and body.get_collision_layer_bit(7) and body.get_parent() != shooter:
+		passGuard = false
 	if (state == bstate.SHOOTING):
 		
 		
@@ -458,6 +518,13 @@ const CROSS_CURL = 0.4
 const LOW_CROSS_MIN = 90.0
 const LOW_CROSS_MAX = 112.0
 
+func _lobVelocity(offset, hang):
+	var airborne = hang * LOB_LANDS_AT
+	var damped = LOB_AIR_DAMP * airborne
+	var flight = Vector3(offset.x, 0.0, offset.z) / airborne * (damped / (1.0 - exp( - damped)))
+	flight.y = 0.5 * 20.0 * gravity_scale * hang
+	return flight
+
 func _loftVelocity(offset, hang):
 	var damped = LOFT_DAMP * hang
 	var flight = Vector3(offset.x, 0.0, offset.z) / hang * (damped / (1.0 - exp( - damped)))
@@ -467,7 +534,7 @@ func _loftVelocity(offset, hang):
 func _crossVelocity(direction, islow):
 	var flat = Vector3(direction.x, 0.0, direction.z)
 	# A little quicker than a lob over the same distance.
-	var hang = clamp((0.95 + flat.length() / 95.0) * 0.88 / 1.05, 1.15, 2.6)
+	var hang = clamp(0.95 + flat.length() / 95.0, 1.4, 2.9)
 	if islow:
 		# Driven along the ground: quicker than a through ball, well below shot pace.
 		return flat.normalized() * clamp(flat.length() * 1.2, LOW_CROSS_MIN, LOW_CROSS_MAX) + Vector3(0, 6.0, 0)

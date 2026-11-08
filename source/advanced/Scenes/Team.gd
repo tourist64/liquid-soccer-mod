@@ -207,6 +207,9 @@ func setPlayerParams( var p, var i):
 		p.myHeadArea.scale = Vector3.ONE * lerp(0.8, 1.3, pp.get("aerial", 5.0) * 0.1)
 	p.set("pLongShot", pp.get("longShot", 0.0))
 	p.set("pPressRes", pp.get("pressRes", 0.0))
+	p.set("pBallWin", pp.get("ballWin", 0.0))
+	if Global.elevenMode and p.get("myTrapArea") != null:
+		p.myTrapArea.scale = Vector3.ONE * lerp(1.0, 1.4, pp.get("ballWin", 0.0))
 	cpdata = pp
 	
 	if i == 0:
@@ -468,6 +471,22 @@ func _passTo( var p):
 	if p:
 		passto = p
 	
+# Passes stay this far inside the lines, unless the receiver is already out there.
+const PASS_LINE_MARGIN = 22.0
+const PASS_LINE_CLOSEST = 5.0
+
+func _safePassSpot(spot, mate):
+	var lineX = 140.0 * Global.ps
+	var lineZ = 90.0 * Global.ps
+	var limitX = lineX - PASS_LINE_MARGIN
+	var limitZ = lineZ - PASS_LINE_MARGIN
+	if mate != null:
+		limitX = max(limitX, min(abs(mate.translation.x), lineX - PASS_LINE_CLOSEST))
+		limitZ = max(limitZ, min(abs(mate.translation.z), lineZ - PASS_LINE_CLOSEST))
+	spot.x = clamp(spot.x, - limitX, limitX)
+	spot.z = clamp(spot.z, - limitZ, limitZ)
+	return spot
+
 func _findPass(pos, lookD, id):
 	var diff
 	var candidate = null
@@ -502,6 +521,8 @@ func _findPass(pos, lookD, id):
 	if (candidate):
 		
 		passDir = res
+		if Global.elevenMode:
+			passDir = _safePassSpot(Global.ballpos + res, candidate) - Global.ballpos
 		
 		passDir.y = 0
 		
@@ -551,6 +572,8 @@ func _findThruPass(pos, lookD, _id):
 		
 		var passPos = candidate.translation - goal
 		passPos = candidate.translation - passPos * 0.2
+		if Global.elevenMode:
+			passPos = _safePassSpot(passPos, candidate)
 		passDir = passPos - Global.ballpos
 		
 		
@@ -632,6 +655,8 @@ func _findLongPass(pos, lookD, _id):
 		opponent.pressTarget(candidate, true)
 		passto = candidate
 		passDir = res
+		if Global.elevenMode:
+			passDir = _safePassSpot(pos + res, candidate) - pos
 	return dopass
 
 

@@ -545,7 +545,45 @@ func pcollectState():
 
 
 
+# The earliest point on an opponent's low pass that this player can get to first.
+func _laneSpot():
+	var ball = myPlayer.ball
+	if ball.state != ball.bstate.OPEN or ball.isShot or Global.ballpos.y > 3.0:
+		return null
+	var kicker = ball.shooter
+	if kicker == null or kicker.get("myTeam") == myTeam:
+		return null
+	var flight = Vector3(Global.ballvel.x, 0.0, Global.ballvel.z)
+	if flight.length() < 35.0:
+		return null
+	var at = 0.1
+	while at <= 0.9:
+		var spot = Global.ballpos + flight * at
+		spot.y = myPlayer.translation.y
+		if (spot - myPlayer.translation).length() - 2.5 <= myPlayer.pBurst * at * 0.9:
+			return spot
+		at += 0.1
+	return null
+
+func _readPassingLane():
+	if not myPlayer.isAI or myTeam.posession:
+		return
+	if state != pstate.DEFEND and state != pstate.MARK and state != pstate.PRESS and state != pstate.SUPPORT and state != pstate.PLAYING:
+		return
+	if _laneSpot() != null:
+		longpass = false
+		changeState(pstate.INTERCEPT)
+
 func interceptState():
+	var lane = _laneSpot() if (Global.elevenMode and myPlayer.pBallWin > 0.0) else null
+	if lane != null:
+		var _close = seek(lane)
+		atarget = lane
+		view = lane
+		if myPlayer.pSpeed <= myPlayer.pOSpeed:
+			myPlayer._burst()
+			myPlayer.myfx.emitting = Global.doParticles
+		return
 	if longpass:
 		var lookahead = 0.1
 		if Global.ballpos.y > 3:
@@ -988,6 +1026,8 @@ func _thruPass( var D):
 func _thruPassAI( var _D, var candidate):
 	var passPos = candidate.translation - myGoal
 	passPos = candidate.translation - (passPos * 0.3)
+	if Global.elevenMode:
+		passPos = myTeam._safePassSpot(passPos, candidate)
 	var pd = passPos - Global.ballpos
 	if rand_range(0, 1) > myPlayer.pAgility:
 		pd.y += 6
@@ -1268,6 +1308,8 @@ func findPass():
 				
 				else:
 					pd = (bestplayer.translation + bestplayer.velocity * bestplayer.dSmart + (myGoal - bestplayer.translation) * 0.05) - pos
+					if Global.elevenMode:
+						pd = myTeam._safePassSpot(pos + pd, bestplayer) - pos
 		
 			
 					myPlayer.passBall(pd * 0.8)
@@ -1743,6 +1785,8 @@ func _setData():
 	
 func _update():
 	atarget = target
+	if Global.elevenMode and myPlayer.pBallWin > 0.0:
+		_readPassingLane()
 	stateFunc[state].call_func()
 	vel += aavoid
 	_setData()
