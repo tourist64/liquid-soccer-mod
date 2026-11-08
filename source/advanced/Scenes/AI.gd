@@ -125,6 +125,9 @@ func _quadratic_bezier(p0: Vector3, p1: Vector3, p2: Vector3, t: float):
 
 func seek( var t):
 	
+	# Players holding position stay onside; runs onto a pass use other states.
+	if Global.elevenMode and (state == pstate.PLAYING or state == pstate.SUPPORT):
+		t = myTeam._keepOnside(t, myPlayer.myID)
 	var diff = (t - pos)
 
 	var dl = diff.length()

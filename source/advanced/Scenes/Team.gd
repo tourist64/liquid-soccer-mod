@@ -888,6 +888,9 @@ func _getGoalKickPos( var pid):
 
 
 func _getPlayPos(pid):
+	return _keepOnside(_getPlayPosRaw(pid), pid)
+
+func _getPlayPosRaw(pid):
 	if Global.elevenMode:
 		var boxRun = _boxRun(pid)
 		if boxRun != null:
@@ -919,6 +922,9 @@ func _getPlayPos(pid):
 		return pp1
 
 func _getSupportPos(pid):
+	return _keepOnside(_getSupportPosRaw(pid), pid)
+
+func _getSupportPosRaw(pid):
 	if Global.elevenMode:
 		var boxRun = _boxRun(pid)
 		if boxRun != null:
@@ -1926,3 +1932,31 @@ func _crossTarget(crosser):
 		return null
 	var miss = lerp(9.0, 2.5, max(tdata.crossing, tdata.setPieces))
 	return best.translation + Vector3(rand_range( - miss, miss), 0.0, rand_range( - miss, miss))
+
+# --- 11v11 offside --------------------------------------------------------------------
+# Supporting attackers stay level with the second-last opponent, or the ball if it is further
+# forward. Runs onto a pass use their own states, so through balls can still beat the line.
+const ONSIDE_MARGIN = 2.0
+
+var onsideFrame = - 1
+var onsideLine = 0.0
+
+func _onsideLine():
+	var frame = Engine.get_idle_frames()
+	if frame != onsideFrame:
+		onsideFrame = frame
+		var depths = []
+		for o in opponent.players:
+			depths.append(o.translation.x * playDir)
+		depths.sort()
+		var secondLast = depths[depths.size() - 2]
+		onsideLine = max(max(secondLast, Global.ballpos.x * playDir), 0.0)
+	return onsideLine
+
+func _keepOnside(p, pid):
+	if not (Global.elevenMode and Global.gameOn and posession) or players[pid] == pplayer:
+		return p
+	var limit = _onsideLine() - ONSIDE_MARGIN
+	if p.x * playDir > limit:
+		p = Vector3(limit * playDir, p.y, p.z)
+	return p
