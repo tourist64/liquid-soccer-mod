@@ -522,6 +522,9 @@ func incomingState():
 	
 	
 	
+	if Global.elevenMode and not pen:
+		_rollSave(R)
+	
 	if dz > 5.0:
 		divedir = sign(dp)
 		
@@ -818,6 +821,8 @@ func _shotIncoming( var A, var shotV, var _curl, var stype):
 func longshotCalcTarget():
 		yield(get_tree().create_timer(0.1), "timeout")
 		longTarget = intersectShot(Global.ballvel)
+		if Global.elevenMode and not pen:
+			_rollSave(shotDir)
 		
 		
 		
@@ -1212,7 +1217,7 @@ func _forcePickup(_ppos):
 
 # --- 11v11 saves ----------------------------------------------------------------------
 # Times the dive to arrive with the ball, limited by how fast this keeper can cover ground,
-# with an occasional mistimed dive so good shots still beat him.
+# and falls short when _rollSave has decided the shot beats him.
 func _elevenDive(intP, shotVel):
 	var ballSpeed = max(shotVel.length(), 1.0)
 	var arrive = max((Global.ballpos - pos).length() / ballSpeed, 0.14)
@@ -1221,6 +1226,25 @@ func _elevenDive(intP, shotVel):
 	var agile = clamp(myPlayer.pAgility / 8.0, 0.0, 1.25)
 	var flat = Vector3(dive.x, 0.0, dive.z).limit_length(lerp(34.0, 52.0, min(agile, 1.0)))
 	var result = Vector3(flat.x, dive.y, flat.z)
-	if randf() > lerp(0.55, 0.9, min(agile, 1.0)):
-		result *= rand_range(0.55, 0.8)
+	if not myPlayer.canSave:
+		result *= rand_range(0.4, 0.75)
 	return result
+
+# Decides whether this shot beats the keeper, from how good the shot is and how good he is.
+func _rollSave(shotVel):
+	var agile = clamp(myPlayer.pAgility / 8.0, 0.0, 1.0)
+	var chance = lerp(0.92, 0.28, _shotQuality(shotVel)) * lerp(0.82, 1.0, agile)
+	if randf() > chance:
+		myPlayer.canSave = false
+
+# 0 = soft and central, 1 = hit hard into the corner by a top finisher.
+func _shotQuality(shotVel):
+	var halfWidth = max(abs(myTeam.goalL.z), 1.0)
+	var toLine = myTeam.dGoal.x - Global.ballpos.x
+	var t = abs(toLine / shotVel.x) if abs(shotVel.x) > 1.0 else 0.0
+	var corner = smoothstep(0.5, 1.0, abs(Global.ballpos.z + shotVel.z * t) / halfWidth)
+	var high = smoothstep(4.0, 7.5, Global.ballpos.y + shotVel.y * t)
+	var placement = max(corner, high * 0.8) + corner * high * 0.2
+	var power = smoothstep(105.0, 150.0, shotVel.length())
+	var finish = myPlayer.ball.shooter.pShoot if myPlayer.ball.shooter else 0.5
+	return clamp(placement * 0.6 + power * 0.3 * (0.5 + 0.5 * placement) + finish * 0.1 * placement, 0.0, 1.0)
