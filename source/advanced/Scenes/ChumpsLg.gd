@@ -6,7 +6,7 @@ extends Node
 
 var gq1 = ["Bayern Munch", "FC Copenhagen", "Galatasaray", "Money Utd"]
 var gq2 = ["Royal Ars", "PSV Eindhoven ", "RC Lens", "Sevilla"]
-var gq3 = ["Royal Mudrid", "Napoli", "SC Braga", "Union Berlin"]
+var gq3 = ["Dream Team", "Napoli", "SC Braga", "Union Berlin"]
 var gq4 = ["Royal Sociedad", "Inter Milano", "Benfico", "RB Salzburg"]
 var gq5 = ["Athletic Mads", "Lazio", "Feyenoord", "Queens Celtic"]
 var gq6 = ["B Dortmund", "PSG", "AC Milano", "Toon Utd"]
