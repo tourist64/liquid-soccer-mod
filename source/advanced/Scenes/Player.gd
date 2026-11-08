@@ -14,10 +14,8 @@ var pCurl = 0.75
 var pLongShot = 0.0
 var pPressRes = 0.0
 var pStrength = 0.5
+var pBlock = 0.0
 var pAerial = 0.5
-var switchArmed = false
-var switchLockDir = Vector2.ZERO
-var switchLockTime = 0.0
 var pAcc = 3
 var pBurst = 44
 var dBurst = 44
@@ -288,7 +286,10 @@ func chipPass( var human):
 			
 			var h = 0.4 + smoothstep(0, 100, myTeam.passDir.length())
 			
-			ball._passBall((myTeam.passDir + Vector3(0, h * 30.0, 0)) * 0.8, self)
+			if Global.elevenMode:
+				_loftAt(translation + Vector3(myTeam.passDir.x, 0.0, myTeam.passDir.z))
+			else:
+				ball._passBall((myTeam.passDir + Vector3(0, h * 30.0, 0)) * 0.8, self)
 			
 			myTeam.momentum = true
 			myTeam.opponent.momentum = false
@@ -450,19 +451,16 @@ func checkInput():
 		if mov.length_squared() > 1:
 			mov = mov.normalized()
 			
-		if Global.elevenMode:
-			mov = _elevenInput(mov)
-
 		if (abs(mov.x) > 0 or abs(mov.y) > 0) and Global.gameOn and assist:
 		
 		
 			if not myTeam.posession and (Global.moveAssist == 2 or Input.is_action_pressed(cpass)):
 					
-				var db = _assistTarget() - translation
+				var db = (Global.ballpos + Global.ballvel * 0.16) - translation
 				db = db.normalized()
 				var df = db.dot(Vector3(mov.x, 0.0, mov.y))
 				
-				if df > (0.3 if Global.elevenMode else acomp):
+				if df > acomp:
 					mov = Vector2(db.x, db.z)
 		
 		
@@ -1145,38 +1143,32 @@ func _push( var v):
 		pushforce += sign(v.dot(transform.basis.x)) * transform.basis.x * rand_range(350, 450) * knock
 		Global.game._oof()
 
-# --- 11v11 input ----------------------------------------------------------------------
-const SWITCH_LOCK_SECONDS = 0.9
+# --- 11v11 long passing ---------------------------------------------------------------
+# Lofts the ball on the flight that lands it at the target, with error set by the passer.
+# Air damping measured on the real ball; the launch speed is raised to cancel it.
+const LOFT_DAMP = 0.39
 
-# Where move assist should steer: the point the player can actually meet the ball.
-func _assistTarget():
-	if not Global.elevenMode:
-		return Global.ballpos + Global.ballvel * 0.16
-	var t = 0.0
-	for _i in range(3):
-		var meet = Global.ballpos + Global.ballvel * t - translation
-		t = clamp(meet.length() / max(pSpeed, 1.0), 0.0, 1.2)
-	return Global.ballpos + Global.ballvel * t
+func _loftFlightTime(distance):
+	return clamp(0.55 + distance / 170.0, 0.75, 1.8)
 
-# Screen-relative input, plus the control-switch lock: if control jumps to a teammate while
-# the held direction points away from the ball, keep him running at the ball until that
-# input changes. Otherwise the same key would carry him the wrong way.
-func _elevenInput(mov):
-	var cam = Global.game.mainCam if Global.game else null
-	if cam and cam.has_method("_isElevenView") and cam._isElevenView() and cam._elevenView() == 0:
-		var f = - cam.global_transform.basis.z
-		var yaw = atan2( - f.x, - f.z)
-		mov = Vector2(mov.x * cos(yaw) + mov.y * sin(yaw), - mov.x * sin(yaw) + mov.y * cos(yaw))
-	var toBall = Vector2(Global.ballpos.x - translation.x, Global.ballpos.z - translation.z).normalized()
-	if switchArmed:
-		switchArmed = false
-		if mov.length_squared() > 0.04 and not myTeam.posession and toBall.dot(mov.normalized()) < 0.2:
-			switchLockDir = mov.normalized()
-			switchLockTime = SWITCH_LOCK_SECONDS
-	if switchLockTime > 0.0:
-		switchLockTime -= get_process_delta_time()
-		if myTeam.posession or mov.length_squared() < 0.04 or mov.normalized().dot(switchLockDir) < 0.8:
-			switchLockTime = 0.0
-		else:
-			mov = toBall
-	return mov
+func _loftAt(target):
+	var skill = clamp(pCurl * 0.6 + pShoot * 0.4, 0.0, 1.0)
+	var miss = lerp(8.0, 1.2, skill)
+	var offset = target - translation
+	offset.y = 0.0
+	offset += Vector3(rand_range( - miss, miss), 0.0, rand_range( - miss, miss))
+	var hang = _loftFlightTime(offset.length())
+	var damped = LOFT_DAMP * hang
+	var flight = offset / hang * (damped / (1.0 - exp( - damped)))
+	flight.y = 0.5 * 20.0 * ball.gravity_scale * hang
+	ball._loftBall(flight, self)
+	return offset
+
+# Long ball to a teammate, led to where he will be when it lands.
+func chipTo(mate):
+	var hang = _loftFlightTime((mate.translation - translation).length())
+	var offset = _loftAt(mate.translation + mate.velocity * hang)
+	myTeam._cross(self)
+	myTeam.posession = false
+	AI._losePosession()
+	return offset

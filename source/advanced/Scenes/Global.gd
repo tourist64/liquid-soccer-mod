@@ -800,7 +800,7 @@ func exitFullWindow(scene):
 
 # --- 11v11 mode -------------------------------------------------------------------
 # squad = players on the pitch per team (keeper included); ps = pitch scale.
-const ELEVEN_PITCH_SCALE = 1.0
+const ELEVEN_PITCH_SCALE = 1.2
 # 11v11 uses the standard camera options; true restores the tele broadcast, co-op and classic views.
 const ELEVEN_CUSTOM_CAMERAS = false
 # 11v11 uses the standard ball, stadium and scoreboard; true restores the custom versions.

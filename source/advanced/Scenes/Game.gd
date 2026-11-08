@@ -176,7 +176,7 @@ func initStadium():
 		$VPC / VP / GameGroup / Goal.translation.x *= Global.ps
 		$VPC / VP / GameGroup / Goal2.translation.x *= Global.ps
 		# The goal model is 9.7 m x 3.2 m at this pitch scale; bring it to a real 7.32 m x 2.44 m.
-		if Global.ps > 1.0:
+		if Global.ELEVEN_CUSTOM_PRESENTATION:
 			$VPC / VP / GameGroup / Goal.scale = ELEVEN_GOAL_SCALE
 			$VPC / VP / GameGroup / Goal2.scale = ELEVEN_GOAL_SCALE
 		$Zones.scale *= Vector3(Global.ps, 1.0, Global.ps)

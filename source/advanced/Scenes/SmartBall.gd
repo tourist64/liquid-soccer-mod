@@ -51,11 +51,6 @@ func _initialize():
 	
 	
 func _physics_process(delta):
-	if Global.elevenMode and translation.y < - 3.0:
-		# Never let the ball stay lost under the pitch.
-		translation.y = 2.0
-		linear_velocity = Vector3.ZERO
-		angular_velocity = Vector3.ZERO
 	
 	
 	sa.global_transform.origin = global_transform.origin + linear_velocity * delta * 1.2
@@ -276,6 +271,17 @@ func _tapBall( var direction, var passer):
 	
 	apply_central_impulse(direction)
 	
+func _loftBall( var flight, var passer):
+	oob = false
+	linear_velocity = Vector3.ZERO
+	state = bstate.OPEN
+	shooter = passer
+	lastPlayer = null
+	player = null
+	isShot = false
+	$BallPassed.play()
+	apply_central_impulse(flight)
+
 func _reset():
 	
 	visible = true

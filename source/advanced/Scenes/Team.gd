@@ -202,6 +202,7 @@ func setPlayerParams( var p, var i):
 	p.pCurl = pp["curl"] * 0.1
 	p.set("pStrength", pp.get("strength", 5.0) * 0.1)
 	p.set("pAerial", pp.get("aerial", 5.0) * 0.1)
+	p.set("pBlock", pp.get("block", 0.0))
 	if Global.elevenMode and p.get("myHeadArea") != null:
 		p.myHeadArea.scale = Vector3.ONE * lerp(0.8, 1.3, pp.get("aerial", 5.0) * 0.1)
 	p.set("pLongShot", pp.get("longShot", 0.0))
@@ -1130,8 +1131,6 @@ func _switchPControl( var p):
 	if not Global.gameOn:
 		return
 	
-	if p != cplayer:
-		p.set("switchArmed", true)
 	cplayer = p
 	closest = p
 	cplayer._controlMe()
@@ -1601,10 +1600,10 @@ func _caughtBall():
 	opponent._defendCaught()
 
 func _shotIncoming( var pos, var dir):
-	if AIteam:
+	if AIteam or Global.elevenMode:
 		for i in range(1, Global.squad):
 			if abs(players[i].translation.x) > abs(pos.x) and abs(players[i].translation.x) > 70 * Global.ps:
-				if dir.y < 35:
+				if dir.y < 35 and players[i].isAI:
 					players[i].AI._blockShot(pos, dir)
 				
 				
