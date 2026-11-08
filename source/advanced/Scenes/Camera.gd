@@ -56,11 +56,13 @@ func _setupCamera():
 			rotation_degrees.x = Global.config.get_value("gfx", "camLRtilt")
 			translation.y = Global.config.get_value("gfx", "camLRheight")
 	if Global.elevenMode and Global.config.get_value("gfx", "camtype") == 0:
-		# 11v11 broadcast view: higher, further back and flatter so most of the pitch is visible.
-		zoffset = 115.0
-		translation.y = 95.0
-		rotation_degrees.x = - 35.0
-		mfov = 42.0
+		# 11v11 tele-broadcast view, fitted to FC footage: gantry camera ~25 m up, ~55 m
+		# behind the near touchline, 17.5 deg down, ~15 deg vertical FOV. It pans along the
+		# pitch but never across, so the whole width stays in view.
+		zoffset = 293.0
+		translation.y = 84.0
+		rotation_degrees.x = - 17.5
+		mfov = 15.3
 		fov = mfov
 		mlimitz = 50
 		# The far stands are further away on the bigger pitch; don't clip them (black band).
@@ -97,7 +99,7 @@ func _process(delta: float) -> void :
 	var nz = zoffset + min(max( - limitZ, lpos.z), limitZ) + (shake * (rand_range( - 6, 6)) * delta)
 	if Global.elevenMode:
 		# Broadcast view: stop at the near touchline instead of swinging over the stands.
-		nz = clamp(nz, zoffset - 60.0, zoffset + 62.0)
+		nz = zoffset
 	var updatedt = Vector3(nx, translation.y, nz)
 	var updated = updatedt - translation
 	var speed = 1.0
@@ -117,7 +119,7 @@ func _updateCam( var delta):
 	var nz = zoffset + min(max( - limitZ, lpos.z), limitZ) + (shake * (rand_range( - 6, 6)) * delta)
 	if Global.elevenMode:
 		# Broadcast view: stop at the near touchline instead of swinging over the stands.
-		nz = clamp(nz, zoffset - 60.0, zoffset + 62.0)
+		nz = zoffset
 	var updatedt = Vector3(nx, translation.y, nz)
 	var updated = updatedt - translation
 	var speed = 1.0
