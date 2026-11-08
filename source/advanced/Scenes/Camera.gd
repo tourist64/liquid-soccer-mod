@@ -62,7 +62,7 @@ func _setupCamera():
 		rotation_degrees.x = - 40.0
 		mfov = 42.0
 		fov = mfov
-		mlimitz = 30
+		mlimitz = 50
 	targetfov = mfov
 
 func _setTarget( var t):
@@ -93,6 +93,9 @@ func _process(delta: float) -> void :
 	
 	var nx = xoffset + min(max( - limitX, lpos.x), limitX) + (shake * (rand_range( - 6, 6)) * delta)
 	var nz = zoffset + min(max( - limitZ, lpos.z), limitZ) + (shake * (rand_range( - 6, 6)) * delta)
+	if Global.elevenMode:
+		# Broadcast view: stop at the near touchline instead of swinging over the stands.
+		nz = clamp(nz, zoffset - 60.0, zoffset + 62.0)
 	var updatedt = Vector3(nx, translation.y, nz)
 	var updated = updatedt - translation
 	var speed = 1.0
@@ -110,6 +113,9 @@ func _updateCam( var delta):
 	
 	var nx = xoffset + min(max( - limitX, lpos.x), limitX) + (shake * (rand_range( - 6, 6)) * delta)
 	var nz = zoffset + min(max( - limitZ, lpos.z), limitZ) + (shake * (rand_range( - 6, 6)) * delta)
+	if Global.elevenMode:
+		# Broadcast view: stop at the near touchline instead of swinging over the stands.
+		nz = clamp(nz, zoffset - 60.0, zoffset + 62.0)
 	var updatedt = Vector3(nx, translation.y, nz)
 	var updated = updatedt - translation
 	var speed = 1.0
