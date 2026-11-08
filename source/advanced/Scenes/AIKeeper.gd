@@ -494,7 +494,8 @@ func incomingState():
 		if rand_range(0.0, 18.0) > myPlayer.pAgility:
 			intP.z *= rand_range( - 1, 1)
 	
-	intP.y *= 0.5 + 0.5 * smoothstep(90, 180, shotDir.length())
+	if pen or not Global.elevenMode:
+		intP.y *= 0.5 + 0.5 * smoothstep(90, 180, shotDir.length())
 	
 	intP.x = clamp(intP.x, - 135.0 * Global.ps, 135.0 * Global.ps)
 	intP.z = clamp(intP.z, - 20.0, 20.0)
@@ -550,6 +551,8 @@ func incomingState():
 		tostate = pstate.ACTIVE
 		
 		vel = (intP - pos) * Vector3(velval, velval * 3.0, velval)
+		if Global.elevenMode and not pen:
+			vel = _elevenDive(intP, R)
 		
 		
 		
@@ -1206,3 +1209,18 @@ func _updatePosition():
 
 func _forcePickup(_ppos):
 	pass
+
+# --- 11v11 saves ----------------------------------------------------------------------
+# Times the dive to arrive with the ball, limited by how fast this keeper can cover ground,
+# with an occasional mistimed dive so good shots still beat him.
+func _elevenDive(intP, shotVel):
+	var ballSpeed = max(shotVel.length(), 1.0)
+	var arrive = max((Global.ballpos - pos).length() / ballSpeed, 0.14)
+	var reach = intP - pos
+	var dive = reach / arrive
+	var agile = clamp(myPlayer.pAgility / 8.0, 0.0, 1.25)
+	var flat = Vector3(dive.x, 0.0, dive.z).limit_length(lerp(34.0, 52.0, min(agile, 1.0)))
+	var result = Vector3(flat.x, dive.y, flat.z)
+	if randf() > lerp(0.55, 0.9, min(agile, 1.0)):
+		result *= rand_range(0.55, 0.8)
+	return result
