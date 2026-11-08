@@ -162,7 +162,7 @@ func moveKeeper():
 	target = dGoal + (bpos - dGoal).normalized() * myPlayer.pAggression
 	
 	target.y = 0
-	target.x = sign(target.x) * min(135.0, abs(target.x))
+	target.x = sign(target.x) * min(135.0 * Global.ps, abs(target.x))
 	
 	view = Global.ballpos
 
@@ -496,7 +496,7 @@ func incomingState():
 	
 	intP.y *= 0.5 + 0.5 * smoothstep(90, 180, shotDir.length())
 	
-	intP.x = clamp(intP.x, - 135.0, 135.0)
+	intP.x = clamp(intP.x, - 135.0 * Global.ps, 135.0 * Global.ps)
 	intP.z = clamp(intP.z, - 20.0, 20.0)
 	
 	
@@ -751,7 +751,7 @@ func _losePosession():
 func _caught():
 	
 	changeState(pstate.CAUGHT)
-	target = Vector3(rand_range(90, 105) * - myTeam.playDir, 0, rand_range( - 30, 30))
+	target = Vector3(rand_range(90, 105) * Global.ps * - myTeam.playDir, 0, rand_range( - 30, 30))
 	
 func _celebrate(_goalscorer):
 	forceChangeState(pstate.CELEBRATE)
@@ -1028,13 +1028,13 @@ func _shootout():
 		mt = - 1
 		myPlayer.myGoalR.z = - myPlayer.myGoalR.z
 		
-	target = Vector3( - 110, 0, 40 * mt)
+	target = Vector3( - 110 * Global.ps, 0, 40 * mt)
 	dGoal = myTeam.dGoal
 	
 	ball._ballFree()
 
 func _defendPen( var ai):
-	target = Vector3( - 138.0, 0.0, 0.0) * myTeam.playDir
+	target = Vector3( - 138.0 * Global.ps, 0.0, 0.0) * myTeam.playDir
 	if ai:
 		DZ = true
 	else:
@@ -1122,7 +1122,7 @@ func _checkGoalThreat():
 	var bv = Global.ballvel
 	var dx = dGoal.x - bp.x
 	# Only balls in our half that are actually travelling towards our goal line.
-	if abs(dx) > 90.0 or abs(bv.x) < 1.0 or sign(bv.x) != sign(dx):
+	if abs(dx) > 90.0 * Global.ps or abs(bv.x) < 1.0 or sign(bv.x) != sign(dx):
 		return
 	var t = dx / bv.x
 	if t > 5.0:

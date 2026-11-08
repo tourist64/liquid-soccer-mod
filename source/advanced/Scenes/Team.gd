@@ -10,7 +10,7 @@ var dGoal
 var playDir
 var Game
 var zone
-var activePlayers = 7
+var activePlayers = Global.squad
 var passDir
 var myC = 0
 var jflip = 1
@@ -113,7 +113,7 @@ func loadPlayers():
 	k.name = "GoalKeeper"
 	$Players.add_child(k)
 	k.get_child(0).translation = Vector3(0.0, 0.0, 100 + dir * 7.0)
-	for i in range(0, 12):
+	for i in range(0, (Global.squad - 1) if Global.elevenMode else 12):
 		var p = preload("res://Scenes/Player.tscn").instance()
 		$Players.add_child(p)
 		p.get_child(0).translation = Vector3(dir * 5.0, 0.0, 80.0 + i * 3.0)
@@ -128,29 +128,29 @@ func setupFormation():
 		tdata = Global.t2
 	if (playDir == 1):
 		
-		formation.append(Vector2( - 110, 0))
-		for i in range(6):
-			formation.append(Vector2(range_lerp(tdata.def[i].y, 0, 1, 150, - 150), range_lerp(tdata.def[i].x, 0, 1, - 100, 100)))
-		formation.append(Vector2( - 110, 0))
-		for i in range(6):
-			formation.append(Vector2(range_lerp(tdata.mid[i].y, 0, 1, 150, - 150), range_lerp(tdata.mid[i].x, 0, 1, - 100, 100)))
-		formation.append(Vector2( - 110, 0))
-		for i in range(6):
-			formation.append(Vector2(range_lerp(tdata.att[i].y, 0, 1, 150, - 150), range_lerp(tdata.att[i].x, 0, 1, - 100, 100)))
+		formation.append(Vector2( - 110 * Global.ps, 0))
+		for i in range(Global.squad - 1):
+			formation.append(Vector2(range_lerp(tdata.def[i].y, 0, 1, 150 * Global.ps, - 150 * Global.ps), range_lerp(tdata.def[i].x, 0, 1, - 100 * Global.ps, 100 * Global.ps)))
+		formation.append(Vector2( - 110 * Global.ps, 0))
+		for i in range(Global.squad - 1):
+			formation.append(Vector2(range_lerp(tdata.mid[i].y, 0, 1, 150 * Global.ps, - 150 * Global.ps), range_lerp(tdata.mid[i].x, 0, 1, - 100 * Global.ps, 100 * Global.ps)))
+		formation.append(Vector2( - 110 * Global.ps, 0))
+		for i in range(Global.squad - 1):
+			formation.append(Vector2(range_lerp(tdata.att[i].y, 0, 1, 150 * Global.ps, - 150 * Global.ps), range_lerp(tdata.att[i].x, 0, 1, - 100 * Global.ps, 100 * Global.ps)))
 		
 	else:
 		
-		formation.append(Vector2(110, 0))
-		for i in range(6):
-			formation.append(Vector2(range_lerp(tdata.def[i].y, 0, 1, - 150, 150), range_lerp(tdata.def[i].x, 0, 1, 100, - 100)))
-		formation.append(Vector2(110, 0))
-		for i in range(6):
-			formation.append(Vector2(range_lerp(tdata.mid[i].y, 0, 1, - 150, 150), range_lerp(tdata.mid[i].x, 0, 1, 100, - 100)))
-		formation.append(Vector2(110, 0))
-		for i in range(6):
-			formation.append(Vector2(range_lerp(tdata.att[i].y, 0, 1, - 150, 150), range_lerp(tdata.att[i].x, 0, 1, 100, - 100)))
-	for i in range(6):
-		cformation.append(Vector3(range_lerp(tdata.cor[i].y, 0, 1, - 150, 150), 0, range_lerp(tdata.cor[i].x, 0, 1, 100, - 100)))
+		formation.append(Vector2(110 * Global.ps, 0))
+		for i in range(Global.squad - 1):
+			formation.append(Vector2(range_lerp(tdata.def[i].y, 0, 1, - 150 * Global.ps, 150 * Global.ps), range_lerp(tdata.def[i].x, 0, 1, 100 * Global.ps, - 100 * Global.ps)))
+		formation.append(Vector2(110 * Global.ps, 0))
+		for i in range(Global.squad - 1):
+			formation.append(Vector2(range_lerp(tdata.mid[i].y, 0, 1, - 150 * Global.ps, 150 * Global.ps), range_lerp(tdata.mid[i].x, 0, 1, 100 * Global.ps, - 100 * Global.ps)))
+		formation.append(Vector2(110 * Global.ps, 0))
+		for i in range(Global.squad - 1):
+			formation.append(Vector2(range_lerp(tdata.att[i].y, 0, 1, - 150 * Global.ps, 150 * Global.ps), range_lerp(tdata.att[i].x, 0, 1, 100 * Global.ps, - 100 * Global.ps)))
+	for i in range(Global.squad - 1):
+		cformation.append(Vector3(range_lerp(tdata.cor[i].y, 0, 1, - 150 * Global.ps, 150 * Global.ps), 0, range_lerp(tdata.cor[i].x, 0, 1, 100 * Global.ps, - 100 * Global.ps)))
 		
 
 func setPlayerParams( var p, var i):
@@ -322,7 +322,7 @@ func _initializeTeam(human):
 		players.append(NB)
 		
 	
-		if i < 7:
+		if i < Global.squad:
 			
 			
 			NB.AI.target = NB.translation
@@ -371,7 +371,7 @@ func _resetTeam(_AI, ourKick):
 	
 	zone = 2
 	setupFormation()
-	activePlayers = 7
+	activePlayers = Global.squad
 	var i = 0
 	Global.teamsReady[teamID - 1] = false
 	for NB in players:
@@ -380,9 +380,9 @@ func _resetTeam(_AI, ourKick):
 		NB.myGoalL = goalL
 		NB.myGoalR = goalR
 		
-		var xp = max(formation[i].x, 30)
+		var xp = max(formation[i].x, 30 * Global.ps)
 		if playDir == 1:
-			xp = min(formation[i].x, - 30)
+			xp = min(formation[i].x, - 30 * Global.ps)
 		NB.AI.setTarget(Vector3(xp, 0, formation[i].y))
 		NB.AI._kickoff()
 		if (i == 0):
@@ -403,9 +403,9 @@ func _lineup( var ourKick):
 	var i = 0
 	for NB in players:
 		
-		var xp = max(formation[i].x, 30)
+		var xp = max(formation[i].x, 30 * Global.ps)
 		if playDir == 1:
-			xp = min(formation[i].x, - 30)
+			xp = min(formation[i].x, - 30 * Global.ps)
 		NB.AI.setTarget(Vector3(xp, 0, formation[i].y))
 		NB.AI._kickoff()
 		i += 1
@@ -420,7 +420,7 @@ func _goGameAttack( var t):
 	
 	state = teamState.ATTACK
 	players[0].AI._defend()
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		if players[i] != passto:
 			players[i].AI._forceAttack()
 		players[i]._shush()
@@ -440,7 +440,7 @@ func _goGameAttack( var t):
 func _goGameDefend():
 	state = teamState.DEFEND
 	players[0].AI._defend()
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		if not players[i].AI._marking():
 			players[i].AI._forceDefend()
 		players[i]._shush()
@@ -468,7 +468,7 @@ func _findPass(pos, lookD, id):
 	var dl = 0
 	var dd = 0
 	
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		if i != id:
 			diff = ((players[i].translation) + (players[i].velocity * players[i].dSmart)) - Global.ballpos
 			var score = diff.normalized().dot(lookD.normalized())
@@ -522,7 +522,7 @@ func _findThruPass(pos, lookD, _id):
 	var dopass = false
 	var dl = 0
 	
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		diff = (players[i].translation) + ((players[i].velocity).normalized() * 1.0) - Global.ballpos
 		
 		
@@ -565,7 +565,7 @@ func _checkPass( var pd, var fromP, var plength):
 	var t = Transform(Basis(r, Vector3.UP, pd), Global.ballpos)
 	var it = t.inverse()
 	
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		
 		
 		var pl = it.xform(opponent.players[i].translation)
@@ -595,7 +595,7 @@ func _findLongPass(pos, lookD, _id):
 	var best = 0
 	var dopass = false
 	var dl = 0
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		diff = (players[i].translation + (goal - players[i].translation) * 0.2) - pos
 		
 		var score = diff.normalized().dot(lookD.normalized())
@@ -629,7 +629,7 @@ func _closestPToTarget( var targ):
 	var CP = null
 	var CSFP = null
 	var t2g = (targ.translation - dGoal).length_squared()
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		var P = players[i]
 		var d = (P.translation - targ.translation).length_squared()
 		if d < dist and (P.translation - dGoal).length_squared() < t2g:
@@ -650,7 +650,7 @@ func pressTarget( var targ, var long):
 func _closestPToP( var target):
 	var dist = 500000
 	var CP = null
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		var P = players[i]
 		var d = (P.translation - target).length_squared()
 		if d < dist:
@@ -661,7 +661,7 @@ func _closestPToP( var target):
 func _closestPToBall():
 	var dist = 300000
 	var CP = null
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		var P = players[i]
 		var d = (P.translation - (Global.ballpos + Global.ballvel * 0.3)).length_squared()
 		if d < dist:
@@ -729,7 +729,7 @@ func _closestPToBallDir():
 	lastjx = jx
 	lastjy = jy
 	
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		var P = players[i]
 		var d = (P.translation - bpos)
 		
@@ -749,7 +749,7 @@ func _closestPToBallDir():
 func _closestSPToBall():
 	var dist = 2000
 	var CP = null
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		var P = players[i]
 		var d = (P.translation - (Global.ballpos + Global.ballvel * 0.2)).length()
 		if d < dist:
@@ -765,7 +765,7 @@ func _closestDPToBall():
 	
 	
 	
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		var P = players[i]
 		
 		
@@ -806,7 +806,7 @@ func _closestDPToBallNew():
 	
 	var bscore = 0
 	var score = 0
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		score = 0
 		var P = players[i]
 		var dgp = (P.translation - P.dGoal).length_squared()
@@ -832,7 +832,7 @@ func setAttack():
 	
 	state = teamState.ATTACK
 	
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		if players[i] != pplayer:
 			players[i].AI._attack()
 		players[i].marked = false
@@ -847,7 +847,7 @@ func setDefend():
 	state = teamState.DEFEND
 	
 	
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		
 		players[i].marked = false
 		players[i].AI.marking = null
@@ -872,31 +872,31 @@ func _getSupportFKPos( var pid):
 		momentum = true
 		return _getPlayPos(pid)
 func _getGoalKickPos( var pid):
-	var posid = pid + 7
+	var posid = pid + Global.squad
 	return Vector3(formation[posid].x, 0, formation[posid].y)
 
 
 func _getPlayPos(pid):
 	
 	var dp = Global.ballpos + Global.ballvel * 0.2
-	var blerp = smoothstep( - 135, 150, dp.x * playDir)
+	var blerp = smoothstep( - 135 * Global.ps, 150 * Global.ps, dp.x * playDir)
 	if momentum:
-		var zlerp = smoothstep(0, 80, abs(dp.z))
-		pp1.x = lerp(formation[pid].x + 20 * playDir, formation[pid + 7].x + 10.0 * playDir, smoothstep(0.0, 0.5, blerp))
-		pp1.z = lerp(formation[pid].y, formation[pid + 7].y, smoothstep(0.0, 0.5, blerp))
+		var zlerp = smoothstep(0, 80 * Global.ps, abs(dp.z))
+		pp1.x = lerp(formation[pid].x + 20 * playDir, formation[pid + Global.squad].x + 10.0 * playDir, smoothstep(0.0, 0.5, blerp))
+		pp1.z = lerp(formation[pid].y, formation[pid + Global.squad].y, smoothstep(0.0, 0.5, blerp))
 		
-		pp1.x = lerp(pp1.x, formation[pid + 14].x + 10 * playDir, smoothstep(0.5, 1.0, blerp))
-		pp1.z = lerp(pp1.z, formation[pid + 14].y, smoothstep(0.5, 1.0, blerp))
+		pp1.x = lerp(pp1.x, formation[pid + 2 * Global.squad].x + 10 * playDir, smoothstep(0.5, 1.0, blerp))
+		pp1.z = lerp(pp1.z, formation[pid + 2 * Global.squad].y, smoothstep(0.5, 1.0, blerp))
 		pp1.z += zlerp * 20.0 * sign(dp.z) * approach
 		return pp1
 	else:
 		
-		pp1.x = lerp(formation[pid].x - 5.0 * playDir, formation[pid + 7].x - 25.0 * playDir, smoothstep(0.0, 0.5, bias(blerp, 0.5)))
-		pp1.z = lerp(formation[pid].y, formation[pid + 7].y, smoothstep(0.0, 0.5, blerp))
-		pp1.x = lerp(pp1.x, formation[pid + 14].x - 40.0 * playDir, smoothstep(0.5, 1.0, bias(blerp, 0.3)))
-		pp1.z = lerp(pp1.z, formation[pid + 14].y, smoothstep(0.5, 1.0, blerp))
+		pp1.x = lerp(formation[pid].x - 5.0 * playDir, formation[pid + Global.squad].x - 25.0 * playDir, smoothstep(0.0, 0.5, bias(blerp, 0.5)))
+		pp1.z = lerp(formation[pid].y, formation[pid + Global.squad].y, smoothstep(0.0, 0.5, blerp))
+		pp1.x = lerp(pp1.x, formation[pid + 2 * Global.squad].x - 40.0 * playDir, smoothstep(0.5, 1.0, bias(blerp, 0.3)))
+		pp1.z = lerp(pp1.z, formation[pid + 2 * Global.squad].y, smoothstep(0.5, 1.0, blerp))
 		
-		var zlerp = smoothstep(0, 80, abs(dp.z - pp1.z))
+		var zlerp = smoothstep(0, 80 * Global.ps, abs(dp.z - pp1.z))
 		
 		pp1.z += zlerp * 12.0 * sign(dp.z - pp1.z)
 	
@@ -911,16 +911,16 @@ func _getSupportPos(pid):
 	
 	
 	if zone == 1:
-		var posid2 = pid + 7
-		var mxr = 1.0 - smoothstep(40, 150, abs(Global.ballpos.x))
+		var posid2 = pid + Global.squad
+		var mxr = 1.0 - smoothstep(40 * Global.ps, 150 * Global.ps, abs(Global.ballpos.x))
 		return (Vector3(formation[posid].x, 0, formation[posid].y) * (1.0 - mxr) + Vector3(formation[posid2].x, 0, formation[posid2].y) * mxr)
 	elif zone == 2:
-		var posid2 = pid + 14
-		var mxr = 0.6 + smoothstep( - 40, 40, (Global.ballpos.x) * - playDir) * 0.4
+		var posid2 = pid + 2 * Global.squad
+		var mxr = 0.6 + smoothstep( - 40 * Global.ps, 40 * Global.ps, (Global.ballpos.x) * - playDir) * 0.4
 		return (Vector3(formation[posid].x, 0, formation[posid].y) * mxr + Vector3(formation[posid2].x, 0, formation[posid2].y) * (1.0 - mxr))
 	else:
-		var posid2 = pid + 7
-		var mxr = 0.6 + smoothstep(40, 100, abs(Global.ballpos.x)) * 0.4
+		var posid2 = pid + Global.squad
+		var mxr = 0.6 + smoothstep(40 * Global.ps, 100 * Global.ps, abs(Global.ballpos.x)) * 0.4
 		return Vector3(formation[posid].x, 0, formation[posid].y) * mxr + Vector3(formation[posid2].x, 0, formation[posid2].y) * (1.0 - mxr)
 
 func _getPosessionPos( var pid, var pos, var tforce):
@@ -936,7 +936,7 @@ func _getPosessionPos( var pid, var pos, var tforce):
 	
 	if (ptarget - pos).length_squared() < 360 or tforce:
 		
-		var pgoal = Vector3(playDir * 130.0, 0.0, formation[pid + 14].y)
+		var pgoal = Vector3(playDir * 130.0 * Global.ps, 0.0, formation[pid + 2 * Global.squad].y)
 		pgoal = lerp(goal * 0.8, pgoal, smoothstep(12, 32, (pos.x - pgoal.x)))
 		
 		
@@ -944,7 +944,7 @@ func _getPosessionPos( var pid, var pos, var tforce):
 		var poff = rand_range( - 1.0, 1.0)
 		poff = lerp(poff, abs(poff), approach)
 		ptarget.z += sign(ptarget.z) * poff * 12
-		ptarget.z = max( - 90, min(ptarget.z, 90))
+		ptarget.z = max( - 90 * Global.ps, min(ptarget.z, 90 * Global.ps))
 	
 	return ptarget
 
@@ -954,14 +954,14 @@ func _getDefendPos(pid):
 	var ppos
 	var bp = Global.ballpos + Global.ballvel * 0.2
 	if zone == 3:
-		posid = pid + 7
+		posid = pid + Global.squad
 		var posid2 = posid
-		var mxr = (smoothstep(100, 160, abs(bp.x))) * 0.25
+		var mxr = (smoothstep(100 * Global.ps, 160 * Global.ps, abs(bp.x))) * 0.25
 		ppos = (Vector3(formation[posid2].x, 0, formation[posid2].y) * (1.0 - mxr) + Vector3(formation[posid].x, 0, formation[posid].y) * mxr)
 	elif zone == 2:
 		
 		var posid2 = pid
-		var mxr = smoothstep( - 40, 40, (bp.x) * - playDir)
+		var mxr = smoothstep( - 40 * Global.ps, 40 * Global.ps, (bp.x) * - playDir)
 		ppos = (Vector3(formation[posid].x, 0, formation[posid].y) * (1.0 - mxr)) + (Vector3(formation[posid2].x, 0.0, formation[posid2].y) * (mxr))
 	else:
 		
@@ -1003,7 +1003,7 @@ func _getDefendFKPos(pid):
 		var posid2 = pid
 		return Vector3(lerp(formation[posid].x, formation[posid2].x, 0.85), 0, lerp(formation[posid].y, formation[posid2].y, 0.85))
 	else:
-		var posid2 = pid + 7
+		var posid2 = pid + Global.squad
 		return (Vector3(formation[posid].x, 0, formation[posid].y) * 0.25 + Vector3(formation[posid2].x, 0, formation[posid2].y) * 0.75)
 	
 
@@ -1018,7 +1018,7 @@ func _getPenPosition(pid):
 		5:
 			return Vector3(Game.penend * - 81, 0, - 25)
 		6:
-			return Vector3(Game.penend * - 91, 0, 0)
+			return Vector3(Game.penend * - 91 * Global.ps, 0, 0)
 	
 
 func _getPenDPosition( var pid):
@@ -1092,7 +1092,7 @@ func _switchPControl( var p):
 	if AIteam or p == null:
 		return
 	
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		if (i != p.myID):
 			players[i]._loseControl()
 			players[i].AI.isHuman = false
@@ -1114,7 +1114,7 @@ func _goal_scored():
 		scorer = ball.shooter.myID
 	celeb = int(rand_range(0, 5))
 	pplayer = players[scorer]
-	for i in range(0, 12):
+	for i in range(0, players.size()):
 		players[i].AI._celebrate(pplayer)
 	
 	if ( not AIteam):
@@ -1126,7 +1126,7 @@ func _goal_scored():
 func _goal_conceded():
 	state = teamState.CONCEDED
 	
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		players[i].AI._conceded()
 	wescored = false
 func _setZone(z):
@@ -1141,7 +1141,7 @@ func lineupState():
 	var pready = 0
 	if Global.teamsReady[teamID - 1]:
 		return
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		
 		if (players[i].translation - players[i].AI.target).length() < 6:
 			pready += 1
@@ -1154,7 +1154,7 @@ func lineupState():
 	
 			
 		
-	if pready > 6:
+	if pready > Global.squad - 1:
 		Global.teamsReady[teamID - 1] = true
 	
 	if (Game.kickTaker.translation - Game.kickTaker.AI.target).length() < 6.0:
@@ -1205,13 +1205,13 @@ func defendState():
 			cplayer.AI._press()
 	
 	
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		players[i].AI._updatePosition()
 		
 func attackState():
 	if not Global.gameOn:
 		return
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		players[i].AI._updatePosition()
 		
 	if (ball._isFree()):
@@ -1237,7 +1237,7 @@ func attackState():
 func playState():
 	if not Global.gameOn:
 		return
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		players[i].AI._updatePosition()
 	print("WTF!")
 	if (ball._isFree()):
@@ -1279,14 +1279,14 @@ func _fullTime( var wewon):
 		if not AIteam:
 			_switchPControl(players[0])
 			players[0]._controlMe()
-		activePlayers = 12
+		activePlayers = players.size()
 	else:
 		for player in players:
 			player.AI._conceded()
 			
 func _replay():
 	state = teamState.REPLAY
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		players[i].AI._replay()
 
 
@@ -1324,7 +1324,7 @@ func _foul( var position, var offender):
 		
 		Game._penalty(opponent.AIteam, opponent.teamID)
 		Global.teamsReady[teamID - 1] = false
-		for i in range(0, 7):
+		for i in range(0, Global.squad):
 			players[i].AI._penaltyDefend()
 			players[i].isAI = true
 			
@@ -1345,7 +1345,7 @@ func _foul( var position, var offender):
 		
 		var d2g = abs(position.x)
 		
-		if sign(playDir) != sign(position.x) and d2g > 40:
+		if sign(playDir) != sign(position.x) and d2g > 40 * Global.ps:
 			Game.fkend = playDir
 		else:
 			Game.fkend = 0
@@ -1358,7 +1358,7 @@ func _foul( var position, var offender):
 		Global.teamsReady[teamID - 1] = false
 		
 		
-		for i in range(0, 7):
+		for i in range(0, Global.squad):
 			
 			if players[i] != Game.ref.offender:
 				if i > 0 and i < 3 and Game.fkend != 0:
@@ -1374,7 +1374,7 @@ func _foul( var position, var offender):
 
 func _ballInBox():
 	
-	if abs(Global.ballpos.x) > 91 and abs(Global.ballpos.z) < 45:
+	if abs(Global.ballpos.x) > 91 * Global.ps and abs(Global.ballpos.z) < 45 * Global.ps:
 		return true
 	return false
 	
@@ -1385,7 +1385,7 @@ func _fouled( var position):
 	momentum = true
 	Global.teamsReady[teamID - 1] = false
 	
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		players[i].AI._attackFK()
 		players[i].isAI = true
 		
@@ -1412,7 +1412,7 @@ func _throwin( var side, var position):
 	
 	Global.ballpos = position
 	ball._initialize()
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		
 		players[i].AI.target = _getPlayPos(i)
 		players[i].isAI = true
@@ -1441,7 +1441,7 @@ func _defendThrowin():
 	Global.teamsReady[teamID - 1] = false
 		
 	ball._ballFree()
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		players[i].AI._kickoff()
 		players[i].AI.target = _getPlayPos(players[i].myID)
 		if i < 0:
@@ -1456,10 +1456,10 @@ func _penalty():
 	
 	Global.teamsReady[teamID - 1] = false
 	ball._initialize()
-	ball.translation = Vector3(Game.penend * - 100, 1.0, 0.0)
+	ball.translation = Vector3(Game.penend * - 100 * Global.ps, 1.0, 0.0)
 	
 	
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		players[i].AI._penalty()
 		players[i].isAI = true
 		
@@ -1469,16 +1469,16 @@ func _penalty():
 	pplayer = Game.kickTaker
 
 func _corner( var side, var e):
-	var posi = Vector3(138.0, 0.0, 88.0)
+	var posi = Vector3(138.0, 0.0, 88.0) * Global.ps
 	ball._ballFree()
 	if side == 0:
-		posi.z = - 88.0
+		posi.z = - 88.0 * Global.ps
 	if e == 1:
-		posi.x = - 138
+		posi.x = - 138 * Global.ps
 	Game.resetPos = posi
 	Global.teamsReady[teamID - 1] = false
 	
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		players[i].AI._corner(e, side)
 		players[i].isAI = true
 		
@@ -1497,7 +1497,7 @@ func _defendCorner():
 	Global.teamsReady[teamID - 1] = false
 	ball._ballFree()
 	isCorner = true
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		match i:
 			0:
 				players[i].AI._defendCorner()
@@ -1521,7 +1521,7 @@ func _goalkick( var side, var e):
 	Game.resetPos = posi
 	Global.teamsReady[teamID - 1] = false
 	
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		players[i].AI._kickoff()
 		if i > 0:
 			players[i].AI.target = _getGoalKickPos(i)
@@ -1538,15 +1538,15 @@ func _goalkick( var side, var e):
 func _defendGoalkick():
 	ball._ballFree()
 	momentum = false
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		players[i].AI._kickoff()
-		players[i].AI.target = _getPlayPos(players[i].myID) - Vector3(30.0 * playDir, 0, 0)
+		players[i].AI.target = _getPlayPos(players[i].myID) - Vector3(30.0 * Global.ps * playDir, 0, 0)
 		
 
 	state = teamState.LINEUP
 func _defendCaught():
 	momentum = false
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		players[i].AI._kickoff()
 		Game.fkzone = 2
 		players[i].AI.target = _getPlayPos(players[i].myID)
@@ -1558,7 +1558,7 @@ func _on_AITimer_timeout():
 
 func _caughtBall():
 	
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		players[i].AI._losePosession()
 	momentum = true
 	setAttack()
@@ -1566,8 +1566,8 @@ func _caughtBall():
 
 func _shotIncoming( var pos, var dir):
 	if AIteam:
-		for i in range(1, 7):
-			if abs(players[i].translation.x) > abs(pos.x) and abs(players[i].translation.x) > 70:
+		for i in range(1, Global.squad):
+			if abs(players[i].translation.x) > abs(pos.x) and abs(players[i].translation.x) > 70 * Global.ps:
 				if dir.y < 35:
 					players[i].AI._blockShot(pos, dir)
 				
@@ -1607,7 +1607,7 @@ func shootoutState():
 			p._loseControl()
 		
 		p.AI._checkLineup()
-	if pready > 6:
+	if pready > Global.squad - 1:
 		Global.teamsReady[teamID - 1] = true
 
 func _shootout():
@@ -1616,7 +1616,7 @@ func _shootout():
 	ball._initialize()
 	playDir = 1
 	state = teamState.SHOOTOUT
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		players[i].AI._shootout()
 		players[i].isAI = true
 		
@@ -1695,7 +1695,7 @@ func _rebound():
 func _calcPositions():
 	var c = 100000
 	var dg = 0
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		p2b[i] = players[i].translation - Global.ballpos + Global.ballvel * players[i].dSmart
 		d2p2b[i] = p2b[i].length_squared()
 		dg = (dGoal - players[i].translation).length_squared()
@@ -1708,7 +1708,7 @@ func bias( var x, var a):
 func _activateThrow( var thrower):
 	var cl = 500000
 	var clp = null
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		if d2p2b[i] < cl and players[i] != thrower:
 			cl = d2p2b[i]
 			clp = players[i]
@@ -1722,7 +1722,7 @@ func _activateThrow( var thrower):
 	
 	cl = 500000
 	clp = null
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		if opponent.d2p2b[i] < cl:
 			cl = opponent.d2p2b[i]
 			clp = opponent.players[i]
@@ -1730,10 +1730,10 @@ func _activateThrow( var thrower):
 		clp.AI._markThrowtarget(throwTarget)
 
 func _lapOfHonour():
-	celebTarget.append(Vector3(135, 0, 90))
-	celebTarget.append(Vector3(135, 0, - 90))
-	celebTarget.append(Vector3( - 135, 0, - 90))
-	celebTarget.append(Vector3( - 135, 0, 90))
+	celebTarget.append(Vector3(135, 0, 90) * Global.ps)
+	celebTarget.append(Vector3(135, 0, - 90) * Global.ps)
+	celebTarget.append(Vector3( - 135, 0, - 90) * Global.ps)
+	celebTarget.append(Vector3( - 135, 0, 90) * Global.ps)
 	for player in players:
 		player.AI._lapOfHonour()
 		player.pSpeed = rand_range(5, 10)
@@ -1765,7 +1765,7 @@ func _isValidKickTaker(p):
 func _closestFreeKickTaker():
 	var best = null
 	var dist = INF
-	for i in range(1, 7):
+	for i in range(1, Global.squad):
 		var p = players[i]
 		if p.carded > 1:
 			continue

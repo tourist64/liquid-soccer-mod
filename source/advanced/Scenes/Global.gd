@@ -797,3 +797,14 @@ func exitFullWindow(scene):
 	if get_viewport().is_connected("size_changed", self, "_fitFullWindow"):
 		get_viewport().disconnect("size_changed", self, "_fitFullWindow")
 	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_KEEP, FULLWINDOW_BASE)
+
+# --- 11v11 mode -------------------------------------------------------------------
+# squad = players on the pitch per team (keeper included); ps = pitch scale.
+var elevenMode = false
+var squad = 7
+var ps = 1.0
+
+func setElevenMode(on):
+	elevenMode = on
+	squad = 11 if on else 7
+	ps = 1.4 if on else 1.0

@@ -169,6 +169,12 @@ func initStadium():
 	var gs = load(stad).instance()
 	gs.name = "Stadium"
 	$VPC / VP / GameGroup.add_child(gs)
+	if Global.elevenMode:
+		# 11v11: a bigger pitch (stadium, lines and zones scale; goals move out but keep their size).
+		gs.scale = Vector3(Global.ps, Global.ps, Global.ps)
+		$VPC / VP / GameGroup / Goal.translation.x *= Global.ps
+		$VPC / VP / GameGroup / Goal2.translation.x *= Global.ps
+		$Zones.scale = Vector3(Global.ps, 1.0, Global.ps)
 	awayFans = gs.find_node("AwayFans")
 	
 	
@@ -356,6 +362,8 @@ func _ready():
 	
 	mainCam.call_deferred("_setGame", self)
 	blobs = $VPC / VP / GameGroup / Blobs
+	if blobs.multimesh.instance_count < 2 * Global.squad + 2:
+		blobs.multimesh.instance_count = 2 * Global.squad + 2
 	
 	if Global.shadtype > 0:
 		var viewmat = null
@@ -746,23 +754,23 @@ func _process(delta):
 	
 func _mp_update_blobs():
 	var tt
-	for m in range(0, 14):
-		if m < 7:
+	for m in range(0, 2 * Global.squad):
+		if m < Global.squad:
 			tt = team1.players[m].translation
 			
 			
 			
 		else:
-			tt = team2.players[m - 7].translation
+			tt = team2.players[m - Global.squad].translation
 		tt.y = 0.1
 		blobs.multimesh.set_instance_transform(m, Transform(Basis(), tt))
 	var rendered_ball = replayBall if mp_replica and state == gameState.REPLAY else ball
 	tt = rendered_ball.translation
 	tt.y = 0.1
-	blobs.multimesh.set_instance_transform(14, Transform(Basis(), tt))
+	blobs.multimesh.set_instance_transform(2 * Global.squad, Transform(Basis(), tt))
 	tt = ref.translation
 	tt.y = 0.1
-	blobs.multimesh.set_instance_transform(15, Transform(Basis(), tt))
+	blobs.multimesh.set_instance_transform(2 * Global.squad + 1, Transform(Basis(), tt))
 
 
 func _physics_process(delta):
@@ -1317,7 +1325,7 @@ func fkSetup():
 			if fkzone == 1:
 				fktype = 0
 			if fkzone < 3:
-				if abs(resetPos.z) > 30:
+				if abs(resetPos.z) > 30 * Global.ps:
 					fktype = 2
 			state = gameState.RESTARTFKAI
 			$Timers / Timer.wait_time = 0.5
@@ -1601,7 +1609,7 @@ func _penalty( var offender, var fteam):
 	
 	state = gameState.PENALTY
 	ball._initialize()
-	resetPos = Vector3( - 100 * penend, 1, 0)
+	resetPos = Vector3( - 100 * Global.ps * penend, 1, 0)
 	fkai = offender
 	
 	fkteam = fteam
@@ -1632,7 +1640,7 @@ func _shootout():
 	else:
 		fkteam = 2
 	state = gameState.SHOOTOUT
-	resetPos = Vector3( - 100, 0.5, 0.0)
+	resetPos = Vector3( - 100 * Global.ps, 0.5, 0.0)
 	ball._initialize()
 	$Timers / Timer.wait_time = 2
 	$Timers / Timer.start()
@@ -1766,7 +1774,7 @@ func throwin( var las):
 	$Sounds / WhistleSounds.play()
 	Global.gameOn = false
 	resetPos = Global.ballpos
-	resetPos.z = sign(resetPos.z) * 92
+	resetPos.z = sign(resetPos.z) * 92 * Global.ps
 	resetPos.y = 0.1
 	state = gameState.THROWIN
 	hud._throwin()
@@ -1896,7 +1904,7 @@ func _oob( var lst):
 	
 	
 	
-	if abs(ball.oobpos.z) > 90.0:
+	if abs(ball.oobpos.z) > 90.0 * Global.ps:
 		throwin(lst)
 	
 	else:
@@ -1934,7 +1942,7 @@ func setupWeather():
 	$ViewportContainer / Viewport.set_update_mode(Viewport.UPDATE_ONCE)
 	
 	sprites.append($ViewportContainer / Viewport / TextureRect / P0)
-	for i in range(1, 14):
+	for i in range(1, 2 * Global.squad):
 		var s = $ViewportContainer / Viewport / TextureRect / P0.duplicate()
 		sprites.append(s)
 		$ViewportContainer / Viewport / TextureRect.add_child(sprites[i])
@@ -1943,7 +1951,7 @@ func doWeather():
 	
 	var x = 0
 	var y = 0
-	for i in range(0, 7):
+	for i in range(0, Global.squad):
 		
 		x = range_lerp(team1.players[i].translation.x, - 150, 150, 0, 2048)
 		y = range_lerp(team1.players[i].translation.z, - 100, 100, 0, 1024)
@@ -1952,9 +1960,9 @@ func doWeather():
 		sprites[i].rotation_degrees = - team1.players[i].rotation_degrees.y
 		x = range_lerp(team2.players[i].translation.x, - 150, 150, 0, 2048)
 		y = range_lerp(team2.players[i].translation.z, - 100, 100, 0, 1024)
-		sprites[i + 7].position.x = x
-		sprites[i + 7].position.y = y
-		sprites[i + 7].rotation_degrees = - team2.players[i].rotation_degrees.y
+		sprites[i + Global.squad].position.x = x
+		sprites[i + Global.squad].position.y = y
+		sprites[i + Global.squad].rotation_degrees = - team2.players[i].rotation_degrees.y
 		
 		
 		
@@ -2263,7 +2271,7 @@ func _doSubs():
 		subteam = team1
 	mainCam._setTarget(subteam.players[1])
 	mainCam.fov = 25
-	mainCam.limitZ = 100
+	mainCam.limitZ = 100 * Global.ps
 func _pickSub( var i):
 	
 	

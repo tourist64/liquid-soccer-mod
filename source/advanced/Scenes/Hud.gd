@@ -37,7 +37,7 @@ func _ready():
 	
 	canPressButton = true
 	var lab = $Debug / Label
-	for i in range(0, 7):
+	for i in range(0, 12):
 
 		team1.append(lab.duplicate())
 		$Debug.add_child(team1[i])
@@ -212,12 +212,12 @@ func _initializeHud():
 	pnames.append(Global.t2.player10.name)
 	pnames.append(Global.t2.player11.name)
 	
-	for i in range(0, 14):
+	for i in range(0, 2 * Global.squad):
 		
 		map.append($Map / P0.duplicate())
 		$Map.add_child(map[i])
 		map[i].modulate = col
-		if (i > 5):
+		if (i > Global.squad - 2):
 			col = team2_col
 	if Global.tournament and Global.tournament.leg == 2:
 		setAggregateScore()
@@ -249,15 +249,15 @@ func _setState( var id, var team, var state, var teamstate):
 		
 
 func _updateMap(tid, id, pos):
-	if id > 6:
+	if id > Global.squad - 1:
 		return
-	var upid = tid * 7 + id
-	map[upid].position.x = range_lerp(pos.x, - 145, 145, 0, 512)
-	map[upid].position.y = range_lerp(pos.z, - 100, 100, 0, 363)
+	var upid = tid * Global.squad + id
+	map[upid].position.x = range_lerp(pos.x, - 145 * Global.ps, 145 * Global.ps, 0, 512)
+	map[upid].position.y = range_lerp(pos.z, - 100 * Global.ps, 100 * Global.ps, 0, 363)
 	
 func _updateMapBall(pos):
-	mapball.position.x = range_lerp(pos.x, - 145, 145, 0, 512)
-	mapball.position.y = range_lerp(pos.z, - 100, 100, 0, 363)
+	mapball.position.x = range_lerp(pos.x, - 145 * Global.ps, 145 * Global.ps, 0, 512)
+	mapball.position.y = range_lerp(pos.z, - 100 * Global.ps, 100 * Global.ps, 0, 363)
 
 func _updateTime(mins, secs):
 	$GameTime.text = "%02d:%02d" % [mins, secs]

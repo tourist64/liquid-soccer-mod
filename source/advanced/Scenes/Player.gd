@@ -318,7 +318,7 @@ func shoot( var targ):
 	myTeam.posession = false
 	
 	
-	var coffset = smoothstep(0.0, 130.0, abs(Global.ballpos.x))
+	var coffset = smoothstep(0.0, 130.0 * Global.ps, abs(Global.ballpos.x))
 	shotV.z += - shotcurl.z * lerp(35.0, 2.0, coffset) * pCurl
 	shotV = shotV.normalized()
 	shotcurl.z *= 1.1

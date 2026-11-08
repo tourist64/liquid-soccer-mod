@@ -291,7 +291,7 @@ func closestPToBallDefendOld():
 	
 	
 	
-	if myTeam.zone == 1 and abs(bp.x) > 60:
+	if myTeam.zone == 1 and abs(bp.x) > 60 * Global.ps:
 		
 		return bp
 	var R = bp - myPlayer.dGoal
@@ -688,8 +688,8 @@ func posessionState():
 		
 		aavoid += newacc * 0.5
 		
-		var tx = smoothstep(125, 138, abs(pos.x))
-		var tz = smoothstep(80, 90, abs(pos.z))
+		var tx = smoothstep(125 * Global.ps, 138 * Global.ps, abs(pos.x))
+		var tz = smoothstep(80 * Global.ps, 90 * Global.ps, abs(pos.z))
 		aavoid -= Vector3(tx * sign(pos.x), 0, tz * sign(pos.z)) * 30.0
 		itarget += aavoid
 			
@@ -979,7 +979,7 @@ func _receivePass( var ppos, var dir, var ptype):
 	
 func _thruPass( var D):
 	
-	if myTeam.zone == 3 and abs(Global.ballpos.z) > 30:
+	if myTeam.zone == 3 and abs(Global.ballpos.z) > 30 * Global.ps:
 		myPlayer.lowshot = true
 		myPlayer.chipPass(true)
 		return
@@ -1207,7 +1207,7 @@ func findPass():
 					closest2goal = dgl
 	
 				
-				if abs(tpt.z) > 35:
+				if abs(tpt.z) > 35 * Global.ps:
 					pscore += (1.0 - myTeam.approach)
 	
 				if dp.x == myTeam.playDir:
@@ -1315,8 +1315,8 @@ func _updatePosition():
 			if (myTeam.zone > 2):
 				var pz = abs(myPlayer.translation.z)
 				var px = abs(myPlayer.translation.x)
-				if pz > 40:
-					if px > 80:
+				if pz > 40 * Global.ps:
+					if px > 80 * Global.ps:
 						
 						
 						myPlayer.chipPass(false)
@@ -1324,7 +1324,7 @@ func _updatePosition():
 						findPass()
 				else:
 					if px > 50.0:
-						var deltashot = Helper.biLerp(2.0, 0.1, 0.75, 0.25, smoothstep(0, 40, pz), smoothstep(50, 110, px))
+						var deltashot = Helper.biLerp(2.0, 0.1, 0.75, 0.25, smoothstep(0, 40 * Global.ps, pz), smoothstep(50 * Global.ps, 110 * Global.ps, px))
 						var ds = rand_range(0.0, 1.0)
 					
 						if ds < deltashot:
@@ -1849,7 +1849,7 @@ func _penaltyTaker():
 	
 	var random = RandomNumberGenerator.new()
 	random.seed = myTeam.teamID + myPlayer.myID
-	target = Vector3( - 90, 0, random.randf_range( - 5, 5))
+	target = Vector3( - 90 * Global.ps, 0, random.randf_range( - 5, 5))
 	
 func _setBenched( var i):
 	state = pstate.BENCH
@@ -1884,7 +1884,7 @@ func _subOn( var _pid):
 	myPlayer.myRoot._bibOff()
 	
 	changeState(pstate.IDLE)
-	target = Vector3(0, 0, - 60)
+	target = Vector3(0, 0, - 60 * Global.ps)
 	myPlayer.set_process(true)
 	myPlayer.set_physics_process(true)
 func _offField( var pid):
@@ -1917,11 +1917,11 @@ func _sentOff():
 	slidevel = Vector3.ZERO
 	yield(get_tree().create_timer(3), "timeout")
 	state = pstate.SENTOFF
-	target = Vector3(0, 0, 100)
+	target = Vector3(0, 0, 100 * Global.ps)
 func _winner():
 	state = pstate.IDLE
 	var off = 0
-	if myPlayer.myID > 6:
+	if myPlayer.myID > Global.squad - 1:
 		off = 5
 	target = Vector3(55 + (myPlayer.myID % 6) * 4.0, 0, 45 - off)
 	
@@ -1937,7 +1937,7 @@ func _firstTimeShot():
 		if _moving() and sign(myPlayer.transform.basis.z.x) != sign(myTeam.playDir):
 			var pz = abs(myPlayer.translation.z)
 			var px = abs(myPlayer.translation.x)
-			var deltashot = Helper.biLerp(1.5, 0.0, 0.25, 0.25, smoothstep(0, 40, pz), smoothstep(65, 130, px))
+			var deltashot = Helper.biLerp(1.5, 0.0, 0.25, 0.25, smoothstep(0, 40 * Global.ps, pz), smoothstep(65 * Global.ps, 130 * Global.ps, px))
 			if rand_range(0, 1) < deltashot:
 				changeState(pstate.POSESSION)
 				tryVolley()

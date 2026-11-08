@@ -106,7 +106,7 @@ func _physics_process(delta):
 		
 		
 	if (Global.gameOn) and ( not oob):
-		if (abs(translation.x) > 140.0) or (abs(translation.z) > 90.0):
+		if (abs(translation.x) > 140.0 * Global.ps) or (abs(translation.z) > 90.0 * Global.ps):
 			oobpos = translation
 			var lst = player
 			if not lst:
@@ -117,7 +117,7 @@ func _physics_process(delta):
 			yield(get_tree().create_timer(0.16), "timeout")
 			Game._oob(lst)
 	elif (Global.penShoot) and Global.penOn:
-		if (abs(translation.x) > 140.0) or (abs(translation.z) > 90.0):
+		if (abs(translation.x) > 140.0 * Global.ps) or (abs(translation.z) > 90.0 * Global.ps):
 			yield(get_tree().create_timer(0.06), "timeout")
 			Game._shootoutMissed()
 	

@@ -8,6 +8,7 @@ var done = false
 
 func _ready():
 	
+	Global.setElevenMode(false)
 	trans = $TextureRect / Transition
 	
 	
@@ -58,7 +59,7 @@ func setButtons():
 	$TextureRect / P1P2Button.text = Global.ll.menus[1]
 	$TextureRect / CupButton.text = Global.ll.menus[2]
 	$TextureRect / WCButton.text = Global.ll.menus[3]
-	$TextureRect / MultiplayerButton.text = "Multiplayer"
+	$TextureRect / MultiplayerButton.text = "11v11"
 	
 	$TextureRect / HelpButton.text = "?"
 	$TextureRect / PracticeButton.text = Global.ll.menus[6]
@@ -191,7 +192,9 @@ func _on_WCButton_pressed():
 func _on_MultiplayerButton_pressed():
 	trans._wipeOff()
 	yield(trans.tween, "tween_completed")
-	var _foo = get_tree().change_scene("res://Scenes/Multiplayer.tscn")
+	# The Multiplayer button now opens the experimental 11v11 mode.
+	Global.setElevenMode(true)
+	var _foo = get_tree().change_scene("res://Scenes/TeamSelect.tscn")
 
 
 func _on_PracticeButton_pressed():

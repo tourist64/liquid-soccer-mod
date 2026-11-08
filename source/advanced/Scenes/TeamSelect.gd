@@ -16,7 +16,7 @@ var p1alt = false
 var p2alt = false
 var t1level = 0
 var t2level = 0
-var lc = [0, 0, 0, 0]
+var lc = [0, 0, 0, 0, 0]
 var gogoGame = false
 var mp_host = false
 var mp_elapsed = 0.0
@@ -56,6 +56,14 @@ func _ready():
 	$TextureRect / T1Levels / T1Level.select(ll)
 	_on_T1Level_item_selected(ll)
 	_on_T2Level_item_selected(ll)
+	if Global.elevenMode:
+		# 11v11: only the 11-a-side squads in Teams/4.
+		t1level = 4
+		t2level = 4
+		_addTeams1(4)
+		_addTeams2(4)
+		$TextureRect / T1Levels.visible = false
+		$TextureRect / T2Levels.visible = false
 	if Global.multiplayer_mode:
 		_select_multiplayer_defaults()
 	else:
@@ -344,6 +352,8 @@ func _readTeams():
 	lc[2] = teams.size()
 	readLevel(3)
 	lc[3] = teams.size()
+	readLevel(4)
+	lc[4] = teams.size()
 	
 func _addTeams1( var level):
 	var from = 0

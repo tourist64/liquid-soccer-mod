@@ -65,14 +65,14 @@ func _setGame( var g):
 	set_process(true)
 	mfov = fov
 func _setCelebrate():
-	limitX = min(limitX + 50, 150)
-	limitZ = min(limitZ + 40, 85)
+	limitX = min(limitX + 50, 150 * Global.ps)
+	limitZ = min(limitZ + 40, 85 * Global.ps)
 	
 	targetfov = 28
 	
 func _setLimits():
-	limitX = mlimitx
-	limitZ = mlimitz
+	limitX = mlimitx * Global.ps
+	limitZ = mlimitz * Global.ps
 	fov = mfov
 	targetfov = mfov
 	

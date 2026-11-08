@@ -29,7 +29,7 @@ func _ready():
 	myAPlayer = $referee / AnimationPlayer
 	
 	
-	gametarget = Vector3( - 80, 0, 40)
+	gametarget = Vector3( - 80, 0, 40) * Global.ps
 	target = Vector3(0, 0, - 30)
 	state = rstate.IDLE
 	$referee._setRef(self)
@@ -111,7 +111,7 @@ func whistleState():
 func gameOnState():
 	
 	
-	var bl = smoothstep( - 100, 100, Global.ballpos.x)
+	var bl = smoothstep( - 100 * Global.ps, 100 * Global.ps, Global.ballpos.x)
 	target = lerp(gametarget, - gametarget, bl)
 	var close = seek(target)
 	if close > 5:

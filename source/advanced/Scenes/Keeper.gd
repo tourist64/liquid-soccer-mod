@@ -220,7 +220,7 @@ func checkInput():
 	
 	
 	if (AI._hasBall()):
-		if abs(translation.x) < 88.0 or abs(translation.z) > 46.5:
+		if abs(translation.x) < 88.0 * Global.ps or abs(translation.z) > 46.5 * Global.ps:
 			
 		
 			AI._clearBall()
