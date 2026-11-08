@@ -63,6 +63,8 @@ func _setupCamera():
 		mfov = 40.0
 		fov = mfov
 		mlimitz = 50
+		# The far stands are further away on the bigger pitch; don't clip them (black band).
+		far = max(far, 1500.0)
 	targetfov = mfov
 
 func _setTarget( var t):
