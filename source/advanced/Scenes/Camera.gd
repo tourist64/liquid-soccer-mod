@@ -67,6 +67,8 @@ func _setupCamera():
 		mlimitz = 50
 		# The far stands are further away on the bigger pitch; don't clip them (black band).
 		far = max(far, 1500.0)
+		# The camera sits behind the near stand; skip drawing it (the pitch edge is ~195 away).
+		near = 165.0
 	targetfov = mfov
 
 func _setTarget( var t):
