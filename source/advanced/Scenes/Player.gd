@@ -1152,8 +1152,8 @@ func _push( var v):
 # Lofts the ball on the flight that lands it at the target, with error set by the passer.
 func _loftFlightTime(distance):
 	# Short and medium lobs fly lower and quicker; long ones keep their full flight.
-	var quicker = lerp(0.8, 1.0, smoothstep(130.0, 200.0, distance))
-	return clamp((0.95 + distance / 95.0) / 1.15 * quicker, 0.85, 2.8)
+	var quicker = lerp(0.93, 1.0, smoothstep(130.0, 200.0, distance))
+	return clamp((0.95 + distance / 95.0) / 1.07 * quicker, 0.95, 3.0)
 
 func _loftAt(target):
 	var skill = clamp(pCurl * 0.6 + pShoot * 0.4, 0.0, 1.0)
@@ -1181,6 +1181,10 @@ func _lobLanding(mate):
 	var distance = max(flat.length(), 1.0)
 	var running = smoothstep(6.0, 18.0, mate.velocity.length())
 	var short = clamp(distance * LOB_BOUNCE_SHARE, 2.0, 12.0) * running
+	# Near a touchline or byline, always bounce it in so it can't run out of play.
+	var lineGap = min(140.0 * Global.ps - abs(spot.x), 90.0 * Global.ps - abs(spot.z))
+	var nearLine = 1.0 - smoothstep(6.0, 30.0, lineGap)
+	short = max(short, nearLine * clamp(distance * 0.23, 12.0, 95.0))
 	var land = spot - flat / distance * short
 	land.x = clamp(land.x, - 128.0 * Global.ps, 128.0 * Global.ps)
 	land.z = clamp(land.z, - 82.0 * Global.ps, 82.0 * Global.ps)

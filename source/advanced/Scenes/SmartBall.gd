@@ -215,6 +215,9 @@ func _shootBall( var shootr, var direction, var curldirection):
 	
 	
 func _passBall( var direction, var passer):
+	# Keepers pass themselves as their AI node; the rest of the game expects the player.
+	if passer.get("myPlayer") != null:
+		passer = passer.myPlayer
 	if _callOffside(passer):
 		return
 	_recordOffside(passer)
@@ -452,6 +455,8 @@ func _callOffside(toucher):
 # Air damping measured on the real ball is cancelled by a higher launch speed.
 const LOFT_DAMP = 0.39
 const CROSS_CURL = 0.4
+const LOW_CROSS_MIN = 90.0
+const LOW_CROSS_MAX = 112.0
 
 func _loftVelocity(offset, hang):
 	var damped = LOFT_DAMP * hang
@@ -462,7 +467,8 @@ func _loftVelocity(offset, hang):
 func _crossVelocity(direction, islow):
 	var flat = Vector3(direction.x, 0.0, direction.z)
 	# A little quicker than a lob over the same distance.
-	var hang = clamp((0.95 + flat.length() / 95.0) * 0.88 / 1.2, 1.0, 2.35)
+	var hang = clamp((0.95 + flat.length() / 95.0) * 0.88 / 1.05, 1.15, 2.6)
 	if islow:
-		hang *= 0.5
+		# Driven along the ground: quicker than a through ball, well below shot pace.
+		return flat.normalized() * clamp(flat.length() * 1.2, LOW_CROSS_MIN, LOW_CROSS_MAX) + Vector3(0, 6.0, 0)
 	return _loftVelocity(flat, hang)

@@ -160,6 +160,8 @@ func moveKeeper():
 	myPlayer.pAggression = max(1.0, myPlayer.pAggression)
 	
 	target = dGoal + (bpos - dGoal).normalized() * myPlayer.pAggression
+	if Global.elevenMode and _shouldSweep():
+		target = Global.ballpos + Global.ballvel * 0.3
 	
 	target.y = 0
 	target.x = sign(target.x) * min(135.0 * Global.ps, abs(target.x))
@@ -1206,3 +1208,22 @@ func _updatePosition():
 
 func _forcePickup(_ppos):
 	pass
+
+# --- 11v11 sweeping -------------------------------------------------------------------
+# Comes off the line for a loose ball in the box when he will clearly get there first.
+const SWEEP_MARGIN = 0.25
+
+func _shouldSweep():
+	if myTeam.posession or not myPlayer.isAI or not ball._isFree() or ball._isShooting():
+		return false
+	if Global.ballpos.y > 3.0 or Global.ballvel.length() > 55.0:
+		return false
+	var spot = Global.ballpos + Global.ballvel * 0.3
+	if sign(spot.x) != sign(dGoal.x) or abs(spot.x) < 88.0 * Global.ps or abs(spot.z) > 46.5 * Global.ps:
+		return false
+	var keeperTime = (spot - pos).length() / max(myPlayer.pSpeed, 1.0)
+	for i in range(1, Global.squad):
+		var o = myTeam.opponent.players[i]
+		if o.carded < 2 and (spot - o.translation).length() / max(o.pSpeed, 1.0) < keeperTime + SWEEP_MARGIN:
+			return false
+	return true
