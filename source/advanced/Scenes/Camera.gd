@@ -59,16 +59,16 @@ func _setupCamera():
 		# 11v11 tele-broadcast view, fitted to FC footage: gantry camera ~25 m up, ~55 m
 		# behind the near touchline, 17.5 deg down, ~15 deg vertical FOV. It pans along the
 		# pitch but never across, so the whole width stays in view.
-		zoffset = 293.0
-		translation.y = 84.0
-		rotation_degrees.x = - 17.5
-		mfov = 15.3
+		zoffset = 197.0
+		translation.y = 66.0
+		rotation_degrees.x = - 22.6
+		mfov = 22.3
 		fov = mfov
 		mlimitz = 50
 		# The far stands are further away on the bigger pitch; don't clip them (black band).
 		far = max(far, 1500.0)
 		# The camera sits behind the near stand; skip drawing it (the pitch edge is ~195 away).
-		near = 165.0
+		near = 95.0
 	targetfov = mfov
 
 func _setTarget( var t):
@@ -101,7 +101,8 @@ func _process(delta: float) -> void :
 	var nz = zoffset + min(max( - limitZ, lpos.z), limitZ) + (shake * (rand_range( - 6, 6)) * delta)
 	if Global.elevenMode:
 		# Broadcast view: stop at the near touchline instead of swinging over the stands.
-		nz = zoffset
+		# Stay put across the pitch, but slide toward the near touchline when play goes there.
+		nz = zoffset + clamp(lpos.z - 50.0, 0.0, 40.0)
 	var updatedt = Vector3(nx, translation.y, nz)
 	var updated = updatedt - translation
 	var speed = 1.0
@@ -121,7 +122,8 @@ func _updateCam( var delta):
 	var nz = zoffset + min(max( - limitZ, lpos.z), limitZ) + (shake * (rand_range( - 6, 6)) * delta)
 	if Global.elevenMode:
 		# Broadcast view: stop at the near touchline instead of swinging over the stands.
-		nz = zoffset
+		# Stay put across the pitch, but slide toward the near touchline when play goes there.
+		nz = zoffset + clamp(lpos.z - 50.0, 0.0, 40.0)
 	var updatedt = Vector3(nx, translation.y, nz)
 	var updated = updatedt - translation
 	var speed = 1.0
