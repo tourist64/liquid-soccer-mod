@@ -73,6 +73,8 @@ func _ready():
 		$Aggregate.visible = true
 		
 	Global.connect("adDone", self, "_adDone")
+	if Global.elevenMode:
+		_broadcastScoreboard()
 	
 func _process(_delta):
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -843,3 +845,52 @@ func _setScore( var x, var y):
 	$Score2.set_text(str(y))
 	if Global.tournament and Global.tournament.leg == 2:
 		setAggregateScore()
+
+# --- 11v11 broadcast-style scoreboard ------------------------------------------------
+# Icon box | white clock box | navy bar: HOME  0 | 0  AWAY | white end cap.
+# Only restyles the existing labels; scoring and timer logic are unchanged.
+func _sbRect(pos, size, col):
+	var r = ColorRect.new()
+	r.rect_position = pos
+	r.rect_size = size
+	r.color = col
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(r)
+	move_child(r, 0)
+	return r
+
+func _sbPlace(node, pos, size, col, al):
+	node.rect_position = pos
+	node.rect_size = size
+	node.add_color_override("font_color", col)
+	node.align = al
+	node.valign = Label.VALIGN_CENTER
+
+func _broadcastScoreboard():
+	var y = 22.0
+	var h = 36.0
+	var navy = Color(0.05, 0.09, 0.45)
+	var blue = Color(0.08, 0.25, 0.85)
+	var white = Color(0.97, 0.97, 0.97)
+	_sbRect(Vector2(410, y), Vector2(6, h), white)
+	_sbRect(Vector2(152, y), Vector2(258, h), navy)
+	_sbRect(Vector2(264, y + 7), Vector2(2, h - 14), Color(1, 1, 1, 0.6))
+	_sbRect(Vector2(58, y), Vector2(94, h), white)
+	_sbRect(Vector2(20, y), Vector2(38, h), blue)
+	var ball = Label.new()
+	ball.text = "o"
+	_sbPlace(ball, Vector2(20, y), Vector2(38, h), white, Label.ALIGN_CENTER)
+	ball.add_font_override("font", $GameTime.get_font("font"))
+	add_child(ball)
+	_sbPlace($GameTime, Vector2(58, y), Vector2(94, h), navy, Label.ALIGN_CENTER)
+	_sbPlace($Team1, Vector2(160, y), Vector2(66, h), white, Label.ALIGN_CENTER)
+	_sbPlace($Score1, Vector2(232, y), Vector2(28, h), white, Label.ALIGN_CENTER)
+	_sbPlace($Score2, Vector2(270, y), Vector2(28, h), white, Label.ALIGN_CENTER)
+	_sbPlace($Team2, Vector2(304, y), Vector2(100, h), white, Label.ALIGN_CENTER)
+	# team colour strips at each end of the bar
+	$Team1Col.rect_position = Vector2(152, y)
+	$Team1Col.rect_size = Vector2(5, h)
+	$Team1Col.expand = true
+	$Team2Col.rect_position = Vector2(405, y)
+	$Team2Col.rect_size = Vector2(5, h)
+	$Team2Col.expand = true
