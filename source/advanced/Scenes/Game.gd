@@ -2442,6 +2442,8 @@ func _hideNearStand(node):
 	for c in node.get_children():
 		if c is GeometryInstance:
 			var a = c.get_transformed_aabb()
+			if OS.has_feature("JavaScript"):
+				JavaScript.eval("(window.slsAabb=window.slsAabb||[]).push(" + to_json([c.name, a.position.z, a.end.z, a.position.y, a.end.y]) + ")", true)
 			if a.position.z > 92.0 * Global.ps:
 				c.visible = false
 				continue
