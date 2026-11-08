@@ -45,7 +45,7 @@ func setColors(shirt, shirt2, shirt3, shorts, skin, number, kit, haircol, hairt,
 	mat.set_shader_param("texture_albedo_trim", Global.t1trim)
 	mat.set_shader_param("texture_albedo2_trim", Global.t2trim)
 
-	if id > 6:
+	if id > Global.squad - 1:
 		mat.set_shader_param("doBibs", true)
 	
 	
