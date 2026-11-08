@@ -350,6 +350,8 @@ func _ready():
 			mainCam = $VPC / VP / GameGroup / Camera
 			hud._setMap(0)
 			worldEnv.dof_blur_far_distance = Global.config.get_value("gfx", "camdof")
+			if Global.elevenMode:
+				worldEnv.dof_blur_far_distance = 600.0
 		1:
 			mainCam = $VPC / VP / GameGroup / AltCameras / CameraTopUD
 			hud._setMap(1)

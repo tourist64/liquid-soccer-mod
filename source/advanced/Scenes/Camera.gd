@@ -55,6 +55,14 @@ func _setupCamera():
 			fov = mfov
 			rotation_degrees.x = Global.config.get_value("gfx", "camLRtilt")
 			translation.y = Global.config.get_value("gfx", "camLRheight")
+	if Global.elevenMode and Global.config.get_value("gfx", "camtype") == 0:
+		# 11v11 broadcast view: higher, further back and flatter so most of the pitch is visible.
+		zoffset = 175.0
+		translation.y = 105.0
+		rotation_degrees.x = - 32.0
+		mfov = 50.0
+		fov = mfov
+		mlimitz = 30
 	targetfov = mfov
 
 func _setTarget( var t):
