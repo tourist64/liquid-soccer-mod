@@ -217,6 +217,7 @@ func _ready():
 	
 	Global.gameOn = false
 	hud = $Hud
+	_enterFullWindow()
 	ball = $VPC / VP / GameGroup / Ball
 	
 	
@@ -2359,3 +2360,33 @@ func _gameOver():
 func _shushCrowd():
 	$Sounds / CrowdSounds.playing = false
 	$Sounds / CrowdSounds.volume_db = - 92
+
+# --- Full-window match view -------------------------------------------------
+# Menus are laid out for a fixed 1031x580 screen, so the project keeps the
+# "keep" aspect (letterboxed). During a match we switch to "expand" so the 3D
+# view fills the whole window, keep the fixed-size HUD centred, and restore
+# "keep" when the match scene is left.
+const BASE_SIZE = Vector2(1031, 580)
+
+func _enterFullWindow():
+	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_EXPAND, BASE_SIZE)
+	if not get_viewport().is_connected("size_changed", self, "_fitFullWindow"):
+		get_viewport().connect("size_changed", self, "_fitFullWindow")
+	_fitFullWindow()
+
+func _fitFullWindow():
+	var vs = get_viewport().get_visible_rect().size
+	$VPC.rect_position = Vector2.ZERO
+	$VPC.rect_size = vs
+	# The container resizes its viewport to the 2D size; render at window resolution instead.
+	var rt = get_tree().get_root()
+	if rt.size.x != Global.vpRes[0]:
+		$VPC / VP.size = rt.size
+	else:
+		$VPC / VP.size = Vector2(Global.vpRes[0], Global.vpRes[1])
+	$Hud.rect_position = ((vs - BASE_SIZE) * 0.5).floor()
+
+func _exit_tree():
+	if get_viewport().is_connected("size_changed", self, "_fitFullWindow"):
+		get_viewport().disconnect("size_changed", self, "_fitFullWindow")
+	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_KEEP, BASE_SIZE)
