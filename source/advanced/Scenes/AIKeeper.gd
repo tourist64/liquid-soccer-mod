@@ -784,6 +784,7 @@ func _updateData(p, v):
 	
 func _update():
 	
+	_checkGoalThreat()
 	stateFunc[state].call_func()
 	
 	myPlayer.acc += vel
@@ -1097,3 +1098,41 @@ func lapState():
 		target = myTeam._getLapTarget(cCelebTarget)
 	view = target
 	atarget = target
+
+
+# --- Goal-bound loose balls -----------------------------------------------------
+# The keeper only dives for balls flagged as shots (Team._shot -> _shotIncoming).
+# Slow back-passes, long free kicks, deflections and crosses that drift towards
+# goal were never flagged, so he ignored them and they rolled in. Treat any loose
+# ball whose path crosses our goal mouth as a shot so the normal save logic runs.
+var threatCooldownUntil = 0
+
+func _checkGoalThreat():
+	if not Global.gameOn or Global.penOn or Global.penShoot:
+		return
+	if not (state == pstate.DEFEND or state == pstate.ACTIVE or state == pstate.IDLE):
+		return
+	if OS.get_ticks_msec() < threatCooldownUntil:
+		return
+	if not ball._isFree() or ball._isShooting() or ball._isCaught():
+		return
+	if dGoal == null:
+		return
+	var bp = Global.ballpos
+	var bv = Global.ballvel
+	var dx = dGoal.x - bp.x
+	# Only balls in our half that are actually travelling towards our goal line.
+	if abs(dx) > 90.0 or abs(bv.x) < 1.0 or sign(bv.x) != sign(dx):
+		return
+	var t = dx / bv.x
+	if t > 5.0:
+		return
+	if bp.y > 10.0 and bv.y > 0.0:
+		return
+	var zAtLine = bp.z + bv.z * t
+	var halfWidth = abs(myTeam.goalL.z) + 2.0
+	if abs(zAtLine) > halfWidth:
+		return
+	threatCooldownUntil = OS.get_ticks_msec() + 1500
+	ball.isShot = true
+	_shotIncoming(bp, bv, Vector3.ZERO, 0)
