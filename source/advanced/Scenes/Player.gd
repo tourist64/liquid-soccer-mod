@@ -287,7 +287,12 @@ func chipPass( var human):
 			var h = 0.4 + smoothstep(0, 100, myTeam.passDir.length())
 			
 			if Global.elevenMode:
-				_loftAt(translation + Vector3(myTeam.passDir.x, 0.0, myTeam.passDir.z))
+				if myTeam.passto:
+					var landed = _lobTo(myTeam.passto)
+					if myTeam.passto.isAI:
+						myTeam.passto.AI._receivePass(translation, landed, 1)
+				else:
+					_loftAt(translation + Vector3(myTeam.passDir.x, 0.0, myTeam.passDir.z))
 			else:
 				ball._passBall((myTeam.passDir + Vector3(0, h * 30.0, 0)) * 0.8, self)
 			
@@ -1146,7 +1151,9 @@ func _push( var v):
 # --- 11v11 long passing ---------------------------------------------------------------
 # Lofts the ball on the flight that lands it at the target, with error set by the passer.
 func _loftFlightTime(distance):
-	return clamp(0.95 + distance / 95.0, 1.2, 3.2)
+	# Short and medium lobs fly lower and quicker; long ones keep their full flight.
+	var quicker = lerp(0.8, 1.0, smoothstep(130.0, 200.0, distance))
+	return clamp((0.95 + distance / 95.0) / 1.15 * quicker, 0.85, 2.8)
 
 func _loftAt(target):
 	var skill = clamp(pCurl * 0.6 + pShoot * 0.4, 0.0, 1.0)
@@ -1158,10 +1165,33 @@ func _loftAt(target):
 	ball._loftBall(ball._loftVelocity(offset, hang), self)
 	return offset
 
-# Long ball to a teammate, led to where he will be when it lands.
-func chipTo(mate):
+# Where a lob should come down: at a stationary receiver's feet, or short of a runner so it
+# bounces into his path. Always inside the pitch so it can't run out of play.
+const LOB_BOUNCE_SHARE = 0.05
+# The ball comes down a little before its nominal flight time.
+const LOB_LEAD_TIME = 0.92
+
+func _lobLanding(mate):
 	var hang = _loftFlightTime((mate.translation - translation).length())
-	var offset = _loftAt(mate.translation + mate.velocity * hang)
+	var spot = mate.translation + mate.velocity * hang * LOB_LEAD_TIME
+	hang = _loftFlightTime((spot - translation).length())
+	spot = mate.translation + mate.velocity * hang * LOB_LEAD_TIME
+	var flat = spot - translation
+	flat.y = 0.0
+	var distance = max(flat.length(), 1.0)
+	var running = smoothstep(6.0, 18.0, mate.velocity.length())
+	var short = clamp(distance * LOB_BOUNCE_SHARE, 2.0, 12.0) * running
+	var land = spot - flat / distance * short
+	land.x = clamp(land.x, - 128.0 * Global.ps, 128.0 * Global.ps)
+	land.z = clamp(land.z, - 82.0 * Global.ps, 82.0 * Global.ps)
+	return land
+
+func _lobTo(mate):
+	return _loftAt(_lobLanding(mate))
+
+# Long ball to a teammate, sent wherever he can actually reach it.
+func chipTo(mate):
+	var offset = _lobTo(mate)
 	myTeam._cross(self)
 	myTeam.posession = false
 	AI._losePosession()

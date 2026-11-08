@@ -462,7 +462,7 @@ func _loftVelocity(offset, hang):
 func _crossVelocity(direction, islow):
 	var flat = Vector3(direction.x, 0.0, direction.z)
 	# A little quicker than a lob over the same distance.
-	var hang = clamp((0.95 + flat.length() / 95.0) * 0.88, 1.2, 2.8)
+	var hang = clamp((0.95 + flat.length() / 95.0) * 0.88 / 1.2, 1.0, 2.35)
 	if islow:
 		hang *= 0.5
 	return _loftVelocity(flat, hang)
