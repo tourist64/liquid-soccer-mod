@@ -2385,6 +2385,8 @@ func _fitFullWindow():
 	else:
 		$VPC / VP.size = Vector2(Global.vpRes[0], Global.vpRes[1])
 	$Hud.rect_position = ((vs - BASE_SIZE) * 0.5).floor()
+	if OS.has_feature("JavaScript"):
+		JavaScript.eval("window.slsView = " + to_json({"visible": [vs.x, vs.y], "root": [rt.size.x, rt.size.y], "vpc": [$VPC.rect_size.x, $VPC.rect_size.y], "vp": [$VPC / VP.size.x, $VPC / VP.size.y], "hud": [$Hud.rect_position.x, $Hud.rect_position.y]}), true)
 
 func _exit_tree():
 	if get_viewport().is_connected("size_changed", self, "_fitFullWindow"):
