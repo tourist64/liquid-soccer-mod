@@ -445,6 +445,10 @@ func _foul():
 	$goalscorer.text = Global.ll.ingame[8]
 	$goalscorer.visible = true
 
+func _offside():
+	$goalscorer.text = "offside"
+	$goalscorer.visible = true
+
 func _throwin():
 	$goalscorer.text = Global.ll.ingame[3]
 	$goalscorer.visible = true

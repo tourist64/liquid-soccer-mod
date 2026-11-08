@@ -538,6 +538,8 @@ func _findThruPass(pos, lookD, _id):
 		
 		var score = diff.normalized().dot(lookD.normalized())
 		
+		if Global.elevenMode and _isOffsidePosition(players[i]):
+			score = - 1000
 		if score > 0.55 and (players[i].myID != _id):
 			dl = diff.length()
 			if (dl < best):
@@ -609,7 +611,7 @@ func _findLongPass(pos, lookD, _id):
 		diff = (players[i].translation + (goal - players[i].translation) * 0.2) - pos
 		
 		var score = diff.normalized().dot(lookD.normalized())
-		if players[i].carded > 1:
+		if players[i].carded > 1 or (Global.elevenMode and _isOffsidePosition(players[i])):
 			score = - 1000
 		if (players[i].myID != _id) and score > 0.55:
 			dl = diff.length_squared()
@@ -1922,7 +1924,7 @@ func _crossTarget(crosser):
 	var best = null
 	for i in range(1, Global.squad):
 		var p = players[i]
-		if p == crosser or p.carded > 1:
+		if p == crosser or p.carded > 1 or _isOffsidePosition(p):
 			continue
 		if abs(p.translation.x - goal.x) < 53.0 * Global.ps and abs(p.translation.z) < 50.0 * Global.ps:
 			if best == null or p.pAerial > best.pAerial:
@@ -1953,9 +1955,51 @@ func _onsideLine():
 	return onsideLine
 
 func _keepOnside(p, pid):
-	if not (Global.elevenMode and Global.gameOn and posession) or players[pid] == pplayer:
+	if not (Global.elevenMode and Global.gameOn) or players[pid] == pplayer:
 		return p
 	var limit = _onsideLine() - ONSIDE_MARGIN
 	if p.x * playDir > limit:
 		p = Vector3(limit * playDir, p.y, p.z)
 	return p
+
+# Offside position, judged when the ball is played: in the opponents' half, ahead of the
+# ball, and ahead of the second-last opponent.
+func _isOffsidePosition(p):
+	var depth = p.translation.x * playDir
+	if depth <= 0.0 or depth <= ball.translation.x * playDir:
+		return false
+	var depths = []
+	for o in opponent.players:
+		if o.carded < 2:
+			depths.append(o.translation.x * playDir)
+	depths.sort()
+	return depths.size() >= 2 and depth > depths[depths.size() - 2]
+
+func _offsidePlayers(kicker):
+	var flagged = {}
+	for i in range(1, Global.squad):
+		if players[i] != kicker and _isOffsidePosition(players[i]):
+			flagged[players[i]] = true
+	return flagged
+
+func _offsideCalled(offender):
+	if not Global.gameOn:
+		return
+	momentum = false
+	isCorner = false
+	Game.resetPos = offender.translation
+	Game.resetPos.y = 0.25
+	Global.gameOn = false
+	state = teamState.FOUL
+	ball._initialize()
+	ball.translation = Game.resetPos
+	opponent.state = teamState.FOULED
+	Game.fkend = playDir if sign(playDir) != sign(Game.resetPos.x) and abs(Game.resetPos.x) > 40 * Global.ps else 0
+	Game.fkzone = zone
+	Game._offsideCall(opponent)
+	Global.teamsReady[teamID - 1] = false
+	for i in range(0, Global.squad):
+		players[i].AI._defendFK()
+		players[i].isAI = true
+	opponent._fouled(Game.resetPos)
+	state = teamState.LINEUP

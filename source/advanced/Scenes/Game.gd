@@ -1361,6 +1361,7 @@ func fkSetup():
 		$Timers / Timer.start()
 
 func throwSetup():
+	ball.offsideExempt = true
 	ball._reset()
 	
 	
@@ -1612,6 +1613,19 @@ func _foul( var _position, var victim, var offender):
 	$Timers / Timer.wait_time = 1
 	$Timers / Timer.start()
 	
+func _offsideCall( var victim):
+	$Sounds / WhistleSounds.play()
+	gametimer.paused = true
+	hud._offside()
+	fkteam = victim.teamID
+	fkai = victim.AIteam
+	targetgoal = victim.goal
+	if not fkai:
+		setControls(fkteam)
+	state = gameState.FREEKICK
+	$Timers / Timer.wait_time = 1
+	$Timers / Timer.start()
+
 func _penalty( var offender, var fteam):
 	$Sounds / WhistleSounds.play()
 	$Sounds / CrowdFoul.playing = true
@@ -1864,6 +1878,7 @@ func checkCorner( var las):
 	if lastteam == 1 and ( not team2.AIteam):
 		setControls(2)
 	
+	ball.offsideExempt = true
 	match cstate:
 		0:
 			team1._corner(side, e)

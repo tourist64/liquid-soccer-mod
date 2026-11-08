@@ -1145,11 +1145,8 @@ func _push( var v):
 
 # --- 11v11 long passing ---------------------------------------------------------------
 # Lofts the ball on the flight that lands it at the target, with error set by the passer.
-# Air damping measured on the real ball; the launch speed is raised to cancel it.
-const LOFT_DAMP = 0.39
-
 func _loftFlightTime(distance):
-	return clamp(0.55 + distance / 170.0, 0.75, 1.8)
+	return clamp(0.95 + distance / 95.0, 1.2, 3.2)
 
 func _loftAt(target):
 	var skill = clamp(pCurl * 0.6 + pShoot * 0.4, 0.0, 1.0)
@@ -1158,10 +1155,7 @@ func _loftAt(target):
 	offset.y = 0.0
 	offset += Vector3(rand_range( - miss, miss), 0.0, rand_range( - miss, miss))
 	var hang = _loftFlightTime(offset.length())
-	var damped = LOFT_DAMP * hang
-	var flight = offset / hang * (damped / (1.0 - exp( - damped)))
-	flight.y = 0.5 * 20.0 * ball.gravity_scale * hang
-	ball._loftBall(flight, self)
+	ball._loftBall(ball._loftVelocity(offset, hang), self)
 	return offset
 
 # Long ball to a teammate, led to where he will be when it lands.

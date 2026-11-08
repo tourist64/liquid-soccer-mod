@@ -1173,7 +1173,7 @@ func findPass():
 			var tpt = myTeam.players[i].translation + myTeam.players[i].velocity * 0.1
 			var dp = tpt - myPlayer.translation
 			var dg = myGoal - tpt
-			if myTeam.players[i].carded > 1:
+			if myTeam.players[i].carded > 1 or (Global.elevenMode and myTeam._isOffsidePosition(myTeam.players[i])):
 				pscore = - 10000
 			else:
 				

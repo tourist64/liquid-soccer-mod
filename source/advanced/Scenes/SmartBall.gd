@@ -28,6 +28,8 @@ var canSave = true
 enum bstate{OPEN, SHOOTING, TRAPPED, CAUGHT, CROSSING}
 var state
 var hitK = null
+var offsideFlags = {}
+var offsideExempt = false
 var sa = null
 var sas = null
 
@@ -149,6 +151,9 @@ func _integrate_forces(pstate):
 		
 	pstate.transform.origin.y = max(0.0, pstate.transform.origin.y)
 func _ballTrapped( var cplayer):
+	if _callOffside(cplayer):
+		return
+	offsideFlags.clear()
 	if (Global.gameOn):
 		trail.render = false
 		state = bstate.TRAPPED
@@ -170,6 +175,7 @@ func _ballCaught( var cplayer):
 	
 	if not canSave:
 		return false
+	offsideFlags.clear()
 	trail.render = false
 	linear_velocity = Vector3.ZERO
 		
@@ -183,8 +189,9 @@ func _ballCaught( var cplayer):
 	
 
 func _shootBall( var shootr, var direction, var curldirection):
-	if state == bstate.CAUGHT:
+	if state == bstate.CAUGHT or _callOffside(shootr):
 		return
+	_recordOffside(shootr)
 	state = bstate.SHOOTING
 	linear_velocity *= 0.25
 	linear_velocity.y = 0.01
@@ -208,6 +215,9 @@ func _shootBall( var shootr, var direction, var curldirection):
 	
 	
 func _passBall( var direction, var passer):
+	if _callOffside(passer):
+		return
+	_recordOffside(passer)
 	
 	
 	
@@ -228,6 +238,9 @@ func _passBall( var direction, var passer):
 	
 	
 func _crossBall( var direction, var passer, var curld, var islow):
+	if _callOffside(passer):
+		return
+	_recordOffside(passer)
 	
 	linear_velocity *= 0.25
 	var d = direction
@@ -250,10 +263,18 @@ func _crossBall( var direction, var passer, var curld, var islow):
 		dl *= 1.1
 	isShot = false
 	
-	apply_central_impulse(d * dl + Vector3(0, high, 0))
+	if Global.elevenMode:
+		linear_velocity = Vector3.ZERO
+		curl = curld * CROSS_CURL
+		apply_central_impulse(_crossVelocity(direction, islow))
+	else:
+		apply_central_impulse(d * dl + Vector3(0, high, 0))
 
 
 func _tapBall( var direction, var passer):
+	if _callOffside(passer):
+		return
+	_recordOffside(passer)
 	
 	
 	oob = false
@@ -272,6 +293,9 @@ func _tapBall( var direction, var passer):
 	apply_central_impulse(direction)
 	
 func _loftBall( var flight, var passer):
+	if _callOffside(passer):
+		return
+	_recordOffside(passer)
 	oob = false
 	linear_velocity = Vector3.ZERO
 	state = bstate.OPEN
@@ -403,3 +427,42 @@ func _on_Ball_body_entered(body):
 
 func _on_Ball_input_event(_camera, _event, _click_position, _click_normal, _shape_idx):
 	pass
+
+# --- 11v11 offside --------------------------------------------------------------------
+# Offside is judged the moment the ball is played and called if a flagged player touches it.
+# Corners, throw-ins and goal kicks set offsideExempt so their first kick cannot be offside.
+func _recordOffside(kicker):
+	offsideFlags.clear()
+	if not Global.elevenMode or kicker == null or kicker.get("myTeam") == null:
+		return
+	if offsideExempt:
+		offsideExempt = false
+		return
+	offsideFlags = kicker.myTeam._offsidePlayers(kicker)
+
+func _callOffside(toucher):
+	if not (Global.elevenMode and Global.gameOn and offsideFlags.has(toucher)):
+		return false
+	offsideFlags.clear()
+	toucher.myTeam._offsideCalled(toucher)
+	return true
+
+# --- 11v11 lofted balls ---------------------------------------------------------------
+# Launch velocity that lands the ball at a horizontal offset after the given hang time.
+# Air damping measured on the real ball is cancelled by a higher launch speed.
+const LOFT_DAMP = 0.39
+const CROSS_CURL = 0.4
+
+func _loftVelocity(offset, hang):
+	var damped = LOFT_DAMP * hang
+	var flight = Vector3(offset.x, 0.0, offset.z) / hang * (damped / (1.0 - exp( - damped)))
+	flight.y = 0.5 * 20.0 * gravity_scale * hang
+	return flight
+
+func _crossVelocity(direction, islow):
+	var flat = Vector3(direction.x, 0.0, direction.z)
+	# A little quicker than a lob over the same distance.
+	var hang = clamp((0.95 + flat.length() / 95.0) * 0.88, 1.2, 2.8)
+	if islow:
+		hang *= 0.5
+	return _loftVelocity(flat, hang)
