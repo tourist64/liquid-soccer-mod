@@ -1127,14 +1127,16 @@ func _checkGoalThreat():
 	var t = dx / bv.x
 	if t > 5.0:
 		return
-	if bp.y > 10.0 and bv.y > 0.0:
+	# Only slow balls along the ground (back-passes, scuffed shots). Real shots already
+	# alert the keeper through Team._shot, and reacting to crosses/fast passes pulled
+	# him out of position, so leave those to the original save logic.
+	if bv.length() > 40.0 or bp.y > 2.0:
 		return
 	var zAtLine = bp.z + bv.z * t
 	var halfWidth = abs(myTeam.goalL.z) + 2.0
 	if abs(zAtLine) > halfWidth:
 		return
 	threatCooldownUntil = OS.get_ticks_msec() + 1500
-	ball.isShot = true
 	_shotIncoming(bp, bv, Vector3.ZERO, 0)
 
 # --- Crash guards --------------------------------------------------------------
