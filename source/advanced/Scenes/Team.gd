@@ -200,6 +200,10 @@ func setPlayerParams( var p, var i):
 	p.pAcc = pp["speed"] * 0.1
 	p.pShoot = pp["shoot"] * 0.1
 	p.pCurl = pp["curl"] * 0.1
+	p.set("pStrength", pp.get("strength", 5.0) * 0.1)
+	p.set("pAerial", pp.get("aerial", 5.0) * 0.1)
+	if Global.elevenMode and p.get("myHeadArea") != null:
+		p.myHeadArea.scale = Vector3.ONE * lerp(0.8, 1.3, pp.get("aerial", 5.0) * 0.1)
 	p.set("pLongShot", pp.get("longShot", 0.0))
 	p.set("pPressRes", pp.get("pressRes", 0.0))
 	cpdata = pp
@@ -884,6 +888,10 @@ func _getGoalKickPos( var pid):
 
 
 func _getPlayPos(pid):
+	if Global.elevenMode:
+		var boxRun = _boxRun(pid)
+		if boxRun != null:
+			return boxRun
 	
 	var dp = Global.ballpos + Global.ballvel * 0.2
 	var blerp = smoothstep( - 135 * Global.ps, 150 * Global.ps, dp.x * playDir)
@@ -911,6 +919,10 @@ func _getPlayPos(pid):
 		return pp1
 
 func _getSupportPos(pid):
+	if Global.elevenMode:
+		var boxRun = _boxRun(pid)
+		if boxRun != null:
+			return boxRun
 	
 	var posid = pid + (zone - 1) * Global.squad
 	
@@ -1112,6 +1124,8 @@ func _switchPControl( var p):
 	if not Global.gameOn:
 		return
 	
+	if p != cplayer:
+		p.set("switchArmed", true)
 	cplayer = p
 	closest = p
 	cplayer._controlMe()
@@ -1861,3 +1875,54 @@ func _elevenDefendCorner():
 				p.AI.target = _getDefendPos(pid)
 			p.AI.atarget = p.AI.target
 			zone += 1
+
+# --- 11v11 crossing -------------------------------------------------------------------
+# [distance from the goal line, distance toward the ball's side] for players attacking a cross.
+const BOX_RUN_SLOTS = [[14.0, 10.0], [18.0, - 2.0], [16.0, - 12.0], [34.0, 4.0], [40.0, - 12.0]]
+
+var boxRunFrame = - 1
+var boxRunners = []
+
+func _boxRunActive():
+	if tdata.crossing < 0.35 or not posession or zone != 3:
+		return false
+	return abs(Global.ballpos.z) > 38.0 * Global.ps or ball._isCrossing()
+
+func _aerialFirst(a, b):
+	return a.pAerial > b.pAerial
+
+func _boxRun(pid):
+	if pid == 0 or players.size() <= pid or not _boxRunActive():
+		return null
+	var frame = Engine.get_idle_frames()
+	if frame != boxRunFrame:
+		boxRunFrame = frame
+		boxRunners.clear()
+		for i in range(1, Global.squad):
+			if players[i] != pplayer and players[i].carded < 2:
+				boxRunners.append(players[i])
+		boxRunners.sort_custom(self, "_aerialFirst")
+		boxRunners.resize(min(boxRunners.size(), int(round(lerp(2.0, 5.0, tdata.crossing)))))
+	var slot = boxRunners.find(players[pid])
+	if slot < 0:
+		return null
+	var inward = - sign(goal.x)
+	return Vector3(goal.x + inward * BOX_RUN_SLOTS[slot][0], 0.0, sign(Global.ballpos.z) * BOX_RUN_SLOTS[slot][1])
+
+# Picks the best header of the ball in the box; better teams find him more often.
+func _crossTarget(crosser):
+	var quality = lerp(0.25, 0.95, max(tdata.crossing, tdata.setPieces))
+	if randf() > quality:
+		return null
+	var best = null
+	for i in range(1, Global.squad):
+		var p = players[i]
+		if p == crosser or p.carded > 1:
+			continue
+		if abs(p.translation.x - goal.x) < 66.0 and abs(p.translation.z) < 62.0:
+			if best == null or p.pAerial > best.pAerial:
+				best = p
+	if best == null:
+		return null
+	var miss = lerp(9.0, 2.5, max(tdata.crossing, tdata.setPieces))
+	return best.translation + Vector3(rand_range( - miss, miss), 0.0, rand_range( - miss, miss))

@@ -78,6 +78,7 @@ func _ready():
 		$DialogSettings / CamButton.clear()
 		$DialogSettings / CamButton.add_item("tele broadcast")
 		$DialogSettings / CamButton.add_item("co-op")
+		$DialogSettings / CamButton.add_item("classic")
 		$DialogSettings / CamButton.select(Global.config.get_value("gfx", "elevenview", 0))
 	
 func _process(_delta):

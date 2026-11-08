@@ -26,6 +26,8 @@ approach = 5.0
 League = 0
 counter = 0.4
 cornerOutlets = 0
+crossing = 0.85
+setPieces = 1.00
 player0 = {
 "aggression": 7.0,
 "agility": 8.0,
@@ -46,6 +48,8 @@ player1 = {
 "facehair": 1,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 2,
+"strength": 7.0,
+"aerial": 6.0,
 "name": "J Timber",
 "shoot": 5.0,
 "skin": Color( 0.330, 0.210, 0.140, 1 ),
@@ -59,6 +63,8 @@ player2 = {
 "facehair": 1,
 "hair": Color( 0.150, 0.100, 0.100, 1 ),
 "hairtype": 4,
+"strength": 8.0,
+"aerial": 8.0,
 "name": "R Calafiori",
 "shoot": 6.0,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
@@ -72,6 +78,8 @@ player3 = {
 "facehair": 2,
 "hair": Color( 0.150, 0.100, 0.100, 1 ),
 "hairtype": 6,
+"strength": 8.0,
+"aerial": 9.0,
 "name": "W Saliba",
 "shoot": 5.0,
 "skin": Color( 0.620, 0.420, 0.300, 1 ),
@@ -85,6 +93,8 @@ player4 = {
 "facehair": 0,
 "hair": Color( 0.150, 0.100, 0.100, 1 ),
 "hairtype": 1,
+"strength": 9.0,
+"aerial": 10.0,
 "name": "Gabriel",
 "shoot": 7.0,
 "skin": Color( 0.330, 0.210, 0.140, 1 ),
@@ -98,6 +108,8 @@ player5 = {
 "facehair": 0,
 "hair": Color( 0.150, 0.100, 0.100, 1 ),
 "hairtype": 1,
+"strength": 10.0,
+"aerial": 8.0,
 "name": "V Gyokeres",
 "shoot": 9.0,
 "skin": Color( 0.780, 0.570, 0.450, 1 ),
@@ -111,6 +123,8 @@ player6 = {
 "facehair": 0,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 5,
+"strength": 6.0,
+"aerial": 6.0,
 "name": "M Zubimendi",
 "shoot": 6.0,
 "skin": Color( 0.330, 0.210, 0.140, 1 ),
@@ -124,6 +138,8 @@ player7 = {
 "facehair": 1,
 "hair": Color( 0.850, 0.700, 0.400, 1 ),
 "hairtype": 1,
+"strength": 5.0,
+"aerial": 4.0,
 "name": "M Odegaard",
 "shoot": 8.0,
 "skin": Color( 0.780, 0.570, 0.450, 1 ),
@@ -137,6 +153,8 @@ player8 = {
 "facehair": 2,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 1,
+"strength": 9.0,
+"aerial": 8.0,
 "name": "D Rice",
 "shoot": 8.0,
 "skin": Color( 0.960, 0.800, 0.690, 1 ),
@@ -150,6 +168,8 @@ player9 = {
 "facehair": 2,
 "hair": Color( 0.150, 0.100, 0.100, 1 ),
 "hairtype": 2,
+"strength": 6.0,
+"aerial": 5.0,
 "name": "B Saka",
 "shoot": 8.0,
 "skin": Color( 0.330, 0.210, 0.140, 1 ),
@@ -163,6 +183,8 @@ player10 = {
 "facehair": 2,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 3,
+"strength": 6.0,
+"aerial": 5.0,
 "name": "E Eze",
 "shoot": 8.0,
 "skin": Color( 0.960, 0.800, 0.690, 1 ),
@@ -172,4 +194,4 @@ player10 = {
 def = [ Vector2( 0.8060, 0.8400 ), Vector2( 0.1940, 0.8400 ), Vector2( 0.6080, 0.8700 ), Vector2( 0.3920, 0.8700 ), Vector2( 0.5000, 0.6200 ), Vector2( 0.5000, 0.7800 ), Vector2( 0.6440, 0.7600 ), Vector2( 0.3560, 0.7600 ), Vector2( 0.8060, 0.7400 ), Vector2( 0.1940, 0.7400 ) ]
 mid = [ Vector2( 0.8400, 0.7000 ), Vector2( 0.1600, 0.7000 ), Vector2( 0.6200, 0.7700 ), Vector2( 0.3800, 0.7700 ), Vector2( 0.5000, 0.4200 ), Vector2( 0.5000, 0.6300 ), Vector2( 0.6600, 0.6000 ), Vector2( 0.3400, 0.6000 ), Vector2( 0.8400, 0.4800 ), Vector2( 0.1600, 0.4800 ) ]
 att = [ Vector2( 0.7200, 0.4200 ), Vector2( 0.2800, 0.4200 ), Vector2( 0.6200, 0.5400 ), Vector2( 0.3800, 0.5400 ), Vector2( 0.5000, 0.1000 ), Vector2( 0.5000, 0.3800 ), Vector2( 0.6600, 0.3000 ), Vector2( 0.3400, 0.3000 ), Vector2( 0.8400, 0.1400 ), Vector2( 0.1600, 0.1400 ) ]
-cor = [ Vector2( 0.6300, 0.1700 ), Vector2( 0.5600, 0.1400 ), Vector2( 0.5800, 0.0800 ), Vector2( 0.4300, 0.0750 ), Vector2( 0.5000, 0.0900 ), Vector2( 0.4000, 0.4600 ), Vector2( 0.6000, 0.4600 ), Vector2( 0.4700, 0.1350 ), Vector2( 0.2000, 0.1200 ), Vector2( 0.5000, 0.2250 ) ]
+cor = [ Vector2( 0.5000, 0.0550 ), Vector2( 0.5600, 0.1400 ), Vector2( 0.5800, 0.0800 ), Vector2( 0.4300, 0.0750 ), Vector2( 0.5000, 0.0900 ), Vector2( 0.4000, 0.4600 ), Vector2( 0.6000, 0.4600 ), Vector2( 0.4700, 0.1350 ), Vector2( 0.2000, 0.1200 ), Vector2( 0.5000, 0.2250 ) ]

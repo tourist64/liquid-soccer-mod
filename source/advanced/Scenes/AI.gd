@@ -1812,7 +1812,8 @@ func _on_DangerZone_body_entered(body):
 
 
 	var clp = Helper.pointToLine(Global.ballpos, Global.ballpos + Global.ballvel * 0.3, pos, 1.0)
-	if clp.y > 6 and bdot < 0.7:
+	var headReach = lerp(7.4, 5.0, myPlayer.pAerial) if Global.elevenMode else 6.0
+	if clp.y > headReach and bdot < 0.7:
 		
 		if (myTeam.AIteam) and (state != pstate.PCOLLECT) and state != pstate.INTERCEPT:
 			_header(false)

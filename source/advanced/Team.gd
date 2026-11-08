@@ -24,6 +24,9 @@ export (int) var League = 0
 # cornerOutlets = players left upfield when defending a corner (0 = everyone back).
 export (float) var counter = 0.0
 export (int) var cornerOutlets = 1
+# How much the team attacks from wide with crosses, and how dangerous its set pieces are (0-1).
+export (float) var crossing = 0.3
+export (float) var setPieces = 0.3
 
 
 export var player0 = {
