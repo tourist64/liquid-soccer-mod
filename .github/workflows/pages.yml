@@ -39,6 +39,8 @@ jobs:
           python3 tools/build_remaster.py --base game3/index-mod.pck --source /tmp/remaster-source.pck --output game3/index.pck
           pck_size=$(stat -c %s game3/index.pck)
           sed -i -E "s/(\"index\.pck\":)[0-9]+/\1${pck_size}/" game3/index.html
+          # Cache-bust: browsers otherwise keep an old index.pck for up to 10 minutes.
+          sed -i "s/\"executable\":\"index\"/\"executable\":\"index\",\"mainPack\":\"index.pck?v=${GITHUB_SHA}\"/" game3/index.html
           rm -f game3/index-mod.html game3/index-mod.pck
 
       - name: Montar artefato web
