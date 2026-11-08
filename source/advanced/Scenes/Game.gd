@@ -176,8 +176,9 @@ func initStadium():
 		$VPC / VP / GameGroup / Goal.translation.x *= Global.ps
 		$VPC / VP / GameGroup / Goal2.translation.x *= Global.ps
 		# The goal model is 9.7 m x 3.2 m at this pitch scale; bring it to a real 7.32 m x 2.44 m.
-		$VPC / VP / GameGroup / Goal.scale = ELEVEN_GOAL_SCALE
-		$VPC / VP / GameGroup / Goal2.scale = ELEVEN_GOAL_SCALE
+		if Global.ps > 1.0:
+			$VPC / VP / GameGroup / Goal.scale = ELEVEN_GOAL_SCALE
+			$VPC / VP / GameGroup / Goal2.scale = ELEVEN_GOAL_SCALE
 		$Zones.scale *= Vector3(Global.ps, 1.0, Global.ps)
 		_useBowlStadium(gs)
 	awayFans = gs.find_node("AwayFans")
@@ -354,7 +355,7 @@ func _ready():
 			mainCam = $VPC / VP / GameGroup / Camera
 			hud._setMap(0)
 			worldEnv.dof_blur_far_distance = Global.config.get_value("gfx", "camdof")
-			if Global.elevenMode:
+			if Global.elevenMode and Global.ELEVEN_CUSTOM_CAMERAS:
 				worldEnv.dof_blur_far_distance = 600.0
 		1:
 			mainCam = $VPC / VP / GameGroup / AltCameras / CameraTopUD

@@ -800,7 +800,9 @@ func exitFullWindow(scene):
 
 # --- 11v11 mode -------------------------------------------------------------------
 # squad = players on the pitch per team (keeper included); ps = pitch scale.
-const ELEVEN_PITCH_SCALE = 1.18
+const ELEVEN_PITCH_SCALE = 1.0
+# 11v11 uses the standard camera options; true restores the tele broadcast, co-op and classic views.
+const ELEVEN_CUSTOM_CAMERAS = false
 # Camera and stadium distances were tuned at this scale and are sized relative to it.
 const ELEVEN_DESIGN_SCALE = 1.25
 var elevenMode = false
@@ -812,7 +814,7 @@ func setElevenMode(on):
 	elevenMode = on
 	squad = 11 if on else 7
 	ps = ELEVEN_PITCH_SCALE if on else 1.0
-	if on:
+	if on and ELEVEN_CUSTOM_CAMERAS:
 		# 11v11 has its own two views on the main camera; the 7-a-side choice comes back after.
 		if elevenPrevCamtype == null:
 			elevenPrevCamtype = config.get_value("gfx", "camtype", 0)

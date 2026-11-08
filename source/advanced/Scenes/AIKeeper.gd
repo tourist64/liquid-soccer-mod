@@ -1233,7 +1233,7 @@ func _elevenDive(intP, shotVel):
 # Decides whether this shot beats the keeper, from how good the shot is and how good he is.
 func _rollSave(shotVel):
 	var agile = clamp(myPlayer.pAgility / 8.0, 0.0, 1.0)
-	var chance = lerp(0.92, 0.28, _shotQuality(shotVel)) * lerp(0.82, 1.0, agile)
+	var chance = lerp(0.97, 0.55, _shotQuality(shotVel)) * lerp(0.85, 1.0, agile)
 	if randf() > chance:
 		myPlayer.canSave = false
 

@@ -1870,7 +1870,7 @@ func _elevenDefendCorner():
 		else:
 			p.AI._kickoff()
 			if zone < CORNER_ZONES.size():
-				p.AI.target = Vector3(dGoal.x + inward * CORNER_ZONES[zone][0], 0.0, kickSide * CORNER_ZONES[zone][1])
+				p.AI.target = Vector3(dGoal.x + inward * CORNER_ZONES[zone][0] * Global.ps / Global.ELEVEN_DESIGN_SCALE, 0.0, kickSide * CORNER_ZONES[zone][1])
 			else:
 				p.AI.target = _getDefendPos(pid)
 			p.AI.atarget = p.AI.target

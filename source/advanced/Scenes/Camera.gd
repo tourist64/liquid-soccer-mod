@@ -147,7 +147,7 @@ func _pitchRatio():
 	return Global.ps / Global.ELEVEN_DESIGN_SCALE
 
 func _isElevenView():
-	return Global.elevenMode and self == _mainElevenCamera()
+	return Global.ELEVEN_CUSTOM_CAMERAS and Global.elevenMode and self == _mainElevenCamera()
 
 func _mainElevenCamera():
 	return get_parent().get_node_or_null("Camera")
