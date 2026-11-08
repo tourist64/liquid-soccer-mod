@@ -9,6 +9,7 @@ var done = false
 func _ready():
 	
 	Global.setElevenMode(false)
+	Global.isPenalties = false
 	trans = $TextureRect / Transition
 	
 	
@@ -194,6 +195,9 @@ func _on_MultiplayerButton_pressed():
 	yield(trans.tween, "tween_completed")
 	# The Multiplayer button now opens the experimental 11v11 mode.
 	Global.setElevenMode(true)
+	Global.isPenalties = false
+	Global.tournament = null
+	Global.doShootout = false
 	var _foo = get_tree().change_scene("res://Scenes/TeamSelect.tscn")
 
 
