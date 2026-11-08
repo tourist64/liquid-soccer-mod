@@ -259,10 +259,24 @@ func closestPToBallDefend():
 	var hp = (myPlayer.dGoal + myPlayer.pAggression * db)
 	return _quadratic_bezier(pos, hp, (Global.ballpos + pvel) - db.normalized() * 4.0, pval)
 func closestPToBallDefendNew():
-	
-	var bp = Global.ballpos + Global.ballvel * myPlayer.dSmart
+	# Pressing the ball carrier. The original aimed 4-8 units goal-side of where the
+	# ball would be after a long look-ahead, so against a dribbler running sideways the
+	# defender ran alongside him (often all the way out of play) instead of tackling.
+	# Now: stay goal-side only when the dribbler is running at our goal from a distance;
+	# when close, or when he is going sideways/away, go for the ball itself.
+	var dist = (Global.ballpos - pos).length()
+	var lead = myPlayer.dSmart
+	if dist < 12.0:
+		lead = min(lead, 0.08)
+	var bp = Global.ballpos + Global.ballvel * lead
 	var b2g = (bp - myPlayer.dGoal).normalized()
-	return bp - b2g * (lerp(8.0, 4.0, myPlayer.pAggression))
+	var towardGoal = 0.0
+	if Global.ballvel.length() > 1.0:
+		towardGoal = clamp(Global.ballvel.normalized().dot( - b2g), 0.0, 1.0)
+	var offset = lerp(8.0, 4.0, myPlayer.pAggression) * lerp(0.15, 1.0, towardGoal)
+	if dist < 8.0:
+		offset = min(offset, 1.0)
+	return bp - b2g * offset
 	
 func closestPToBallDefendOld():
 	
