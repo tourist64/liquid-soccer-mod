@@ -1188,6 +1188,10 @@ func _loftAt(target, mate = null):
 # Where a lob should come down: at a stationary receiver's feet, or short of a runner so it
 # bounces into his path. Always inside the pitch so it can't run out of play.
 const LOB_BOUNCE_SHARE = 0.05
+# How far a lob carries on after landing, measured from the ball's own bounce and roll.
+const LOB_DIRECT_GAP = 12.0
+const LOB_BOUNCE_RUN = 34.0
+const LOB_BOUNCE_PER_UNIT = 0.085
 # The ball comes down a little before its nominal flight time.
 const LOB_LEAD_TIME = 0.92
 
@@ -1196,22 +1200,25 @@ func _lobLanding(mate):
 	var spot = mate.translation + mate.velocity * hang * LOB_LEAD_TIME
 	hang = _loftFlightTime((spot - translation).length())
 	spot = mate.translation + mate.velocity * hang * LOB_LEAD_TIME
+	spot = myTeam._safePassSpot(spot, mate)
 	var flat = spot - translation
 	flat.y = 0.0
 	var distance = max(flat.length(), 1.0)
+	var heading = flat / distance
+	var lineX = 140.0 * Global.ps
+	var lineZ = 90.0 * Global.ps
+	# A receiver already out on the line gets it direct.
+	var mateGap = min(lineX - abs(mate.translation.x), lineZ - abs(mate.translation.z))
+	if mateGap < LOB_DIRECT_GAP:
+		return spot
 	var running = smoothstep(6.0, 18.0, mate.velocity.length())
 	var short = clamp(distance * LOB_BOUNCE_SHARE, 2.0, 12.0) * running
-	# Near a touchline or byline, always bounce it in so it can't run out of play.
-	var lineGap = min(140.0 * Global.ps - abs(spot.x), 90.0 * Global.ps - abs(spot.z))
-	var nearLine = 1.0 - smoothstep(6.0, 30.0, lineGap)
-	# A receiver already out on the line gets it just in front of him.
-	var mateGap = min(140.0 * Global.ps - abs(mate.translation.x), 90.0 * Global.ps - abs(mate.translation.z))
-	if mateGap < myTeam.PASS_LINE_MARGIN:
-		nearLine = 0.0
-		short = max(short, 8.0)
-	short = max(short, nearLine * clamp(distance * 0.23, 12.0, 95.0))
-	var land = spot - flat / distance * short
-	return myTeam._safePassSpot(land, mate)
+	# Heading for a line, it comes down early and bounces on to the target.
+	var toX = 1.0 - smoothstep(30.0, 70.0, lineX - abs(spot.x)) if heading.x * spot.x > 0.0 else 0.0
+	var toZ = 1.0 - smoothstep(30.0, 70.0, lineZ - abs(spot.z)) if heading.z * spot.z > 0.0 else 0.0
+	var towardLine = max(toX * smoothstep(0.25, 0.7, abs(heading.x)), toZ * smoothstep(0.25, 0.7, abs(heading.z)))
+	short = max(short, towardLine * min(LOB_BOUNCE_RUN + distance * LOB_BOUNCE_PER_UNIT, distance * 0.6))
+	return spot - heading * short
 
 func _lobTo(mate):
 	return _loftAt(_lobLanding(mate), mate)

@@ -14,13 +14,15 @@ var oobpos = Vector3.ZERO
 var passGuard = false
 const LINE_BRAKE_LOOK = 0.6
 const LINE_STOP_GAP = 3.0
-# Lobs keep their pace in the air, so long ones needn't be struck absurdly hard, and check up on landing.
+# Lobs keep more pace in the air, so long ones needn't be struck absurdly hard.
 var loftFlight = false
-const LOB_AIR_DAMP = 0.05
-const LOB_DRAG_CANCEL = 0.25
+var lobbed = false
+const LOB_AIR_DAMP = 0.1
+const LOB_DRAG_CANCEL = 0.2
 const LOB_LANDS_AT = 0.87
-const LOB_LANDING_KEEP = 0.75
-const LOB_LANDING_BOUNCE = 0.4
+# A lob is only ever eased to a stop while rolling, and gently.
+const LOB_ROLL_HEIGHT = 1.2
+const LOB_MAX_BRAKE = 60.0
 var trail = null
 var minPassSpeed = 80
 var maxPassSpeed = 100
@@ -170,21 +172,23 @@ func _lineBrake(along, speed, line, step):
 	var gap = line - abs(along) - LINE_STOP_GAP
 	if outward <= 0.0 or gap > outward * LINE_BRAKE_LOOK:
 		return speed
+	if lobbed:
+		var eased = max(0.0, outward - LOB_MAX_BRAKE * step)
+		return eased * sign(along)
 	if gap <= 0.0:
 		return 0.0
 	return speed * max(0.0, 1.0 - outward / (2.0 * gap) * step)
 
 func _carryLob(pstate):
 	var v = pstate.linear_velocity
-	var keep = exp(LOB_DRAG_CANCEL * pstate.step)
 	if translation.y < 1.0 and v.y < 0.0:
-		keep = LOB_LANDING_KEEP
-		v.y *= LOB_LANDING_BOUNCE
 		loftFlight = false
+		return
+	var keep = exp(LOB_DRAG_CANCEL * pstate.step)
 	pstate.linear_velocity = Vector3(v.x * keep, v.y, v.z * keep)
 
 func _brakeAtLines(pstate):
-	if loftFlight:
+	if loftFlight or (lobbed and translation.y > LOB_ROLL_HEIGHT):
 		return
 	var v = pstate.linear_velocity
 	var before = Vector2(v.x, v.z).length()
@@ -291,6 +295,7 @@ func _passBall( var direction, var passer):
 	apply_central_impulse(dr * (ddl / dl) + Vector3(0, 5, 0))
 	passGuard = Global.elevenMode
 	loftFlight = false
+	lobbed = false
 	
 	
 func _crossBall( var direction, var passer, var curld, var islow):
@@ -365,6 +370,7 @@ func _loftBall( var flight, var passer):
 	apply_central_impulse(flight)
 	passGuard = Global.elevenMode
 	loftFlight = Global.elevenMode
+	lobbed = Global.elevenMode
 
 func _reset():
 	
