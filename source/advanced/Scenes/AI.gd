@@ -345,6 +345,8 @@ func findMarker():
 		return player.translation - Vector3(myTeam.playDir * 5, 0, 0)
 	else:
 		return target
+const UNIT_SPRINT_GAP = 25.0
+
 func playingState():
 	
 	target = myTeam._getPlayPos(myPlayer.myID)
@@ -386,11 +388,14 @@ func playingState():
 		else:
 			marking.marked = false
 			marking = null
-	elif (myTeam.zone == 3) and myTeam.momentum:
+	elif (myTeam.zone == 3) and myTeam.momentum and myTeam.tdata.unitShape <= 0.0:
 		t = (t * 0.7 + (Global.ballpos + Global.ballvel * 0.3) * 0.3)
 	atarget = t
 	
 	var _close = seek(t)
+	# Unit-shape teams sprint to their spot when the team switches between attack and defence.
+	if myTeam.tdata.unitShape > 0.0 and _close > UNIT_SPRINT_GAP and myPlayer.pSpeed <= myPlayer.pOSpeed and (myTeam._onTheBall() or not myTeam.opponent._onTheBall() or (myPlayer.translation - myTeam.dGoal).length() > (Global.ballpos - myTeam.dGoal).length()):
+		myPlayer._burst()
 
 
 func supportState():

@@ -922,6 +922,10 @@ func _getGoalKickPos( var pid):
 	return Vector3(formation[posid].x, 0, formation[posid].y)
 
 
+# Unit-shape teams attack only while they have the ball or their own pass is still travelling.
+func _onTheBall():
+	return posession or passto != null
+
 func _getPlayPos(pid):
 	return _keepOnside(_getPlayPosRaw(pid), pid)
 
@@ -933,7 +937,10 @@ func _getPlayPosRaw(pid):
 	
 	var dp = Global.ballpos + Global.ballvel * 0.2
 	var blerp = smoothstep( - 135 * Global.ps, 150 * Global.ps, dp.x * playDir)
-	if momentum and tdata.unitShape > 0.0:
+	if tdata.unitShape > 0.0:
+		if not _onTheBall():
+			# Without the ball a unit-shape team drops into its deep shape wherever the ball is.
+			return _getDefendPos(pid)
 		blerp = max(blerp, smoothstep( - 60 * Global.ps, 30 * Global.ps, dp.x * playDir) * tdata.unitShape)
 	if momentum:
 		var zlerp = smoothstep(0, 80 * Global.ps, abs(dp.z))
@@ -968,7 +975,7 @@ func _getSupportPosRaw(pid):
 			return boxRun
 	
 	var z = zone
-	if momentum and tdata.unitShape > 0.0 and z < 3 and Global.ballpos.x * playDir > - 40 * Global.ps:
+	if tdata.unitShape > 0.0 and _onTheBall() and z < 3 and Global.ballpos.x * playDir > - 40 * Global.ps:
 		z = 3
 	var posid = pid + (z - 1) * Global.squad
 	
