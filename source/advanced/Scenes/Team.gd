@@ -202,8 +202,16 @@ func setPlayerParams( var p, var i):
 	p.set("pStrength", pp.get("strength", 5.0) * 0.1)
 	p.set("pAerial", pp.get("aerial", 5.0) * 0.1)
 	p.set("pBlock", pp.get("block", 0.0))
-	if Global.elevenMode and p.get("myHeadArea") != null:
-		p.myHeadArea.scale = Vector3.ONE * lerp(0.8, 1.3, pp.get("aerial", 5.0) * 0.1)
+	# Aerial ratings always count in 11v11; in the normal game only for players who have one.
+	p.set("aerialRated", Global.elevenMode or pp.has("aerial"))
+	p.set("blockRated", Global.elevenMode or pp.has("block"))
+	# hitbox: a bigger body for blocking shots and a bigger reach for headers (1 = normal).
+	var hitbox = pp.get("hitbox", 1.0)
+	if p.get("myHeadArea") != null:
+		var reach = lerp(0.8, 1.3, pp.get("aerial", 5.0) * 0.1) if p.get("aerialRated") else 1.0
+		p.myHeadArea.scale = Vector3.ONE * reach * hitbox
+	if p.has_node("BallCollider/CollisionShape"):
+		p.get_node("BallCollider/CollisionShape").scale = Vector3.ONE * hitbox
 	p.set("pLongShot", pp.get("longShot", 0.0))
 	p.set("pPressRes", pp.get("pressRes", 0.0))
 	p.set("pBallWin", pp.get("ballWin", 0.0))
@@ -925,6 +933,8 @@ func _getPlayPosRaw(pid):
 	
 	var dp = Global.ballpos + Global.ballvel * 0.2
 	var blerp = smoothstep( - 135 * Global.ps, 150 * Global.ps, dp.x * playDir)
+	if momentum and tdata.unitShape > 0.0:
+		blerp = max(blerp, smoothstep( - 60 * Global.ps, 30 * Global.ps, dp.x * playDir) * tdata.unitShape)
 	if momentum:
 		var zlerp = smoothstep(0, 80 * Global.ps, abs(dp.z))
 		pp1.x = lerp(formation[pid].x + 20 * playDir, formation[pid + Global.squad].x + 10.0 * playDir, smoothstep(0.0, 0.5, blerp))
@@ -957,16 +967,19 @@ func _getSupportPosRaw(pid):
 		if boxRun != null:
 			return boxRun
 	
-	var posid = pid + (zone - 1) * Global.squad
+	var z = zone
+	if momentum and tdata.unitShape > 0.0 and z < 3 and Global.ballpos.x * playDir > - 40 * Global.ps:
+		z = 3
+	var posid = pid + (z - 1) * Global.squad
 	
 	
 	
 	
-	if zone == 1:
+	if z == 1:
 		var posid2 = pid + Global.squad
 		var mxr = 1.0 - smoothstep(40 * Global.ps, 150 * Global.ps, abs(Global.ballpos.x))
 		return (Vector3(formation[posid].x, 0, formation[posid].y) * (1.0 - mxr) + Vector3(formation[posid2].x, 0, formation[posid2].y) * mxr)
-	elif zone == 2:
+	elif z == 2:
 		var posid2 = pid + 2 * Global.squad
 		var mxr = 0.6 + smoothstep( - 40 * Global.ps, 40 * Global.ps, (Global.ballpos.x) * - playDir) * 0.4
 		return (Vector3(formation[posid].x, 0, formation[posid].y) * mxr + Vector3(formation[posid2].x, 0, formation[posid2].y) * (1.0 - mxr))
@@ -1021,6 +1034,8 @@ func _getDefendPos(pid):
 		
 			
 		
+	if tdata.unitShape > 0.0:
+		ppos = ppos.linear_interpolate(Vector3(formation[pid].x, 0, formation[pid].y), tdata.unitShape)
 	var adjust = 10
 	if sign(Global.ballpos.z) == sign(ppos.z):
 		adjust = 20
@@ -1090,7 +1105,38 @@ func _getShootoutPosition( var pid):
 	if teamID == 2:
 		pt = - 1.0
 	return Vector3(0.0, 0.0, 10 + pid * 4.5) * pt
+const LOCKDOWN_REACH = 40.0
+
+func _closerToOurGoal(a, b):
+	return a.translation.distance_squared_to(dGoal) < b.translation.distance_squared_to(dGoal)
+
+func _lockdownMark(pid):
+	var threats = []
+	for i in range(1, Global.squad):
+		var o = opponent.players[i]
+		if o != Game.kickTaker and o.carded < 2:
+			threats.append(o)
+	if threats.empty():
+		return _getDefendPos(pid)
+	threats.sort_custom(self, "_closerToOurGoal")
+	var slot = pid - 1
+	var o = threats[slot % threats.size()]
+	var toGoal = dGoal - o.translation
+	toGoal.y = 0.0
+	toGoal = toGoal.normalized()
+	var spot = o.translation + toGoal * 3.5
+	if slot >= threats.size():
+		spot = o.translation + toGoal * 2.5 + toGoal.cross(Vector3.UP) * (2.5 if slot % 2 == 0 else - 2.5)
+	var fromGoal = spot - dGoal
+	fromGoal.y = 0.0
+	if fromGoal.length() > LOCKDOWN_REACH:
+		spot = dGoal + fromGoal.normalized() * LOCKDOWN_REACH
+	spot.y = 0.0
+	return spot
+
 func _getMarkPosition( var pid):
+	if isCorner and not Global.elevenMode and tdata.cornerLockdown > 0.0:
+		return _lockdownMark(pid)
 	
 	if Global.elevenMode and isCorner:
 		if cornerMark.has(pid):
@@ -1559,6 +1605,10 @@ func _defendCorner():
 		state = teamState.LINEUP
 		return
 	for i in range(0, Global.squad):
+		if i > 0 and tdata.cornerLockdown > 0.0:
+			players[i].AI._mark()
+			players[i].indicator.visible = false
+			continue
 		match i:
 			0:
 				players[i].AI._defendCorner()

@@ -27,6 +27,12 @@ export (int) var cornerOutlets = 1
 # How much the team attacks from wide with crosses, and how dangerous its set pieces are (0-1).
 export (float) var crossing = 0.3
 export (float) var setPieces = 0.3
+# Unit shape (0-1): without the ball the whole team holds its deep shape wherever the ball is;
+# on the attack the whole team moves up into its attacking shape from around halfway.
+export (float) var unitShape = 0.0
+# Corner lockdown: every outfield player marks at defending corners, nearest attackers first,
+# spare defenders doubling up, all staying close to the keeper.
+export (float) var cornerLockdown = 0.0
 
 
 export var player0 = {

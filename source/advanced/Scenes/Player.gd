@@ -17,6 +17,8 @@ var pBallWin = 0.0
 var pStrength = 0.5
 var pBlock = 0.0
 var pAerial = 0.5
+var aerialRated = false
+var blockRated = false
 var pAcc = 3
 var pBurst = 44
 var dBurst = 44
@@ -1059,14 +1061,14 @@ func _on_HeadArea_body_entered(_body):
 				aim *= myTeam.playDir
 			else:
 				aim = rand_range( - 1.0, 1.0)
-				if Global.elevenMode:
+				if aerialRated:
 					aim = sign(aim) * lerp(abs(aim), 1.0, pAerial * 0.55)
 			
 			
 			shotV = lerp(myGoalL, myGoalR, smoothstep( - 1, 1, aim))
 			shotV = shotV - translation
 			
-			var headPower = lerp(72.0, 98.0, pAerial) if Global.elevenMode else 83.5
+			var headPower = lerp(72.0, 98.0, pAerial) if aerialRated else 83.5
 			var headdir = (shotV.normalized() + Vector3(0, lerp( - 0.1, - 0.425, pShoot), 0)) * headPower
 			if sign(transform.basis.z.x) == sign(myTeam.playDir):
 				headdir = (myGoal - translation).normalized()

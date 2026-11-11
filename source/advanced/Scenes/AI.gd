@@ -1743,7 +1743,7 @@ func _blockShot( var _bpos, var dir):
 	
 	sp = pos - sp
 	
-	var blockRange = lerp(10.0, 20.0, myPlayer.pBlock) if Global.elevenMode else 10.0
+	var blockRange = lerp(10.0, 20.0, myPlayer.pBlock) if myPlayer.blockRated else 10.0
 	if (sp.length_squared() < blockRange * blockRange):
 		sp = - sp.normalized()
 		_slide(false, Vector2(sp.x, sp.z))
@@ -1849,7 +1849,7 @@ func _on_DangerZone_body_entered(body):
 
 
 	var clp = Helper.pointToLine(Global.ballpos, Global.ballpos + Global.ballvel * 0.3, pos, 1.0)
-	var headReach = lerp(7.4, 5.0, myPlayer.pAerial) if Global.elevenMode else 6.0
+	var headReach = lerp(7.4, 5.0, myPlayer.pAerial) if myPlayer.aerialRated else 6.0
 	if clp.y > headReach and bdot < 0.7:
 		
 		if (myTeam.AIteam) and (state != pstate.PCOLLECT) and state != pstate.INTERCEPT:

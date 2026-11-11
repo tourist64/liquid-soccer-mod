@@ -25,6 +25,8 @@ aggression = 10
 approach = 5.0
 League = 1
 counter = 1.0
+unitShape = 1.0
+cornerLockdown = 1.0
 player0 = {
 "aggression": 9.5,
 "agility": 8.0,
@@ -181,7 +183,7 @@ player11 = {
 "smart": 8.0,
 "speed": 8.0
 }
-def = [ Vector2( 0.3, 0.9 ), Vector2( 0.42, 0.94 ), Vector2( 0.58, 0.94 ), Vector2( 0.5, 0.88 ), Vector2( 0.64, 0.87 ), Vector2( 0.45, 0.82 ) ]
+def = [ Vector2( 0.3, 0.9 ), Vector2( 0.42, 0.94 ), Vector2( 0.58, 0.94 ), Vector2( 0.5, 0.88 ), Vector2( 0.62, 0.9 ), Vector2( 0.45, 0.88 ) ]
 mid = [ Vector2( 0.25, 0.78 ), Vector2( 0.42, 0.86 ), Vector2( 0.58, 0.86 ), Vector2( 0.5, 0.74 ), Vector2( 0.64, 0.68 ), Vector2( 0.45, 0.62 ) ]
-att = [ Vector2( 0.18, 0.55 ), Vector2( 0.4, 0.72 ), Vector2( 0.6, 0.72 ), Vector2( 0.5, 0.5 ), Vector2( 0.68, 0.22 ), Vector2( 0.42, 0.12 ) ]
+att = [ Vector2( 0.33, 0.2 ), Vector2( 0.42, 0.5 ), Vector2( 0.58, 0.5 ), Vector2( 0.5, 0.28 ), Vector2( 0.64, 0.14 ), Vector2( 0.46, 0.08 ) ]
 cor = [ Vector2( 0.35, 0.14 ), Vector2( 0.45, 0.08 ), Vector2( 0.56, 0.08 ), Vector2( 0.5, 0.2 ), Vector2( 0.66, 0.16 ), Vector2( 0.42, 0.1 ) ]
