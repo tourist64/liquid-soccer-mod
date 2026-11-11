@@ -149,9 +149,8 @@ func setupFormation():
 		formation.append(Vector2(110 * Global.ps, 0))
 		for i in range(Global.squad - 1):
 			formation.append(Vector2(range_lerp(tdata.att[i].y, 0, 1, - 150 * Global.ps, 150 * Global.ps), range_lerp(tdata.att[i].x, 0, 1, 100 * Global.ps, - 100 * Global.ps)))
-	if Global.elevenMode:
-		# Corner spots are looked up by player id, and id 0 is the keeper.
-		cformation.append(Vector3.ZERO)
+	# Corner and free-kick spots are looked up by player id, and id 0 is the keeper.
+	cformation.append(Vector3.ZERO)
 	for i in range(Global.squad - 1):
 		cformation.append(Vector3(range_lerp(tdata.cor[i].y, 0, 1, - 150 * Global.ps, 150 * Global.ps), 0, range_lerp(tdata.cor[i].x, 0, 1, 100 * Global.ps, - 100 * Global.ps)))
 		
