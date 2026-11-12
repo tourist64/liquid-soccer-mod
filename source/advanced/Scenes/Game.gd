@@ -100,6 +100,7 @@ var mp_replica = false
 var mp_snapshot_elapsed = 0.0
 var mp_last_snapshot_version = 0
 var mp_last_presented_state = -1
+var madridGoalSound = null
 func initTeams():
 	team1 = $VPC / VP / GameGroup / Team
 	team1.opponent = $VPC / VP / GameGroup / Team2
@@ -235,9 +236,9 @@ func _ready():
 	hud = $Hud
 	Global.enterFullWindow(self)
 	ball = $VPC / VP / GameGroup / Ball
-	
-	
-	
+	_setupMadridGoalSound()
+
+
 	gameFunc[gameState.LINEUP] = funcref(self, "goIntro")
 	gameFunc[gameState.INTRO] = funcref(self, "goSetup")
 	gameFunc[gameState.GAMEON] = funcref(self, "_noop")
@@ -524,6 +525,10 @@ func _mp_apply_replica_state():
 	_mp_apply_referee_state(snapshot.get("referee", []))
 	var remote_score = snapshot.get("score", [])
 	if typeof(remote_score) == TYPE_ARRAY and remote_score.size() >= 2:
+		if remote_score[0] > score.x:
+			_playMadridGoal(0)
+		elif remote_score[1] > score.y:
+			_playMadridGoal(1)
 		score = Vector2(remote_score[0], remote_score[1])
 		hud._setScore(score.x, score.y)
 	state = remote_state
@@ -1500,6 +1505,31 @@ func goalScored():
 	$Timers / Timer.wait_time = 2
 	$Timers / Timer.start()
 
+func _setupMadridGoalSound():
+	var stream = load("res://Res/madrid_goal.mp3")
+	if not stream:
+		push_error("couldn't load Madrid goal track")
+		return
+	madridGoalSound = AudioStreamPlayer.new()
+	madridGoalSound.stream = stream
+	madridGoalSound.bus = "Music"
+	$Sounds.add_child(madridGoalSound)
+
+func _isMadrid(t):
+	if t == null:
+		return false
+	var sn = str(t.get("shortname")).to_upper()
+	var tn = str(t.get("teamname")).to_lower()
+	# Real Madrid, 2017 Real Madrid, Atletico Madrid, Royal Mudrid,
+	# Mudrid 2017, Mudrid 2026 and Athletic Mads
+	return sn == "MAD" or "madrid" in tn or "mudrid" in tn or "athletic mads" in tn
+
+func _playMadridGoal(teamIndex):
+	if madridGoalSound == null:
+		return
+	if _isMadrid(Global.t1 if teamIndex == 0 else Global.t2):
+		madridGoalSound.play()
+
 func _on_team1_scored(_body):
 
 	gametimer.paused = true
@@ -1520,9 +1550,12 @@ func _on_team1_scored(_body):
 		
 		team1Scored = true
 		goalScored()
+		_playMadridGoal(0)
 	elif Global.penShoot:
-		
+
 		goal1Sim._calcNet()
+		if Global.penOn and kickTaker != null:
+			_playMadridGoal(0 if kickTaker.myTeam == team1 else 1)
 		$VPC / VP / GameGroup / Stadium._celebrate()
 		$VPC / VP / GameGroup / Stadium._awayConceded()
 		
@@ -1551,7 +1584,8 @@ func _on_team2_scored(_body):
 	
 		team1Scored = false
 		goalScored()
-	
+		_playMadridGoal(1)
+
 func _on_Zone1_body_entered(body):
 	if body != ball:
 		return
