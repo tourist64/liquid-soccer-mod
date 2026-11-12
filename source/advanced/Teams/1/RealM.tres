@@ -61,7 +61,7 @@ player2 = {
 "shoot": 7.5,
 "skin": Color( 0.620, 0.420, 0.300, 1 ),
 "smart": 10.0,
-"speed": 7.0
+"speed": 8.5
 }
 player3 = {
 "aggression": 8.5,
