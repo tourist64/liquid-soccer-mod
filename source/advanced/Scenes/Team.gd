@@ -939,6 +939,8 @@ func _getPlayPos(pid):
 # Without the ball, the deepest defenders stand level with each other, goal-side of the ball,
 # so attackers who drift beyond them are offside.
 const LINE_DEFENDERS = 3
+# Only players nearly as deep as the deepest defender belong to the line, never a midfielder.
+const LINE_DEPTH_BAND = 0.06
 const LINE_BALL_GAP = 4.0
 const LINE_MIN_DEPTH = 12.0
 var lineFrame = - 1
@@ -949,7 +951,12 @@ func _lineIds():
 	for i in range(1, Global.squad):
 		ids.append(i)
 	ids.sort_custom(self, "_deeperInShape")
-	return ids.slice(0, LINE_DEFENDERS - 1)
+	var deepest = tdata.def[ids[0] - 1].y
+	var line = []
+	for id in ids.slice(0, LINE_DEFENDERS - 1):
+		if deepest - tdata.def[id - 1].y <= LINE_DEPTH_BAND:
+			line.append(id)
+	return line
 
 func _deeperInShape(a, b):
 	return tdata.def[a - 1].y > tdata.def[b - 1].y
@@ -1175,7 +1182,9 @@ func _getPenDPosition( var pid):
 		3:
 			return Vector3(Game.penend * - 82 * Global.ps, 0, - 23)
 		_:
-			return _getDefendPos(pid)
+			# Everyone else waits along the edge of the box, never in the way of the kick.
+			var side = 1.0 if pid % 2 == 0 else - 1.0
+			return Vector3(Game.penend * - 76 * Global.ps, 0, side * (42 + 8 * int((pid - 4) / 2)))
 
 func _getShootoutPosition( var pid):
 	var pt = 1.0

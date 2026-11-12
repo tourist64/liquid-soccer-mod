@@ -1040,12 +1040,14 @@ func _on_TrapArea_body_entered(body):
 
 # How well the man on the ball keeps it from this challenge, out of TACKLE_ROLL.
 const TACKLE_ROLL = 9.0
+const NORMAL_MIN_STEAL = 0.25
 const BALL_WIN_BONUS = 2.0
 
 func _holdScore(holder):
 	var hold = holder.pAgility
 	if not Global.elevenMode:
-		return hold
+		# Normal game: any touch on the ball wins it at least a quarter of the time.
+		return min(hold, TACKLE_ROLL * (1.0 - NORMAL_MIN_STEAL))
 	var res = holder.get("pPressRes")
 	res = res if res else 0.0
 	var holderStr = holder.get("pStrength")
