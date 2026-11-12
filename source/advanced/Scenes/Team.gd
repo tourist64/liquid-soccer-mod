@@ -2072,9 +2072,26 @@ var cornerMark = {}
 
 # Extra pull toward the most advanced runner in the seconds after winning the ball.
 func _counterBonus():
-	if tdata.counter <= 0.0 or OS.get_ticks_msec() - wonBallAt > COUNTER_WINDOW_MS:
+	var counter = tdata.counter + COMEBACK_COUNTER * _comebackBoost()
+	if counter <= 0.0 or OS.get_ticks_msec() - wonBallAt > COUNTER_WINDOW_MS:
 		return 0.0
-	return tdata.counter * 2.5
+	return counter * 2.5
+
+# --- Comeback ---------------------------------------------------------------------------
+const COMEBACK_PRESS = 0.3      # team aggression rises by up to 0.3 (on a 0-1 scale)
+const COMEBACK_TACKLE = 0.3     # each player's tackling eagerness rises by up to 0.3
+const COMEBACK_COUNTER = 0.6    # the counter-attack setting rises by up to 0.6
+
+# 0 when level or ahead, 0.5 one goal down, 1 when two or more down.
+func _comebackBoost():
+	if tdata.get("comeback") == null or tdata.comeback <= 0.0 or Game == null or Game.get("score") == null:
+		return 0.0
+	var mine = Game.score.x if teamID == 1 else Game.score.y
+	var theirs = Game.score.y if teamID == 1 else Game.score.x
+	return tdata.comeback * min(max(theirs - mine, 0.0), 2.0) * 0.5
+
+func _aggressionNow():
+	return min(aggression + COMEBACK_PRESS * _comebackBoost(), 1.0)
 
 # Best delivery among the players not assigned to the box.
 func _bestCornerTaker(fallback):

@@ -49,6 +49,8 @@ export (int) var anchorId = 0
 export (float) var sweeperKeeper = 0.0
 # How far open-play crosses carry in normal matches (1 = the game's usual cross, lower = shorter).
 export (float) var crossPace = 1.0
+# Comeback (0-1): the further behind, the harder the team presses, tackles and counters.
+export (float) var comeback = 0.0
 
 
 export var player0 = {

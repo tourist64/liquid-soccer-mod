@@ -28,6 +28,7 @@ counter = 1.2
 unitShape = 1.0
 midBlock = 0.5
 crossPace = 0.85
+comeback = 1.0
 player0 = {
 "aggression": 6.0,
 "agility": 10.0,

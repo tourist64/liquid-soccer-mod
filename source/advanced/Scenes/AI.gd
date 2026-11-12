@@ -522,7 +522,7 @@ func pressState():
 	
 	if myTeam.AIteam:
 		var doslide = rand_range(0.0, 1.0)
-		if ((pos - Global.ballpos + Global.ballvel * 0.2).length() < 10) and (doslide * 2.0 < myPlayer.pAggression) and (myTeam.opponent.posession == true):
+		if ((pos - Global.ballpos + Global.ballvel * 0.2).length() < 10) and (doslide * 2.0 < myPlayer.pAggression + myTeam.COMEBACK_TACKLE * myTeam._comebackBoost()) and (myTeam.opponent.posession == true):
 			if myTeam.opponent.pplayer:
 			
 				if sign(myTeam.opponent.pplayer.velocity.dot(myPlayer.velocity)) < 0 and Global.ballpos.y < 1:
@@ -741,7 +741,7 @@ func posessionState():
 				myPlayer.myfx.emitting = false
 	
 		var _close = seek(itarget)
-		vel *= lerp(1.0, 2.0, myTeam.aggression)
+		vel *= lerp(1.0, 2.0, myTeam._aggressionNow())
 		
 		
 		aavoid += newacc * 0.5

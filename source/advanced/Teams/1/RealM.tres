@@ -24,6 +24,7 @@ tictacs = 2
 aggression = 2
 approach = 5.0
 League = 1
+comeback = 1.0
 player0 = {
 "aggression": 6.0,
 "agility": 9.5,
