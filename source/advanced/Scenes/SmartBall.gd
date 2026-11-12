@@ -330,7 +330,11 @@ func _crossBall( var direction, var passer, var curld, var islow):
 		curl = curld * CROSS_CURL
 		apply_central_impulse(_crossVelocity(direction, islow))
 	else:
-		apply_central_impulse(d * dl + Vector3(0, high, 0))
+		var lift = high
+		# Corners come in a little slower and flatter, so there is more time to react and they still arrive at head height.
+		if abs(translation.x) > 130.0 * Global.ps and abs(translation.z) > 75.0 * Global.ps:
+			dl *= CORNER_PACE
+		apply_central_impulse(d * dl + Vector3(0, lift, 0))
 
 
 func _tapBall( var direction, var passer):
@@ -502,7 +506,7 @@ func _on_Ball_input_event(_camera, _event, _click_position, _click_normal, _shap
 # Corners, throw-ins and goal kicks set offsideExempt so their first kick cannot be offside.
 func _recordOffside(kicker):
 	offsideFlags.clear()
-	if not Global.elevenMode or kicker == null or kicker.get("myTeam") == null:
+	if kicker == null or kicker.get("myTeam") == null:
 		return
 	if offsideExempt:
 		offsideExempt = false
@@ -510,7 +514,7 @@ func _recordOffside(kicker):
 	offsideFlags = kicker.myTeam._offsidePlayers(kicker)
 
 func _callOffside(toucher):
-	if not (Global.elevenMode and Global.gameOn and offsideFlags.has(toucher)):
+	if not (Global.gameOn and offsideFlags.has(toucher)):
 		return false
 	offsideFlags.clear()
 	toucher.myTeam._offsideCalled(toucher)
@@ -519,6 +523,7 @@ func _callOffside(toucher):
 # --- 11v11 lofted balls ---------------------------------------------------------------
 # Launch velocity that lands the ball at a horizontal offset after the given hang time.
 # Air damping measured on the real ball is cancelled by a higher launch speed.
+const CORNER_PACE = 0.9
 const LOFT_DAMP = 0.39
 const CROSS_CURL = 0.4
 const LOW_CROSS_MIN = 90.0

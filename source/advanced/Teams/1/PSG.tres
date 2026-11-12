@@ -110,7 +110,7 @@ player6 = {
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 3,
 "name": "O Dembele",
-"shoot": 10.0,
+"shoot": 9.0,
 "skin": Color( 0.330, 0.210, 0.140, 1 ),
 "smart": 10.0,
 "speed": 9.5

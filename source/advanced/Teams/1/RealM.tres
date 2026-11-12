@@ -71,7 +71,7 @@ player3 = {
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 2,
 "name": "F Valverde",
-"shoot": 9.0,
+"shoot": 10.0,
 "skin": Color( 0.780, 0.570, 0.450, 1 ),
 "smart": 9.5,
 "speed": 9.0
@@ -97,7 +97,7 @@ player5 = {
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 3,
 "name": "Vini Jr",
-"shoot": 9.0,
+"shoot": 8.0,
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
 "smart": 9.0,
 "speed": 10.0
@@ -110,7 +110,7 @@ player6 = {
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 3,
 "name": "K Mbappe",
-"shoot": 10.0,
+"shoot": 9.5,
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
 "smart": 10.0,
 "speed": 11.0
@@ -182,5 +182,5 @@ player11 = {
 }
 def = [ Vector2( 0.25, 0.8 ), Vector2( 0.75, 0.8 ), Vector2( 0.62, 0.7 ), Vector2( 0.42, 0.66 ), Vector2( 0.25, 0.5 ), Vector2( 0.55, 0.46 ) ]
 mid = [ Vector2( 0.2, 0.62 ), Vector2( 0.8, 0.62 ), Vector2( 0.65, 0.52 ), Vector2( 0.42, 0.45 ), Vector2( 0.2, 0.32 ), Vector2( 0.52, 0.28 ) ]
-att = [ Vector2( 0.15, 0.45 ), Vector2( 0.85, 0.45 ), Vector2( 0.68, 0.38 ), Vector2( 0.45, 0.26 ), Vector2( 0.18, 0.16 ), Vector2( 0.5, 0.1 ) ]
+att = [ Vector2( 0.15, 0.45 ), Vector2( 0.85, 0.45 ), Vector2( 0.68, 0.38 ), Vector2( 0.45, 0.26 ), Vector2( 0.18, 0.16 ), Vector2( 0.55, 0.13 ) ]
 cor = [ Vector2( 0.451, 0.258 ), Vector2( 0.472, 0.456 ), Vector2( 0.62, 0.165 ), Vector2( 0.308, 0.155 ), Vector2( 0.522, 0.138 ), Vector2( 0.473, 0.15 ) ]

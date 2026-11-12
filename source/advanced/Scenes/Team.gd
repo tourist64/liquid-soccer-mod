@@ -566,7 +566,7 @@ func _findThruPass(pos, lookD, _id):
 		
 		var score = diff.normalized().dot(lookD.normalized())
 		
-		if Global.elevenMode and _isOffsidePosition(players[i]):
+		if _isOffsidePosition(players[i]):
 			score = - 1000
 		if score > 0.55 and (players[i].myID != _id):
 			dl = diff.length()
@@ -641,7 +641,7 @@ func _findLongPass(pos, lookD, _id):
 		diff = (players[i].translation + (goal - players[i].translation) * 0.2) - pos
 		
 		var score = diff.normalized().dot(lookD.normalized())
-		if players[i].carded > 1 or (Global.elevenMode and _isOffsidePosition(players[i])):
+		if players[i].carded > 1 or _isOffsidePosition(players[i]):
 			score = - 1000
 		if (players[i].myID != _id) and score > 0.55:
 			dl = diff.length_squared()
@@ -926,8 +926,50 @@ func _getGoalKickPos( var pid):
 func _onTheBall():
 	return posession or passto != null
 
+# Nobody has the ball and nobody's pass is travelling: the two nearest players go and win it.
+func _looseBall():
+	if ball.state == ball.bstate.CAUGHT or ball.state == ball.bstate.TRAPPED:
+		return false
+	return not posession and passto == null and not opponent.posession and opponent.passto == null
+
 func _getPlayPos(pid):
-	return _keepOnside(_getPlayPosRaw(pid), pid)
+	return _holdLine(_keepOnside(_getPlayPosRaw(pid), pid), pid)
+
+# --- Normal-game back line ---------------------------------------------------------------
+# Without the ball, the deepest defenders stand level with each other, goal-side of the ball,
+# so attackers who drift beyond them are offside.
+const LINE_DEFENDERS = 3
+const LINE_BALL_GAP = 4.0
+const LINE_MIN_DEPTH = 12.0
+var lineFrame = - 1
+var lineX = 0.0
+
+func _lineIds():
+	var ids = []
+	for i in range(1, Global.squad):
+		ids.append(i)
+	ids.sort_custom(self, "_deeperInShape")
+	return ids.slice(0, LINE_DEFENDERS - 1)
+
+func _deeperInShape(a, b):
+	return tdata.def[a - 1].y > tdata.def[b - 1].y
+
+func _holdLine(p, pid):
+	if Global.elevenMode or not Global.gameOn or isCorner or _onTheBall():
+		return p
+	var ids = _lineIds()
+	if not ids.has(pid) or players[pid] == pplayer:
+		return p
+	if Engine.get_physics_frames() != lineFrame:
+		lineFrame = Engine.get_physics_frames()
+		var total = 0.0
+		for id in ids:
+			total += _keepOnside(_getPlayPosRaw(id), id).x
+		var line = abs(total / ids.size() - dGoal.x)
+		var ballDepth = abs(Global.ballpos.x - dGoal.x)
+		line = max(min(line, ballDepth - LINE_BALL_GAP), LINE_MIN_DEPTH)
+		lineX = dGoal.x - sign(dGoal.x) * line
+	return Vector3(lineX, p.y, p.z)
 
 func _getPlayPosRaw(pid):
 	if Global.elevenMode:
@@ -1042,7 +1084,10 @@ func _getDefendPos(pid):
 			
 		
 	if tdata.unitShape > 0.0:
-		ppos = ppos.linear_interpolate(Vector3(formation[pid].x, 0, formation[pid].y), tdata.unitShape)
+		var unitPos = Vector3(formation[pid].x, 0, formation[pid].y)
+		if tdata.midBlock > 0.0:
+			unitPos = _blockByDepth(pid)
+		ppos = ppos.linear_interpolate(unitPos, tdata.unitShape)
 	var adjust = 10
 	if sign(Global.ballpos.z) == sign(ppos.z):
 		adjust = 20
@@ -1053,6 +1098,31 @@ func _getDefendPos(pid):
 	ppos.z += clamp(diff, - adjust, adjust)
 	return ppos
 
+
+# Where a mid-block side stands without the ball, given how far the ball is from its goal.
+const BLOCK_BACK_FOUR = 4
+const BLOCK_DEFENDERS_UP = 0.1
+const BLOCK_OTHERS_UP = 0.3
+const BLOCK_OWN_HALF = 0.52
+
+func _blockByDepth(pid):
+	var shape = tdata.def[pid - 1]
+	var ballDepth = abs(Global.ballpos.x - dGoal.x)
+	var far = smoothstep(80.0 * Global.ps, 200.0 * Global.ps, ballDepth) * tdata.midBlock
+	var close = 1.0 - smoothstep(40.0 * Global.ps, 90.0 * Global.ps, ballDepth)
+	# The four deepest in the shape (ties to whoever is listed first) are the back four.
+	var deeper = 0
+	for i in range(1, Global.squad):
+		var other = tdata.def[i - 1].y
+		if other > shape.y or (other == shape.y and i < pid):
+			deeper += 1
+	var up = BLOCK_DEFENDERS_UP if deeper < BLOCK_BACK_FOUR else BLOCK_OTHERS_UP
+	var y = max(shape.y - up * far, BLOCK_OWN_HALF)
+	y = lerp(y, y + (1.0 - y) * 0.4, close)
+	var x = lerp(shape.x, 0.5 + (shape.x - 0.5) * 0.75, close)
+	if playDir == 1:
+		return Vector3(range_lerp(y, 0, 1, 150 * Global.ps, - 150 * Global.ps), 0, range_lerp(x, 0, 1, - 100 * Global.ps, 100 * Global.ps))
+	return Vector3(range_lerp(y, 0, 1, - 150 * Global.ps, 150 * Global.ps), 0, range_lerp(x, 0, 1, 100 * Global.ps, - 100 * Global.ps))
 
 func _getDefendFKPos(pid):
 	
@@ -1596,7 +1666,8 @@ func _corner( var side, var e):
 		if players[i].carded < 2:
 			Game.kickTaker = players[i]
 	
-	if Global.elevenMode:
+	# 11v11 sides and strong set-piece sides send their best crosser of the ball to the flag.
+	if Global.elevenMode or tdata.setPieces > 0.5:
 		Game.kickTaker = _bestCornerTaker(Game.kickTaker)
 	
 	Game.kickTaker.AI.setTarget(posi + posi * 0.04)
@@ -1998,7 +2069,7 @@ func _boxRun(pid):
 	return Vector3(goal.x + inward * BOX_RUN_SLOTS[slot][0], 0.0, sign(Global.ballpos.z) * BOX_RUN_SLOTS[slot][1])
 
 # Picks the best header of the ball in the box; better teams find him more often.
-func _crossTarget(crosser):
+func _crossTarget(crosser, low = false):
 	var quality = lerp(0.25, 0.95, max(tdata.crossing, tdata.setPieces))
 	if randf() > quality:
 		return null
@@ -2008,7 +2079,11 @@ func _crossTarget(crosser):
 		if p == crosser or p.carded > 1 or _isOffsidePosition(p):
 			continue
 		if abs(p.translation.x - goal.x) < 53.0 * Global.ps and abs(p.translation.z) < 50.0 * Global.ps:
-			if best == null or p.pAerial > best.pAerial:
+			if best == null:
+				best = p
+			elif low and p.translation.distance_squared_to(goal) < best.translation.distance_squared_to(goal):
+				best = p
+			elif not low and p.pAerial > best.pAerial:
 				best = p
 	if best == null:
 		return null
@@ -2036,7 +2111,7 @@ func _onsideLine():
 	return onsideLine
 
 func _keepOnside(p, pid):
-	if not (Global.elevenMode and Global.gameOn) or players[pid] == pplayer:
+	if not Global.gameOn or players[pid] == pplayer:
 		return p
 	var limit = _onsideLine() - ONSIDE_MARGIN
 	if p.x * playDir > limit:

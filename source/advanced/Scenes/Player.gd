@@ -223,9 +223,11 @@ func chipPass( var human):
 			
 			var swing = - 1
 			var sw = 0
+			# Strong crossing sides (crossing above 0.5) whip in many more ground crosses.
+			var crossSide = not Global.elevenMode and myTeam.tdata.crossing > 0.5
 			if myTeam.AIteam:
 				sw = sign(velocity.x) * myTeam.playDir
-				if rand_range(0, 1) > 0.8:
+				if rand_range(0, 1) > (lerp(0.8, 0.45, clamp(myTeam.tdata.crossing, 0.0, 1.0)) if crossSide else 0.8):
 					lowshot = true
 			else:
 				sw = sign(Input.get_joy_axis(myC, clr)) * myTeam.playDir
@@ -261,7 +263,16 @@ func chipPass( var human):
 			
 			if Global.elevenMode:
 				crossto.x = clamp(crossto.x, - 141.0 * Global.ps, 141.0 * Global.ps)
+			var picked = null
+			if crossSide and lowshot:
+				# Ground crosses are picked out for the man nearest goal; high balls keep the usual aim.
+				picked = myTeam._crossTarget(self, true)
+				if picked != null:
+					crossto = Vector3(picked.x, crossto.y, picked.z)
 			var curl = Vector3( - myTeam.playDir * swing, - 0.2, 0) * pCurl
+			if picked != null:
+				# Half the swing, so the ball still arrives where the man is.
+				curl *= 0.5
 			var cp = myTeam._closestPToP(crossto)
 			
 			

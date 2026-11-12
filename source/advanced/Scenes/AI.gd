@@ -126,7 +126,7 @@ func _quadratic_bezier(p0: Vector3, p1: Vector3, p2: Vector3, t: float):
 func seek( var t):
 	
 	# Players holding position stay onside; runs onto a pass use other states.
-	if Global.elevenMode and (state == pstate.PLAYING or state == pstate.SUPPORT):
+	if state == pstate.PLAYING or state == pstate.SUPPORT:
 		t = myTeam._keepOnside(t, myPlayer.myID)
 	var diff = (t - pos)
 
@@ -346,6 +346,17 @@ func findMarker():
 	else:
 		return target
 const UNIT_SPRINT_GAP = 25.0
+const LOOSE_BALL_CHASERS = 2
+
+# One of this team's two outfield players nearest the ball.
+func _closeToLooseBall():
+	var mine = myPlayer.translation.distance_squared_to(Global.ballpos)
+	var nearer = 0
+	for i in range(1, Global.squad):
+		var mate = myTeam.players[i]
+		if mate != myPlayer and mate.translation.distance_squared_to(Global.ballpos) < mine:
+			nearer += 1
+	return nearer < LOOSE_BALL_CHASERS
 
 func playingState():
 	
@@ -390,6 +401,11 @@ func playingState():
 			marking = null
 	elif (myTeam.zone == 3) and myTeam.momentum and myTeam.tdata.unitShape <= 0.0:
 		t = (t * 0.7 + (Global.ballpos + Global.ballvel * 0.3) * 0.3)
+	if myTeam.tdata.unitShape > 0.0 and myTeam._looseBall() and _closeToLooseBall():
+		t = Global.ballpos + Global.ballvel * myPlayer.dSmart
+		t.y = 0.0
+		if myPlayer.pSpeed <= myPlayer.pOSpeed:
+			myPlayer._burst()
 	atarget = t
 	
 	var _close = seek(t)
@@ -903,7 +919,7 @@ func _corner( var end, var side):
 	marking = null
 	changeState(pstate.IDLE)
 		
-	var spread = 3.0 if Global.elevenMode else 12.0
+	var spread = 3.0 if (Global.elevenMode or myTeam.tdata.setPieces > 0.5) else 12.0
 	target = myTeam.cformation[myPlayer.myID] + Vector3(rand_range( - spread, spread), 0.0, rand_range( - spread, spread))
 	if end < 1:
 		target.x *= - 1
@@ -1218,7 +1234,7 @@ func findPass():
 			var tpt = myTeam.players[i].translation + myTeam.players[i].velocity * 0.1
 			var dp = tpt - myPlayer.translation
 			var dg = myGoal - tpt
-			if myTeam.players[i].carded > 1 or (Global.elevenMode and myTeam._isOffsidePosition(myTeam.players[i])):
+			if myTeam.players[i].carded > 1 or myTeam._isOffsidePosition(myTeam.players[i]):
 				pscore = - 10000
 			else:
 				
