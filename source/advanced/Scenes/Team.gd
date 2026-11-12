@@ -961,6 +961,22 @@ func _lineIds():
 func _deeperInShape(a, b):
 	return tdata.def[a - 1].y > tdata.def[b - 1].y
 
+const TRAP_REACH = 14.0
+const TRAP_STEP = 3.0
+
+# Step the line up past any attacker who is just onside near it, so he is left offside.
+func _springTrap(line):
+	var reach = TRAP_REACH * tdata.offsideTrap
+	var stepped = line
+	for i in range(1, Global.squad):
+		var o = opponent.players[i]
+		if o == opponent.pplayer or o.carded > 1:
+			continue
+		var depth = abs(o.translation.x - dGoal.x)
+		if depth >= line and depth <= line + reach:
+			stepped = max(stepped, depth + TRAP_STEP)
+	return min(stepped, line + reach + TRAP_STEP)
+
 func _holdLine(p, pid):
 	if Global.elevenMode or not Global.gameOn or isCorner or _onTheBall():
 		return p
@@ -974,6 +990,8 @@ func _holdLine(p, pid):
 			total += _keepOnside(_getPlayPosRaw(id), id).x
 		var line = abs(total / ids.size() - dGoal.x)
 		var ballDepth = abs(Global.ballpos.x - dGoal.x)
+		if tdata.offsideTrap > 0.0:
+			line = _springTrap(line)
 		line = max(min(line, ballDepth - LINE_BALL_GAP), LINE_MIN_DEPTH)
 		lineX = dGoal.x - sign(dGoal.x) * line
 	return Vector3(lineX, p.y, p.z)

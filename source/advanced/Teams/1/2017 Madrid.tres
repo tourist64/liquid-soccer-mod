@@ -97,15 +97,16 @@ player4 = {
 }
 player5 = {
 "aggression": 6.0,
-"agility": 9.5,
-"curl": 9.5,
+"agility": 9.0,
+"curl": 10.0,
 "facehair": 1,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 4,
+"aerial": 8.0,
 "name": "G Bale",
 "shoot": 9.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 9.0,
+"smart": 8.5,
 "speed": 11.0
 }
 player6 = {

@@ -36,6 +36,8 @@ export (float) var cornerLockdown = 0.0
 # Mid-block (0-1): a unit-shape team defends higher and wider when the ball is far from its goal,
 # drops back as the ball comes into its half and squeezes into a tight low block near the box.
 export (float) var midBlock = 0.0
+# Offside trap (0-1): the back line steps up past attackers who are just onside near it.
+export (float) var offsideTrap = 0.0
 
 
 export var player0 = {

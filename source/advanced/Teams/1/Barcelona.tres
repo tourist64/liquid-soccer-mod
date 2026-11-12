@@ -21,9 +21,10 @@ shirtType = 2
 shirt2Type = 0
 level = 0
 tictacs = 2.0
-aggression = 7
+aggression = 8
 approach = 2.0
 League = 1
+offsideTrap = 1.0
 player0 = {
 "aggression": 6.0,
 "agility": 9.5,
@@ -180,7 +181,7 @@ player11 = {
 "smart": 10.0,
 "speed": 7.0
 }
-def = [ Vector2( 0.25, 0.76 ), Vector2( 0.5, 0.8 ), Vector2( 0.45, 0.64 ), Vector2( 0.6, 0.6 ), Vector2( 0.25, 0.45 ), Vector2( 0.75, 0.45 ) ]
-mid = [ Vector2( 0.18, 0.55 ), Vector2( 0.5, 0.66 ), Vector2( 0.45, 0.48 ), Vector2( 0.6, 0.42 ), Vector2( 0.22, 0.25 ), Vector2( 0.8, 0.25 ) ]
+def = [ Vector2( 0.32, 0.62 ), Vector2( 0.5, 0.66 ), Vector2( 0.45, 0.52 ), Vector2( 0.58, 0.48 ), Vector2( 0.32, 0.36 ), Vector2( 0.68, 0.36 ) ]
+mid = [ Vector2( 0.26, 0.48 ), Vector2( 0.5, 0.56 ), Vector2( 0.45, 0.42 ), Vector2( 0.58, 0.36 ), Vector2( 0.28, 0.22 ), Vector2( 0.72, 0.22 ) ]
 att = [ Vector2( 0.15, 0.36 ), Vector2( 0.5, 0.55 ), Vector2( 0.45, 0.34 ), Vector2( 0.58, 0.2 ), Vector2( 0.3, 0.1 ), Vector2( 0.75, 0.12 ) ]
 cor = [ Vector2( 0.62, 0.08 ), Vector2( 0.47, 0.1 ), Vector2( 0.5, 0.24 ), Vector2( 0.56, 0.22 ), Vector2( 0.4, 0.06 ), Vector2( 0.53, 0.12 ) ]
