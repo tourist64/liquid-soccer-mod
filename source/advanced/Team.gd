@@ -38,6 +38,17 @@ export (float) var cornerLockdown = 0.0
 export (float) var midBlock = 0.0
 # Offside trap (0-1): the back line steps up past attackers who are just onside near it.
 export (float) var offsideTrap = 0.0
+# Possession-and-pressure back line (0-1), Guardiola style: compact with midfield, drops off when an
+# opponent has clean time in midfield. Replaces the offside trap for the sides that use it.
+export (float) var pepLine = 0.0
+# Counter-press (0-1): for 6 seconds after losing the ball the three nearest players swarm the carrier.
+export (float) var counterPress = 0.0
+# Holding midfielder who screens centrally and never man-marks wide (player number, 0 = none).
+export (int) var anchorId = 0
+# Keeper comes out to sweep loose balls in his box in normal matches too (0-1).
+export (float) var sweeperKeeper = 0.0
+# How far open-play crosses carry in normal matches (1 = the game's usual cross, lower = shorter).
+export (float) var crossPace = 1.0
 
 
 export var player0 = {

@@ -386,6 +386,9 @@ func playingState():
 
 
 			
+		elif myPlayer.myID == myTeam.tdata.anchorId:
+			# The anchor keeps screening; he doesn't follow a man wide.
+			t = target
 		else:
 			t = findMarker()
 	
@@ -401,6 +404,13 @@ func playingState():
 			marking = null
 	elif (myTeam.zone == 3) and myTeam.momentum and myTeam.tdata.unitShape <= 0.0:
 		t = (t * 0.7 + (Global.ballpos + Global.ballvel * 0.3) * 0.3)
+	# Counter-press: straight after losing the ball, the three nearest swarm the carrier.
+	if myTeam._counterPressing() and myTeam._counterPresser(myPlayer):
+		var carrier = myTeam.opponent.pplayer
+		t = carrier.translation + carrier.velocity * 0.2
+		t.y = 0.0
+		if myPlayer.pSpeed <= myPlayer.pOSpeed:
+			myPlayer._burst()
 	if myTeam.tdata.unitShape > 0.0 and myTeam._looseBall() and _closeToLooseBall():
 		t = Global.ballpos + Global.ballvel * myPlayer.dSmart
 		t.y = 0.0

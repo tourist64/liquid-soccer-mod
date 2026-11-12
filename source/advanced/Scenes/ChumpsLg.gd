@@ -11,7 +11,7 @@ var gq4 = ["Royal Sociedad", "Inter Milano", "Benfico", "RB Salzburg"]
 var gq5 = ["Athletic Mads", "Lazio", "Feyenoord", "Queens Celtic"]
 var gq6 = ["B Dortmund", "PSG", "AC Milano", "Toon Utd"]
 var gq7 = ["Money Citeh", "RB Leibzigs", "Young Boys", "Red Star Belgrade"]
-var gq8 = ["Barcaloony", "FC Port", "Shaktar Donetsk", "Royale Antwerps"]
+var gq8 = ["2011 Barcelona", "FC Port", "Shaktar Donetsk", "Royale Antwerps"]
 
 
 var g1

@@ -812,8 +812,17 @@ var squad = 7
 var ps = 1.0
 var elevenPrevCamtype = null
 
+# 8v8: the normal game and pitch with one more player a side, for the curated squads in Teams/5.
+var eightMode = false
+
+func setEightMode(on):
+	setElevenMode(false)
+	eightMode = on
+	squad = 8 if on else 7
+
 func setElevenMode(on):
 	elevenMode = on
+	eightMode = false
 	squad = 11 if on else 7
 	ps = ELEVEN_PITCH_SCALE if on else 1.0
 	if on and ELEVEN_CUSTOM_CAMERAS:

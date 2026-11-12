@@ -160,7 +160,7 @@ func moveKeeper():
 	myPlayer.pAggression = max(1.0, myPlayer.pAggression)
 	
 	target = dGoal + (bpos - dGoal).normalized() * myPlayer.pAggression
-	if Global.elevenMode and _shouldSweep():
+	if (Global.elevenMode or myTeam.tdata.sweeperKeeper > 0.0) and _shouldSweep():
 		target = Global.ballpos + Global.ballvel * 0.3
 	
 	target.y = 0

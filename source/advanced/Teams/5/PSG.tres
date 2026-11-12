@@ -1,0 +1,186 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://Team.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+teamname = "PSG"
+shortname = "PSG"
+Shirt1Color = Color( 0.0627451, 0.156863, 0.321569, 1 )
+Shirt2Color = Color( 0.776471, 0.117647, 0.117647, 1 )
+Shirt3Color = Color( 0, 0, 0, 1 )
+ShortColor = Color( 0.0627441, 0.15686, 0.321533, 1 )
+KeeperColor = Color( 0.309804, 0.447059, 0.145098, 1 )
+altShirt1Color = Color( 0.886275, 0.894118, 0.913725, 1 )
+altShirt2Color = Color( 0.666667, 0.156863, 0.121569, 1 )
+altShirt3Color = Color( 0, 0, 0, 1 )
+altShortColor = Color( 0.0588235, 0.145098, 0.364706, 1 )
+numberColor = Color( 0.937255, 0.894118, 0.894118, 1 )
+sponsor = "argent"
+shirtType = 4
+shirt2Type = 4
+level = 1.0
+tictacs = 1.0
+aggression = 6.0
+approach = 1.0
+League = 2
+player0 = {
+"aggression": 7.0,
+"agility": 9.5,
+"curl": 5.0,
+"facehair": 1,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 3,
+"name": "G Donnarumma",
+"shoot": 5.0,
+"skin": Color( 0.960, 0.800, 0.690, 1 ),
+"smart": 10.0,
+"speed": 6.0
+}
+player1 = {
+"aggression": 8.0,
+"agility": 9.0,
+"curl": 7.0,
+"facehair": 1,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 5,
+"name": "N Mendes",
+"shoot": 6.5,
+"skin": Color( 0.450, 0.290, 0.200, 1 ),
+"smart": 9.0,
+"speed": 10.5
+}
+player2 = {
+"aggression": 7.5,
+"agility": 9.0,
+"curl": 8.5,
+"facehair": 1,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 5,
+"name": "A Hakimi",
+"shoot": 8.0,
+"skin": Color( 0.780, 0.570, 0.450, 1 ),
+"smart": 9.5,
+"speed": 10.5
+}
+player3 = {
+"aggression": 7.0,
+"agility": 10.0,
+"curl": 10.0,
+"facehair": 1,
+"hair": Color( 0.250, 0.150, 0.080, 1 ),
+"hairtype": 1,
+"name": "Vitinha",
+"shoot": 8.5,
+"skin": Color( 0.880, 0.670, 0.550, 1 ),
+"smart": 10.0,
+"speed": 7.5
+}
+player4 = {
+"aggression": 10.0,
+"agility": 9.0,
+"curl": 8.0,
+"facehair": 0,
+"hair": Color( 0.550, 0.380, 0.200, 1 ),
+"hairtype": 6,
+"name": "J Neves",
+"shoot": 8.0,
+"skin": Color( 0.880, 0.670, 0.550, 1 ),
+"smart": 10.0,
+"speed": 8.5
+}
+player5 = {
+"aggression": 5.0,
+"agility": 10.0,
+"curl": 9.5,
+"facehair": 1,
+"hair": Color( 0.250, 0.150, 0.080, 1 ),
+"hairtype": 1,
+"name": "K Kvaratskhelia",
+"shoot": 9.0,
+"skin": Color( 0.960, 0.800, 0.690, 1 ),
+"smart": 9.5,
+"speed": 9.0
+}
+player6 = {
+"aggression": 6.0,
+"agility": 10.0,
+"curl": 9.5,
+"facehair": 1,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 3,
+"name": "O Dembele",
+"shoot": 9.0,
+"skin": Color( 0.330, 0.210, 0.140, 1 ),
+"smart": 10.0,
+"speed": 9.5
+}
+player7 = {
+"aggression": 8.0,
+"agility": 7.0,
+"curl": 5.0,
+"facehair": 2,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 3,
+"name": "Marquinhos",
+"shoot": 4.0,
+"skin": Color( 0.780, 0.570, 0.450, 1 ),
+"smart": 10.0,
+"speed": 7.0
+}
+player8 = {
+"aggression": 8.5,
+"agility": 6.0,
+"curl": 4.0,
+"facehair": 1,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 3,
+"name": "W Pacho",
+"shoot": 3.0,
+"skin": Color( 0.330, 0.210, 0.140, 1 ),
+"smart": 9.0,
+"speed": 8.0
+}
+player9 = {
+"aggression": 6.0,
+"agility": 8.0,
+"curl": 9.0,
+"facehair": 2,
+"hair": Color( 0.250, 0.150, 0.080, 1 ),
+"hairtype": 1,
+"name": "F Ruiz",
+"shoot": 8.0,
+"skin": Color( 0.880, 0.670, 0.550, 1 ),
+"smart": 10.0,
+"speed": 6.0
+}
+player10 = {
+"aggression": 5.0,
+"agility": 9.5,
+"curl": 9.0,
+"facehair": 0,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 5,
+"name": "D Doue",
+"shoot": 9.0,
+"skin": Color( 0.450, 0.290, 0.200, 1 ),
+"smart": 9.0,
+"speed": 9.0
+}
+player11 = {
+"aggression": 5.0,
+"agility": 9.0,
+"curl": 7.5,
+"facehair": 0,
+"hair": Color( 0.050, 0.040, 0.030, 1 ),
+"hairtype": 2,
+"name": "B Barcola",
+"shoot": 8.0,
+"skin": Color( 0.300, 0.190, 0.130, 1 ),
+"smart": 8.5,
+"speed": 9.5
+}
+def = [ Vector2( 0.2, 0.8 ), Vector2( 0.8, 0.8 ), Vector2( 0.38, 0.66 ), Vector2( 0.62, 0.66 ), Vector2( 0.24, 0.56 ), Vector2( 0.5, 0.52 ), Vector2( 0.5, 0.87 ) ]
+mid = [ Vector2( 0.15, 0.6 ), Vector2( 0.85, 0.6 ), Vector2( 0.38, 0.46 ), Vector2( 0.62, 0.46 ), Vector2( 0.18, 0.3 ), Vector2( 0.5, 0.26 ), Vector2( 0.5, 0.72 ) ]
+att = [ Vector2( 0.12, 0.4 ), Vector2( 0.88, 0.4 ), Vector2( 0.38, 0.3 ), Vector2( 0.62, 0.3 ), Vector2( 0.18, 0.14 ), Vector2( 0.5, 0.08 ), Vector2( 0.5, 0.58 ) ]
+cor = [ Vector2( 0.62, 0.08 ), Vector2( 0.47, 0.1 ), Vector2( 0.5, 0.24 ), Vector2( 0.56, 0.22 ), Vector2( 0.4, 0.06 ), Vector2( 0.53, 0.12 ), Vector2( 0.45, 0.16 ) ]

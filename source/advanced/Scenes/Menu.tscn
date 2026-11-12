@@ -284,7 +284,7 @@ focus_neighbour_right = NodePath("../P1P2Button")
 focus_neighbour_bottom = NodePath("../P1P2Button")
 custom_styles/hover = SubResource( 6 )
 custom_styles/normal = SubResource( 6 )
-text = "11v11"
+text = "8v8"
 
 [node name="HelpButton" type="Button" parent="TextureRect"]
 self_modulate = Color( 0.960784, 0.796078, 0.439216, 1 )

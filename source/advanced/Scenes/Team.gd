@@ -933,7 +933,71 @@ func _looseBall():
 	return not posession and passto == null and not opponent.posession and opponent.passto == null
 
 func _getPlayPos(pid):
-	return _holdLine(_keepOnside(_getPlayPosRaw(pid), pid), pid)
+	var p = _holdLine(_keepOnside(_getPlayPosRaw(pid), pid), pid)
+	# The anchor screens the middle without the ball instead of drifting wide.
+	if tdata.anchorId == pid and not _onTheBall():
+		p.z = clamp(p.z, - ANCHOR_HALF_WIDTH * Global.ps, ANCHOR_HALF_WIDTH * Global.ps)
+	return p
+
+# --- Guardiola-style defending (pepLine, counterPress, anchorId) ---------------------------
+const ANCHOR_HALF_WIDTH = 12.0      # anchor stays within 12 units (~3.5 m) of the centre
+const COUNTER_PRESS_FRAMES = 360    # 6 seconds at 60 physics frames a second
+const COUNTER_PRESSERS = 3          # the three nearest players swarm the carrier
+const PEP_MAX_GAP = 75.0            # back line no more than ~22 m (75 units) behind the midfield line
+const PEP_DROP = 26.0               # drop ~8 m (26 units) when the carrier has clean time in midfield
+const PEP_PRESSURE_RADIUS = 10.0    # "pressured" = one of ours within 10 units (~3 m) of the carrier
+const PEP_CALM_FRAMES = 45          # clean time = unpressured for 0.75 seconds
+const PEP_MIDFIELD_FROM = 90.0      # midfield band: 90-200 units from our goal
+const PEP_MIDFIELD_TO = 200.0
+var lostBallFrame = - 100000
+var calmFrames = 0
+
+func _counterPressing():
+	if tdata.counterPress <= 0.0 or _onTheBall() or opponent.pplayer == null:
+		return false
+	return Engine.get_physics_frames() - lostBallFrame < COUNTER_PRESS_FRAMES
+
+# One of the three outfield players nearest the ball (the anchor holds his screen instead).
+func _counterPresser(p):
+	if p.myID == tdata.anchorId:
+		return false
+	var mine = p.translation.distance_squared_to(Global.ballpos)
+	var nearer = 0
+	for i in range(1, Global.squad):
+		var mate = players[i]
+		if mate != p and i != tdata.anchorId and mate.translation.distance_squared_to(Global.ballpos) < mine:
+			nearer += 1
+	return nearer < COUNTER_PRESSERS
+
+func _pepLine(line, ids):
+	# Vertical compactness: never more than PEP_MAX_GAP behind the midfield line.
+	var total = 0.0
+	var count = 0
+	for i in range(1, Global.squad):
+		if not ids.has(i):
+			total += abs(_getPlayPosRaw(i).x - dGoal.x)
+			count += 1
+	if count > 0:
+		line = max(line, total / count - PEP_MAX_GAP)
+	# While counter-pressing the line holds its height; no drop-off.
+	if _counterPressing():
+		calmFrames = 0
+		return line
+	# Drop-off: an opponent with clean, unpressured time on the ball in midfield.
+	var carrier = opponent.pplayer
+	var calm = false
+	if carrier != null and ball._isTrapped():
+		var depth = abs(carrier.translation.x - dGoal.x)
+		if depth > PEP_MIDFIELD_FROM and depth < PEP_MIDFIELD_TO:
+			calm = true
+			for i in range(1, Global.squad):
+				if players[i].translation.distance_to(carrier.translation) < PEP_PRESSURE_RADIUS:
+					calm = false
+					break
+	calmFrames = calmFrames + 1 if calm else 0
+	if calmFrames > PEP_CALM_FRAMES:
+		line -= PEP_DROP * tdata.pepLine
+	return line
 
 # --- Normal-game back line ---------------------------------------------------------------
 # Without the ball, the deepest defenders stand level with each other, goal-side of the ball,
@@ -992,6 +1056,8 @@ func _holdLine(p, pid):
 		var ballDepth = abs(Global.ballpos.x - dGoal.x)
 		if tdata.offsideTrap > 0.0:
 			line = _springTrap(line)
+		if tdata.pepLine > 0.0:
+			line = _pepLine(line, ids)
 		line = max(min(line, ballDepth - LINE_BALL_GAP), LINE_MIN_DEPTH)
 		lineX = dGoal.x - sign(dGoal.x) * line
 	return Vector3(lineX, p.y, p.z)
@@ -1270,6 +1336,7 @@ func _lostPosession( var moment):
 	passto = null
 	
 	momentum = moment
+	lostBallFrame = Engine.get_physics_frames()
 	
 	setDefend()
 	

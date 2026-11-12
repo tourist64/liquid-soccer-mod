@@ -193,8 +193,8 @@ func _on_WCButton_pressed():
 func _on_MultiplayerButton_pressed():
 	trans._wipeOff()
 	yield(trans.tween, "tween_completed")
-	# The Multiplayer button now opens the experimental 11v11 mode.
-	Global.setElevenMode(true)
+	# The Multiplayer button now opens the 8v8 mode.
+	Global.setEightMode(true)
 	Global.isPenalties = false
 	Global.tournament = null
 	Global.doShootout = false

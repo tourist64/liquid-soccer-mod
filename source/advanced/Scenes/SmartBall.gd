@@ -331,6 +331,11 @@ func _crossBall( var direction, var passer, var curld, var islow):
 		apply_central_impulse(_crossVelocity(direction, islow))
 	else:
 		var lift = high
+		# Open-play crosses carry past their aim in this game; some sides play them shorter.
+		var side = passer.get("myTeam") if passer != null else null
+		if side != null and side.tdata.get("crossPace") != null and side.tdata.crossPace < 1.0:
+			if not (abs(translation.x) > 130.0 * Global.ps and abs(translation.z) > 75.0 * Global.ps):
+				dl *= side.tdata.crossPace
 		# Corners come in a little slower and flatter, so there is more time to react and they still arrive at head height.
 		if abs(translation.x) > 130.0 * Global.ps and abs(translation.z) > 75.0 * Global.ps:
 			dl *= CORNER_PACE
