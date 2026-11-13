@@ -1,27 +1,27 @@
 extends Node
 
-# New UCL (tType 6): the 2025/26 Champions League format, played 7v7.
+# New UCL (tType 6): the 2026/27 Champions League, played 7v7.
 # League phase: 36 clubs in one table, 8 matchdays against 8 different opponents.
 # 1st-8th go straight to the last 16, 9th-24th play a knockout play-off, 25th-36th are out.
 # Knockouts are single matches (penalties if level): play-off, last 16, quarters, semis, final.
 # Matches the player isn't in are simulated from club strength, so big clubs usually win.
 
 const TEAM_DIR = "res://Teams/6/"
-const SAVE_FILE = "user://newucl.save"
+const SAVE_FILE = "user://newucl2627.save"
 const MATCHDAYS = 8
 const ROUND_NAMES = ["Knockout play-off", "Round of 16", "Quarter-finals", "Semi-finals", "Final"]
 
 # Club strength (about 65-92) for simulated results; also orders the clubs.
 const RATINGS = {"PSG": 92, "Real Madrid": 91, "Arsenal": 91, "Bayern Munich": 91, "Barcelona": 90,
-	"Man City": 89, "Liverpool": 89, "Inter": 88, "Chelsea": 87, "Atletico Madrid": 85, "Napoli": 85,
-	"Newcastle": 83, "Juventus": 83, "Dortmund": 83, "Tottenham": 82, "Atalanta": 81, "Leverkusen": 81,
-	"Villarreal": 80, "Athletic Club": 80, "Marseille": 80, "Benfica": 80, "Sporting CP": 80,
-	"Frankfurt": 79, "Monaco": 79, "Galatasaray": 79, "PSV": 78, "Ajax": 76, "Club Brugge": 76,
-	"Olympiacos": 75, "Union SG": 73, "Slavia Prague": 73, "Copenhagen": 73, "Bodo Glimt": 73,
-	"Qarabag": 70, "Pafos": 67, "Kairat": 65}
+	"Man City": 89, "Liverpool": 89, "Inter": 87, "Atletico Madrid": 85, "Napoli": 84, "Dortmund": 83,
+	"Aston Villa": 83, "Man Utd": 82, "Roma": 81, "Porto": 80, "Sporting CP": 80, "Villarreal": 80,
+	"RB Leipzig": 80, "Fenerbahce": 80, "Galatasaray": 80, "Como": 79, "Stuttgart": 79, "Real Betis": 79,
+	"Lille": 78, "PSV": 77, "Feyenoord": 77, "Lens": 77, "Club Brugge": 76, "Shakhtar Donetsk": 75,
+	"AEK Athens": 74, "Bodo Glimt": 74, "Slavia Prague": 73, "LASK": 70, "Viking": 69, "Sabah": 67,
+	"Slovan Bratislava": 67}
 
 # Simulated scorelines: each side's expected goals is BASE_GOALS scaled by the strength gap.
-# A 27-point gap (PSG v Kairat) is about 3.8 v 0.4 goals; level clubs about 1.3 each.
+# A 25-point gap (PSG v Slovan Bratislava) is about 3.5 v 0.5 goals; level clubs about 1.3 each.
 const BASE_GOALS = 1.3
 const GAP_FACTOR = 0.04
 const HOME_EDGE = 1.5

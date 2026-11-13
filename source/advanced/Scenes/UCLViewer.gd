@@ -65,7 +65,7 @@ func _show():
 # --- Pick a club ----------------------------------------------------------------------------
 
 func _picker():
-	_title("CHAMPIONS LEAGUE 2025/26")
+	_title("CHAMPIONS LEAGUE 2026/27")
 	_label(page, "Pick your club", Vector2(0, 62), Vector2(1031, 30), fBig, WHITE, Label.ALIGN_CENTER)
 	var tmp = UCL.new()
 	for i in range(tmp.files.size()):
@@ -98,7 +98,7 @@ func _continue():
 # --- League phase: table + next match -------------------------------------------------------
 
 func _league():
-	_title("CHAMPIONS LEAGUE 2025/26")
+	_title("CHAMPIONS LEAGUE 2026/27")
 	_label(page, ucl.stageName(), Vector2(500, 16), Vector2(510, 30), fMed, WHITE, Label.ALIGN_RIGHT)
 	_table(Vector2(18, 58))
 	var x = 600
@@ -152,7 +152,7 @@ func _table(at):
 # --- Knockouts: bracket + next match --------------------------------------------------------
 
 func _bracket():
-	_title("CHAMPIONS LEAGUE 2025/26")
+	_title("CHAMPIONS LEAGUE 2026/27")
 	_label(page, ucl.stageName(), Vector2(500, 16), Vector2(510, 30), fMed, WHITE, Label.ALIGN_RIGHT)
 	var counts = [8, 8, 4, 2, 1]
 	var colW = 196

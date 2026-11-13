@@ -55,12 +55,12 @@ player2 = {
 "agility": 6.5,
 "curl": 4.5,
 "facehair": 0,
-"hair": Color( 0.700, 0.560, 0.330, 1 ),
-"hairtype": 2,
-"name": "F Sjovold",
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 1,
+"name": "H Aleesami",
 "shoot": 4.0,
-"skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 7.5,
+"skin": Color( 0.450, 0.290, 0.200, 1 ),
+"smart": 8.0,
 "speed": 8.0
 }
 player3 = {
@@ -91,29 +91,29 @@ player4 = {
 }
 player5 = {
 "aggression": 5.0,
-"agility": 8.5,
+"agility": 8.0,
 "curl": 7.5,
-"facehair": 1,
+"facehair": 0,
 "hair": Color( 0.700, 0.560, 0.330, 1 ),
-"hairtype": 0,
-"name": "K Hogh",
-"shoot": 8.0,
+"hairtype": 5,
+"name": "A Helmersen",
+"shoot": 7.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 8.0,
-"speed": 9.0
+"speed": 8.5
 }
 player6 = {
-"aggression": 7.0,
+"aggression": 5.0,
 "agility": 8.0,
-"curl": 8.0,
-"facehair": 0,
-"hair": Color( 0.250, 0.150, 0.080, 1 ),
-"hairtype": 2,
-"name": "H Evjen",
-"shoot": 7.0,
+"curl": 7.5,
+"facehair": 2,
+"hair": Color( 0.700, 0.560, 0.330, 1 ),
+"hairtype": 4,
+"name": "O Blomberg",
+"shoot": 7.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 8.0,
-"speed": 7.5
+"speed": 9.5
 }
 player7 = {
 "aggression": 7.0,
@@ -131,6 +131,19 @@ player7 = {
 player8 = {
 "aggression": 7.0,
 "agility": 8.0,
+"curl": 8.0,
+"facehair": 0,
+"hair": Color( 0.250, 0.150, 0.080, 1 ),
+"hairtype": 2,
+"name": "H Evjen",
+"shoot": 7.0,
+"skin": Color( 0.880, 0.670, 0.550, 1 ),
+"smart": 8.0,
+"speed": 7.5
+}
+player9 = {
+"aggression": 7.0,
+"agility": 8.0,
 "curl": 7.5,
 "facehair": 0,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
@@ -141,7 +154,7 @@ player8 = {
 "smart": 8.0,
 "speed": 7.0
 }
-player9 = {
+player10 = {
 "aggression": 8.0,
 "agility": 6.5,
 "curl": 4.5,
@@ -154,31 +167,18 @@ player9 = {
 "smart": 8.0,
 "speed": 8.0
 }
-player10 = {
+player11 = {
 "aggression": 5.0,
 "agility": 8.0,
-"curl": 7.0,
-"facehair": 2,
+"curl": 7.5,
+"facehair": 0,
 "hair": Color( 0.700, 0.560, 0.330, 1 ),
-"hairtype": 1,
-"name": "I Maatta",
+"hairtype": 4,
+"name": "O Brynhildsen",
 "shoot": 7.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 7.5,
-"speed": 8.5
-}
-player11 = {
-"aggression": 7.0,
-"agility": 8.0,
-"curl": 7.5,
-"facehair": 3,
-"hair": Color( 0.700, 0.560, 0.330, 1 ),
-"hairtype": 3,
-"name": "A Gronbaek",
-"shoot": 6.5,
-"skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 8.0,
-"speed": 7.0
+"speed": 8.5
 }
 def = [ Vector2( 0.35, 0.82743 ), Vector2( 0.592117, 0.834043 ), Vector2( 0.470552, 0.769525 ), Vector2( 0.301458, 0.68602 ), Vector2( 0.534688, 0.513662 ), Vector2( 0.619963, 0.683642 ) ]
 mid = [ Vector2( 0.3, 0.68 ), Vector2( 0.65, 0.68 ), Vector2( 0.56573, 0.545717 ), Vector2( 0.25, 0.35 ), Vector2( 0.7, 0.35 ), Vector2( 0.384668, 0.545014 ) ]

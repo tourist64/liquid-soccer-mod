@@ -4,19 +4,19 @@
 
 [resource]
 script = ExtResource( 1 )
-teamname = "Athletic Club"
-shortname = "ATH"
-Shirt1Color = Color( 0.658824, 0.0509804, 0.0509804, 1 )
-Shirt2Color = Color( 0.94902, 0.901961, 0.909804, 1 )
+teamname = "Porto"
+shortname = "POR"
+Shirt1Color = Color( 0.176471, 0.34902, 0.615686, 1 )
+Shirt2Color = Color( 0.905882, 0.862745, 0.862745, 1 )
 Shirt3Color = Color( 0, 0, 0, 1 )
-ShortColor = Color( 0.027451, 0.0941176, 0.196078, 1 )
-KeeperColor = Color( 0.0980392, 0.317647, 0.0941176, 1 )
-altShirt1Color = Color( 0.0784302, 0.184204, 0.348877, 1 )
-altShirt2Color = Color( 0.901961, 0.913725, 0.937255, 1 )
-altShirt3Color = Color( 0, 0, 0, 1 )
-altShortColor = Color( 0.666667, 0.113725, 0.0745098, 1 )
-numberColor = Color( 0.94873, 0.901855, 0.909668, 1 )
-sponsor = "PVC"
+ShortColor = Color( 0.176471, 0.34902, 0.615686, 1 )
+KeeperColor = Color( 0.309804, 0.447059, 0.145098, 1 )
+altShirt1Color = Color( 0.219608, 0.345098, 0.611765, 1 )
+altShirt2Color = Color( 0.94873, 0.956543, 0.972168, 1 )
+altShirt3Color = Color( 0.137255, 0.0235294, 0.0235294, 1 )
+altShortColor = Color( 0.94902, 0.956863, 0.972549, 1 )
+numberColor = Color( 0.145098, 0.105882, 0.105882, 1 )
+sponsor = "dragoes"
 shirtType = 2
 shirt2Type = 0
 level = 2.0
@@ -28,41 +28,41 @@ player0 = {
 "aggression": 7.0,
 "agility": 9.0,
 "curl": 5.0,
-"facehair": 2,
+"facehair": 3,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 5,
-"name": "U Simon",
+"name": "D Costa",
 "shoot": 4.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 9.0,
 "speed": 6.0
 }
 player1 = {
-"aerial": 10.0,
-"hitbox": 1.15,
 "aggression": 8.5,
 "agility": 7.5,
 "curl": 5.5,
-"facehair": 0,
+"facehair": 1,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
-"hairtype": 6,
-"name": "D Vivian",
+"hairtype": 0,
+"name": "J Kiwior",
 "shoot": 4.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 9.0,
+"smart": 8.5,
 "speed": 8.5
 }
 player2 = {
+"aerial": 10.0,
+"hitbox": 1.15,
 "aggression": 8.5,
-"agility": 7.5,
-"curl": 5.5,
+"agility": 7.0,
+"curl": 5.0,
 "facehair": 0,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
-"hairtype": 4,
-"name": "A Laporte",
+"hairtype": 3,
+"name": "J Bednarek",
 "shoot": 4.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 9.0,
+"smart": 8.5,
 "speed": 8.5
 }
 player3 = {
@@ -70,91 +70,93 @@ player3 = {
 "agility": 8.5,
 "curl": 8.5,
 "facehair": 0,
-"hair": Color( 0.250, 0.150, 0.080, 1 ),
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 4,
-"name": "M Jauregizar",
+"name": "A Varela",
+"shoot": 7.5,
+"skin": Color( 0.780, 0.570, 0.450, 1 ),
+"smart": 8.5,
+"speed": 8.0
+}
+player4 = {
+"aggression": 7.5,
+"agility": 8.5,
+"curl": 8.5,
+"facehair": 0,
+"hair": Color( 0.250, 0.150, 0.080, 1 ),
+"hairtype": 5,
+"name": "G Veiga",
 "shoot": 7.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 8.5,
 "speed": 7.5
 }
-player4 = {
-"aggression": 5.5,
-"agility": 9.5,
-"curl": 8.5,
-"facehair": 0,
-"hair": Color( 0.080, 0.050, 0.040, 1 ),
-"hairtype": 2,
-"name": "N Williams",
-"shoot": 9.0,
-"skin": Color( 0.330, 0.210, 0.140, 1 ),
-"smart": 9.0,
-"speed": 11.0
-}
 player5 = {
+"aerial": 10.0,
+"hitbox": 1.15,
 "aggression": 5.5,
 "agility": 9.0,
-"curl": 8.0,
-"facehair": 0,
-"hair": Color( 0.250, 0.150, 0.080, 1 ),
-"hairtype": 4,
-"name": "G Guruzeta",
+"curl": 8.5,
+"facehair": 2,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 5,
+"name": "Samu",
 "shoot": 8.5,
-"skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 8.5,
+"skin": Color( 0.330, 0.210, 0.140, 1 ),
+"smart": 9.0,
 "speed": 9.5
 }
 player6 = {
 "aggression": 5.5,
 "agility": 9.0,
-"curl": 8.5,
-"facehair": 1,
+"curl": 8.0,
+"facehair": 0,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 6,
-"name": "I Williams",
+"name": "Pepe",
 "shoot": 8.5,
-"skin": Color( 0.330, 0.210, 0.140, 1 ),
-"smart": 9.0,
+"skin": Color( 0.620, 0.420, 0.300, 1 ),
+"smart": 8.5,
 "speed": 10.5
 }
 player7 = {
-"aggression": 7.5,
+"aggression": 5.5,
 "agility": 9.0,
-"curl": 8.5,
-"facehair": 2,
-"hair": Color( 0.250, 0.150, 0.080, 1 ),
-"hairtype": 1,
-"name": "O Sancet",
-"shoot": 7.5,
-"skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 9.0,
-"speed": 8.0
+"curl": 8.0,
+"facehair": 0,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 4,
+"name": "S Gimenez",
+"shoot": 8.5,
+"skin": Color( 0.780, 0.570, 0.450, 1 ),
+"smart": 8.5,
+"speed": 9.5
 }
 player8 = {
-"aggression": 7.5,
+"aggression": 5.0,
 "agility": 8.5,
 "curl": 8.0,
 "facehair": 0,
-"hair": Color( 0.250, 0.150, 0.080, 1 ),
-"hairtype": 0,
-"name": "M Vesga",
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 3,
+"name": "W Gomes",
+"shoot": 8.0,
+"skin": Color( 0.620, 0.420, 0.300, 1 ),
+"smart": 8.0,
+"speed": 10.0
+}
+player9 = {
+"aggression": 7.5,
+"agility": 8.5,
+"curl": 8.0,
+"facehair": 2,
+"hair": Color( 0.700, 0.560, 0.330, 1 ),
+"hairtype": 5,
+"name": "V Froholdt",
 "shoot": 7.0,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 8.5,
 "speed": 7.5
-}
-player9 = {
-"aggression": 5.5,
-"agility": 8.5,
-"curl": 8.0,
-"facehair": 0,
-"hair": Color( 0.250, 0.150, 0.080, 1 ),
-"hairtype": 0,
-"name": "A Berenguer",
-"shoot": 8.0,
-"skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 8.5,
-"speed": 9.0
 }
 player10 = {
 "aggression": 8.5,
@@ -162,8 +164,8 @@ player10 = {
 "curl": 5.0,
 "facehair": 0,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
-"hairtype": 5,
-"name": "J Areso",
+"hairtype": 1,
+"name": "A Costa",
 "shoot": 4.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 8.5,
@@ -173,10 +175,10 @@ player11 = {
 "aggression": 8.5,
 "agility": 7.0,
 "curl": 5.0,
-"facehair": 3,
+"facehair": 0,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 1,
-"name": "Yuri",
+"name": "F Moura",
 "shoot": 4.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 8.5,
