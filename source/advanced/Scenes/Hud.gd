@@ -508,6 +508,8 @@ func _on_exit_pressed():
 			var _foo = get_tree().change_scene("res://Scenes/CupViewer.tscn")
 		elif Global.tType == 1:
 			var _foo = get_tree().change_scene("res://Scenes/LeagueViewer.tscn")
+		elif Global.tType == 6:
+			var _foo = get_tree().change_scene("res://Scenes/UCLViewer.tscn")
 		else:
 			if Global.tournament.knockoutStage:
 				var _foo = get_tree().change_scene("res://Scenes/CupViewer.tscn")

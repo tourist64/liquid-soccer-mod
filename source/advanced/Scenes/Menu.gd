@@ -59,7 +59,8 @@ func setButtons():
 	$TextureRect / TextureButton.text = Global.ll.menus[0]
 	$TextureRect / P1P2Button.text = Global.ll.menus[1]
 	$TextureRect / CupButton.text = Global.ll.menus[2]
-	$TextureRect / WCButton.text = Global.ll.menus[3]
+	# The old Womens World Cup button opens the new Champions League.
+	$TextureRect / WCButton.text = "New UCL"
 	$TextureRect / MultiplayerButton.text = "11v11"
 	
 	$TextureRect / HelpButton.text = "?"
@@ -183,11 +184,11 @@ func _on_EditButton_pressed():
 
 
 func _on_WCButton_pressed():
-	Global.tType = 3
+	Global.tType = 6
 	Global.isPenalties = false
 	trans._wipeOff()
 	yield(trans.tween, "tween_completed")
-	var _foo = get_tree().change_scene("res://Scenes/GlobalCupSelect.tscn")
+	var _foo = get_tree().change_scene("res://Scenes/UCLViewer.tscn")
 
 
 func _on_MultiplayerButton_pressed():

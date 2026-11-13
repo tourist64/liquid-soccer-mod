@@ -2060,6 +2060,10 @@ func _halfOver():
 			Global.stats.stats_dict.games_completed += 1
 			
 			if Global.final:
+				# The final ends in the trophy ceremony and then the menu, never back at the New UCL
+				# screen, so record its result (and the champion) now.
+				if Global.tType == 6 and Global.tournament and Global.tournament.has_method("simulateRound"):
+					Global.tournament._gamePlayed(score)
 				state = gameState.WINNER
 				$Timers / Timer.wait_time = 4
 				$Timers / Timer.start()
