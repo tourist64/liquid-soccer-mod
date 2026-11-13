@@ -269,8 +269,6 @@ func initStadium():
 	penTarget = $VPC / VP / GameGroup / Goal / Target
 	
 	$VPC / VP / GameGroup / Stadium._setShadows()
-	if not atBernabeu:
-		_daySun()
 	
 
 func _ready():
@@ -1574,13 +1572,6 @@ func goalScored():
 	$Timers / Timer.start()
 
 # Louder goal roar and a stadium reverb on the whole crowd, with a limiter so nothing clips.
-# Day matches: the sun was strongly orange; a softer, more neutral afternoon light.
-const DAY_SUN = Color(0.86, 0.73, 0.64)
-
-func _daySun():
-	var light = $VPC / VP / GameGroup / Stadium.get_node_or_null("DirectionalLight")
-	if light:
-		light.light_color = DAY_SUN
 
 # Night match in the Bernabeu: only the sky goes dark. The pitch, players and lighting stay as in a
 # day match: the sky used to provide the fill light, so a matching sky-blue fill replaces it.
