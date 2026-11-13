@@ -106,6 +106,8 @@ var madridGoalFade = null
 var madridCrowdBed = null
 var crowdTension = null
 var crowdOohWait = 0.0
+var crowdExcitement = 0.0
+var crowdPressure = 0.0
 var madridGoalActive = false
 var madridGoalLeftPlay = false
 const MADRID_GOAL_DELAY = 2.5
@@ -117,18 +119,24 @@ const MADRID_CROWD_BED_FADE_IN = 4.0
 const MADRID_GOAL_VOLUME_DB = 4.0
 const MADRID_GOAL_BUS = "MadridGoal"
 # Crowd atmosphere: ambience level during play, extra goal roar, and the 8v8 Bernabeu crowd boost.
-const CROWD_AMBIENCE_DB = -9.0
+const CROWD_AMBIENCE_DB = -6.0
 const GOAL_ROAR_DB = 6.0
 const BERNABEU_CROWD_DB = 3.0
 # The crowd rises as the ball nears either goal. Distances are shares of the centre-to-goal
 # distance: it starts building at CROWD_DANGER_START and is at full volume by CROWD_DANGER_FULL
 # (about the penalty spot). The edge of the box is about 0.31.
-const CROWD_DANGER_DB = 12.0
+const CROWD_DANGER_DB = 9.0
 const CROWD_DANGER_START = 0.6
 const CROWD_DANGER_FULL = 0.15
 const CROWD_PITCH_HALF_WIDTH = 90.0
 # A higher-pitched copy of the crowd fades in with the danger so it sounds agitated, not just louder.
-const CROWD_TENSION_DB = -2.0
+const CROWD_TENSION_DB = 0.0
+# Excitement builds toward the danger level (faster up than down), and pressure that lasts gets an
+# extra push: up to CROWD_SUSTAIN_BONUS more after CROWD_SUSTAIN_TIME seconds in a dangerous area.
+const CROWD_BUILD_UP = 0.5
+const CROWD_BUILD_DOWN = 0.3
+const CROWD_SUSTAIN_TIME = 4.0
+const CROWD_SUSTAIN_BONUS = 0.35
 const CROWD_TENSION_PITCH = 1.12
 # The anticipation "ooh" when the ball gets into the box, at most once per cooldown.
 const CROWD_BOX_DEPTH = 0.31
@@ -1571,13 +1579,24 @@ func _updateCrowdTension(delta):
 	crowdOohWait = max(crowdOohWait - delta, 0.0)
 	var crowd = $Sounds / CrowdSounds
 	if state != gameState.GAMEON or not crowd.playing:
+		crowdExcitement = max(crowdExcitement - CROWD_BUILD_DOWN * delta, 0.0)
+		crowdPressure = 0.0
 		_fadeCrowdTension(delta)
 		return
 	var gx = abs($VPC / VP / GameGroup / Goal.translation.x)
 	var toGoal = (gx - abs(Global.ballpos.x)) / gx
 	var danger = smoothstep(CROWD_DANGER_START, CROWD_DANGER_FULL, toGoal)
 	danger *= 1.0 - 0.3 * clamp(abs(Global.ballpos.z) / CROWD_PITCH_HALF_WIDTH, 0.0, 1.0)
-	crowd.volume_db = _approachDb(crowd.volume_db, _crowdBoost(CROWD_AMBIENCE_DB) + CROWD_DANGER_DB * danger, delta)
+	# Sustained pressure builds the noise further; it drains twice as fast once the danger passes.
+	if danger > 0.4:
+		crowdPressure = min(crowdPressure + delta, CROWD_SUSTAIN_TIME)
+	else:
+		crowdPressure = max(crowdPressure - 2.0 * delta, 0.0)
+	var target = clamp(danger * (1.0 - CROWD_SUSTAIN_BONUS + CROWD_SUSTAIN_BONUS * 2.0 * crowdPressure / CROWD_SUSTAIN_TIME), 0.0, 1.0)
+	var step = (CROWD_BUILD_UP if target > crowdExcitement else CROWD_BUILD_DOWN) * delta
+	crowdExcitement += clamp(target - crowdExcitement, - step, step)
+	var level = sqrt(crowdExcitement)
+	crowd.volume_db = _crowdBoost(CROWD_AMBIENCE_DB) + CROWD_DANGER_DB * level
 	if crowdTension == null:
 		crowdTension = AudioStreamPlayer.new()
 		crowdTension.stream = crowd.stream
@@ -1587,8 +1606,7 @@ func _updateCrowdTension(delta):
 		$Sounds.add_child(crowdTension)
 	if not crowdTension.playing:
 		crowdTension.play(8.0)
-	var tensionDb = lerp(-60.0, _crowdBoost(CROWD_TENSION_DB), sqrt(danger)) if danger > 0.01 else -60.0
-	crowdTension.volume_db = _approachDb(crowdTension.volume_db, tensionDb, delta)
+	crowdTension.volume_db = lerp(-40.0, _crowdBoost(CROWD_TENSION_DB), level) if crowdExcitement > 0.02 else -60.0
 	if toGoal < CROWD_BOX_DEPTH and abs(Global.ballpos.z) < CROWD_BOX_HALF_WIDTH and crowdOohWait <= 0.0:
 		crowdOohWait = CROWD_OOH_COOLDOWN
 		$Sounds / CrowdCross.play()
