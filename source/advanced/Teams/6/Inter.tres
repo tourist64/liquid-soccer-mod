@@ -116,6 +116,19 @@ player6 = {
 "speed": 11.0
 }
 player7 = {
+"aggression": 7.5,
+"agility": 9.0,
+"curl": 9.5,
+"facehair": 0,
+"hair": Color( 0.250, 0.150, 0.080, 1 ),
+"hairtype": 4,
+"name": "P Zielinski",
+"shoot": 7.5,
+"skin": Color( 0.880, 0.670, 0.550, 1 ),
+"smart": 9.0,
+"speed": 8.0
+}
+player8 = {
 "aggression": 8.5,
 "agility": 7.5,
 "curl": 5.5,
@@ -128,7 +141,7 @@ player7 = {
 "smart": 9.0,
 "speed": 8.5
 }
-player8 = {
+player9 = {
 "aggression": 9.0,
 "agility": 8.0,
 "curl": 6.5,
@@ -140,19 +153,6 @@ player8 = {
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 9.5,
 "speed": 9.0
-}
-player9 = {
-"aggression": 7.5,
-"agility": 9.0,
-"curl": 9.5,
-"facehair": 0,
-"hair": Color( 0.250, 0.150, 0.080, 1 ),
-"hairtype": 4,
-"name": "P Zielinski",
-"shoot": 7.5,
-"skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 9.0,
-"speed": 8.0
 }
 player10 = {
 "aggression": 7.5,
@@ -182,7 +182,7 @@ player11 = {
 "smart": 8.5,
 "speed": 9.5
 }
-def = [ Vector2( 0.35, 0.82743 ), Vector2( 0.592117, 0.834043 ), Vector2( 0.470552, 0.769525 ), Vector2( 0.301458, 0.68602 ), Vector2( 0.534688, 0.513662 ), Vector2( 0.619963, 0.683642 ) ]
-mid = [ Vector2( 0.3, 0.68 ), Vector2( 0.65, 0.68 ), Vector2( 0.56573, 0.545717 ), Vector2( 0.25, 0.35 ), Vector2( 0.7, 0.35 ), Vector2( 0.384668, 0.545014 ) ]
-att = [ Vector2( 0.3, 0.46 ), Vector2( 0.65, 0.5 ), Vector2( 0.467177, 0.290079 ), Vector2( 0.30101, 0.152624 ), Vector2( 0.470595, 0.146494 ), Vector2( 0.635529, 0.151934 ) ]
-cor = [ Vector2( 0.451, 0.258 ), Vector2( 0.472, 0.456 ), Vector2( 0.456144, 0.259935 ), Vector2( 0.308, 0.155 ), Vector2( 0.462209, 0.144758 ), Vector2( 0.587819, 0.133348 ) ]
+def = [ Vector2( 0.35, 0.82743 ), Vector2( 0.592117, 0.834043 ), Vector2( 0.470552, 0.769525 ), Vector2( 0.301458, 0.68602 ), Vector2( 0.534688, 0.513662 ), Vector2( 0.619963, 0.683642 ), Vector2( 0.44, 0.64 ) ]
+mid = [ Vector2( 0.3, 0.68 ), Vector2( 0.65, 0.68 ), Vector2( 0.56573, 0.545717 ), Vector2( 0.25, 0.35 ), Vector2( 0.7, 0.35 ), Vector2( 0.384668, 0.545014 ), Vector2( 0.46, 0.47 ) ]
+att = [ Vector2( 0.3, 0.46 ), Vector2( 0.65, 0.5 ), Vector2( 0.467177, 0.290079 ), Vector2( 0.30101, 0.152624 ), Vector2( 0.470595, 0.146494 ), Vector2( 0.635529, 0.151934 ), Vector2( 0.42, 0.33 ) ]
+cor = [ Vector2( 0.451, 0.258 ), Vector2( 0.472, 0.456 ), Vector2( 0.456144, 0.259935 ), Vector2( 0.308, 0.155 ), Vector2( 0.462209, 0.144758 ), Vector2( 0.587819, 0.133348 ), Vector2( 0.5, 0.3 ) ]

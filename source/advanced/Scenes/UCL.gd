@@ -1,6 +1,6 @@
 extends Node
 
-# New UCL (tType 6): the 2026/27 Champions League, played 7v7.
+# New UCL (tType 6): the 2026/27 Champions League, played 8v8.
 # League phase: 36 clubs in one table, 8 matchdays against 8 different opponents.
 # 1st-8th go straight to the last 16, 9th-24th play a knockout play-off, 25th-36th are out.
 # Knockouts are single matches (penalties if level): play-off, last 16, quarters, semis, final.
@@ -25,6 +25,8 @@ const RATINGS = {"PSG": 92, "Real Madrid": 91, "Arsenal": 91, "Bayern Munich": 9
 const BASE_GOALS = 1.3
 const GAP_FACTOR = 0.04
 const HOME_EDGE = 1.5
+# In the knockouts, AI clubs rated this high (and any finalist) play with the sharpest AI (level 0).
+const SHARP_AI_RATING = 84
 
 # Read by Game.gd / Hud.gd like the other tournaments.
 var cup = 2

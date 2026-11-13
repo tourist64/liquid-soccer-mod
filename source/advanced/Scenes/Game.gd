@@ -224,8 +224,8 @@ func initStadium():
 		$Zones.scale *= Vector3(Global.ps, 1.0, Global.ps)
 		if Global.ELEVEN_CUSTOM_PRESENTATION:
 			_useBowlStadium(gs)
-	elif Global.eightMode:
-		# 8v8 is played in a packed Bernabeu.
+	elif Global.eightMode and (not _inUCL() or Global.t1.teamname == "Real Madrid"):
+		# 8v8 is played in a packed Bernabeu; in the Champions League only Real Madrid's home games are.
 		_useBowlStadium(gs, "bernabeu")
 	awayFans = gs.find_node("AwayFans")
 	
@@ -1672,6 +1672,10 @@ func _approachDb(cur, target, delta):
 	var rate = 10.0 if target > cur else 4.0
 	return cur + clamp(target - cur, - rate * delta, rate * delta)
 
+# A New UCL match (the menu clears the tournament, so 8v8 friendlies afterwards don't count).
+func _inUCL():
+	return Global.tType == 6 and Global.tournament != null and Global.tournament.has_method("simulateRound")
+
 func _crowdBoost(db):
 	return db + BERNABEU_CROWD_DB if Global.eightMode else db
 
@@ -2062,7 +2066,7 @@ func _halfOver():
 			if Global.final:
 				# The final ends in the trophy ceremony and then the menu, never back at the New UCL
 				# screen, so record its result (and the champion) now.
-				if Global.tType == 6 and Global.tournament and Global.tournament.has_method("simulateRound"):
+				if _inUCL():
 					Global.tournament._gamePlayed(score)
 				state = gameState.WINNER
 				$Timers / Timer.wait_time = 4

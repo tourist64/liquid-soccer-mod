@@ -243,9 +243,22 @@ func _play():
 	Global.doShootout = ucl.knockoutStage
 	Global.p1human = f[0] == ucl.tTeam
 	Global.p2human = not Global.p1human
+	# The Champions League is played 8v8.
+	Global.setEightMode(true)
 	Global.team1 = ucl.path(f[0])
 	Global.team2 = ucl.path(f[1])
 	Global._loadTeams(false, false)
+	# Knockouts: strong clubs (and anyone in the final) get the sharpest AI. Only this match's copy
+	# of the team changes, not the club's file.
+	if ucl.knockoutStage:
+		var ai = f[1] if f[0] == ucl.tTeam else f[0]
+		if ucl.ratings[ai] >= UCL.SHARP_AI_RATING or ucl.isFinal():
+			if ai == f[0]:
+				Global.t1 = Global.t1.duplicate()
+				Global.t1.level = 0.0
+			else:
+				Global.t2 = Global.t2.duplicate()
+				Global.t2.level = 0.0
 	Global.toLoad = 1
 	Global.stadium = 3 - int(Global.t1.level)
 	trans._wipeOff()
