@@ -31,6 +31,12 @@ var style = ""
 var crowdScale = 1.0
 # Share of fans per tier (lower, middle, top). The Bernabeu fills every tier evenly by seating area.
 var tierWeights = [0.62, 0.23, 0.15]
+# Even spread (Bernabeu): fans are placed by a low-discrepancy sequence, evenly by distance around
+# the stand and up its rows, instead of at random, so there are no gaps or clumps.
+var evenSpread = false
+var haltonIndex = 0
+var arcTables = {}
+const ARC_SAMPLES = 1024
 var fascia = FASCIA
 var roof = ROOF
 var roofEdge = ROOF_EDGE
@@ -52,7 +58,9 @@ func _ready():
 		fascia = BERNABEU_FASCIA
 		roof = BERNABEU_ROOF
 		roofEdge = BERNABEU_ROOF_EDGE
-		crowdScale = 3.3
+		# About 32,000 fans in all: ~22,300 home, ~3,250 away, ~6,500 on the near-side upper tiers.
+		crowdScale = 4.64
+		evenSpread = true
 		tierWeights = [0.25, 0.29, 0.46]
 	for d in tiers:
 		d["a"] = [d["a"][0] * ratio, d["a"][1] * ratio, d["a"][2]]
@@ -187,14 +195,21 @@ func seats(count, away, nearUpper = false):
 		guard += 1
 		# By default most fans go in the lower tier, the part the sideline cameras actually see.
 		var roll = randf()
+		var u = randf()
+		var v = randf()
+		if evenSpread:
+			haltonIndex += 1
+			roll = _halton(haltonIndex, 5)
+			u = _halton(haltonIndex, 2)
+			v = _halton(haltonIndex, 3)
 		var t = 0 if roll < tierWeights[0] else (1 if roll < tierWeights[0] + tierWeights[1] else 2)
 		var d = tiers[t]
 		var a = d["a"]
 		var b = d["b"]
-		var f = rand_range(0.03, 0.97)
+		var f = _evenDepth(t, v) if evenSpread else lerp(0.03, 0.97, v)
 		var hx = lerp(a[0], b[0], f)
 		var hz = lerp(a[1], b[1], f)
-		var p = _ring(hx, hz, rand_range(0.0, SEGMENTS))
+		var p = _ring(hx, hz, _evenAngle(t, u) if evenSpread else u * SEGMENTS)
 		if (not d["near"] and _blocksView(p)) != nearUpper:
 			continue
 		var inAway = (p.x < - hx * 0.82)
@@ -202,3 +217,53 @@ func seats(count, away, nearUpper = false):
 			continue
 		out.append(Vector3(p.x, lerp(a[2], b[2], f) + 0.5, p.y))
 	return out
+
+func _halton(i, base):
+	var f = 1.0
+	var r = 0.0
+	while i > 0:
+		f /= base
+		r += f * (i % base)
+		i = int(i / base)
+	return r
+
+# Ring position for a share u of the distance around tier t (the ring parameter alone bunches
+# points into the corners).
+func _evenAngle(t, u):
+	var cum = _arcTable(t)
+	var k = int(clamp(cum.bsearch(u), 1, ARC_SAMPLES))
+	var lo = cum[k - 1]
+	var hi = cum[k]
+	var frac = (u - lo) / max(hi - lo, 0.000001)
+	return (float(k - 1) + frac) * SEGMENTS / ARC_SAMPLES
+
+func _arcTable(t):
+	if arcTables.has(t):
+		return arcTables[t]
+	var a = tiers[t]["a"]
+	var b = tiers[t]["b"]
+	var hx = (a[0] + b[0]) * 0.5
+	var hz = (a[1] + b[1]) * 0.5
+	var cum = [0.0]
+	var total = 0.0
+	var prev = _ring(hx, hz, 0.0)
+	for k in range(1, ARC_SAMPLES + 1):
+		var q = _ring(hx, hz, float(k) * SEGMENTS / ARC_SAMPLES)
+		total += prev.distance_to(q)
+		cum.append(total)
+		prev = q
+	for k in range(cum.size()):
+		cum[k] /= total
+	arcTables[t] = cum
+	return cum
+
+# Depth into tier t for a share v of its seats: back rows are longer, so they get more fans.
+func _evenDepth(t, v):
+	var a = tiers[t]["a"]
+	var b = tiers[t]["b"]
+	var p0 = a[0] + a[1]
+	var p1 = b[0] + b[1]
+	var f = v
+	if abs(p1 - p0) > 0.001:
+		f = (- p0 + sqrt(p0 * p0 + (p1 * p1 - p0 * p0) * v)) / (p1 - p0)
+	return lerp(0.03, 0.97, f)
