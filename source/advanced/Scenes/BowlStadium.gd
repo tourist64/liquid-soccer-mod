@@ -87,9 +87,9 @@ func _ready():
 		fascia = BERNABEU_FASCIA
 		roof = BERNABEU_ROOF
 		roofEdge = BERNABEU_ROOF_EDGE
-		# About 20,000 fans: ~13,900 home, ~2,000 away and ~4,100 on the near-side upper tiers (only drawn
-		# when the camera faces them, so usually ~16,000 on screen).
-		crowdScale = 2.9
+		# About 16,000 fans: ~11,100 home, ~1,600 away and ~3,200 on the near-side upper tiers (only drawn
+		# when the camera faces them).
+		crowdScale = 2.32
 		evenSpread = true
 		tierWeights = [0.25, 0.29, 0.46]
 		paintText = true

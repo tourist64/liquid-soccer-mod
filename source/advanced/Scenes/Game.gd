@@ -269,8 +269,11 @@ func initStadium():
 	penTarget = $VPC / VP / GameGroup / Goal / Target
 	
 	$VPC / VP / GameGroup / Stadium._setShadows()
+	_pitchTint()
 	if atBernabeu:
 		_nightLight()
+	else:
+		_daySun()
 	
 
 func _ready():
@@ -1574,6 +1577,27 @@ func goalScored():
 	$Timers / Timer.start()
 
 # Louder goal roar and a stadium reverb on the whole crowd, with a limiter so nothing clips.
+# Pitch: a touch darker, cooler green like a real pitch; the texture itself is unchanged.
+const PITCH_TINT = Color(0.87, 0.93, 0.86)
+# Day matches: the sun was strongly orange; a softer, more neutral afternoon light.
+const DAY_SUN = Color(0.86, 0.73, 0.64)
+
+func _pitchTint():
+	var pitch = $VPC / VP / GameGroup / Stadium.find_node("Pitch1", true, false)
+	if pitch == null:
+		return
+	var m = pitch.get_surface_material(0)
+	if m == null or not (m is ShaderMaterial):
+		return
+	m = m.duplicate()
+	m.set_shader_param("albedo_color", PITCH_TINT)
+	pitch.set_surface_material(0, m)
+
+func _daySun():
+	var light = $VPC / VP / GameGroup / Stadium.get_node_or_null("DirectionalLight")
+	if light:
+		light.light_color = DAY_SUN
+
 # Night match in the Bernabeu: dark sky, cool floodlight from high above, a soft glow on the lights.
 const NIGHT_SKY = Color(0.015, 0.022, 0.055)
 func _nightEnv(env):
