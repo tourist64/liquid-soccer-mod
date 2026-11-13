@@ -106,6 +106,8 @@ var madridGoalFade = null
 var madridGoalActive = false
 var madridGoalLeftPlay = false
 const MADRID_GOAL_DELAY = 2.5
+# The track starts from 1:03.5.
+const MADRID_GOAL_START = 63.5
 const MADRID_GOAL_VOLUME_DB = 4.0
 const MADRID_GOAL_BUS = "MadridGoal"
 # Crowd atmosphere: ambience level during play, extra goal roar, and the 8v8 Bernabeu crowd boost.
@@ -1624,7 +1626,7 @@ func _startMadridGoalTrack():
 	if not madridGoalActive:
 		return
 	madridGoalSound.volume_db = MADRID_GOAL_VOLUME_DB
-	madridGoalSound.play()
+	madridGoalSound.play(MADRID_GOAL_START)
 
 func _inPlay():
 	return state == gameState.GAMEON or state == gameState.TAKEPEN or state == gameState.TAKEPENAI
