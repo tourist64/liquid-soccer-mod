@@ -101,6 +101,13 @@ var mp_snapshot_elapsed = 0.0
 var mp_last_snapshot_version = 0
 var mp_last_presented_state = -1
 var madridGoalSound = null
+var madridGoalTimer = null
+var madridGoalFade = null
+var madridGoalActive = false
+var madridGoalLeftPlay = false
+const MADRID_GOAL_DELAY = 2.5
+const MADRID_GOAL_VOLUME_DB = 4.0
+const MADRID_GOAL_BUS = "MadridGoal"
 func initTeams():
 	team1 = $VPC / VP / GameGroup / Team
 	team1.opponent = $VPC / VP / GameGroup / Team2
@@ -692,6 +699,7 @@ func checkInput():
 			doLap()
 
 func _process(delta):
+	_updateMadridGoalTrack()
 	if mp_replica:
 		_mp_apply_replica_state()
 		_mp_update_blobs()
@@ -1512,8 +1520,53 @@ func _setupMadridGoalSound():
 		return
 	madridGoalSound = AudioStreamPlayer.new()
 	madridGoalSound.stream = stream
-	madridGoalSound.bus = "Music"
+	madridGoalSound.volume_db = MADRID_GOAL_VOLUME_DB
+	madridGoalSound.bus = _madridGoalBus()
 	$Sounds.add_child(madridGoalSound)
+	madridGoalTimer = Timer.new()
+	madridGoalTimer.one_shot = true
+	madridGoalTimer.wait_time = MADRID_GOAL_DELAY
+	var _t = madridGoalTimer.connect("timeout", self, "_startMadridGoalTrack")
+	$Sounds.add_child(madridGoalTimer)
+	madridGoalFade = Tween.new()
+	$Sounds.add_child(madridGoalFade)
+
+# Stadium sound for the Madrid track: echo off the far stands, a big reverb tail and a limiter
+# so the extra volume never clips. It feeds the Music bus, so the music volume setting still applies.
+func _madridGoalBus():
+	if AudioServer.get_bus_index(MADRID_GOAL_BUS) != -1:
+		return MADRID_GOAL_BUS
+	var idx = AudioServer.get_bus_count()
+	AudioServer.add_bus(idx)
+	AudioServer.set_bus_name(idx, MADRID_GOAL_BUS)
+	AudioServer.set_bus_send(idx, "Music")
+	var echo = AudioEffectDelay.new()
+	echo.set_dry(1.0)
+	echo.set_tap1_active(true)
+	echo.set_tap1_delay_ms(260.0)
+	echo.set_tap1_level_db(-9.0)
+	echo.set_tap1_pan(-0.4)
+	echo.set_tap2_active(true)
+	echo.set_tap2_delay_ms(520.0)
+	echo.set_tap2_level_db(-15.0)
+	echo.set_tap2_pan(0.4)
+	echo.set_feedback_active(false)
+	AudioServer.add_bus_effect(idx, echo)
+	var reverb = AudioEffectReverb.new()
+	reverb.room_size = 0.9
+	reverb.damping = 0.35
+	reverb.spread = 1.0
+	reverb.predelay_msec = 90.0
+	reverb.predelay_feedback = 0.3
+	reverb.hipass = 0.15
+	reverb.dry = 1.0
+	reverb.wet = 0.3
+	AudioServer.add_bus_effect(idx, reverb)
+	var limiter = AudioEffectLimiter.new()
+	limiter.threshold_db = -3.0
+	limiter.ceiling_db = -0.5
+	AudioServer.add_bus_effect(idx, limiter)
+	return MADRID_GOAL_BUS
 
 func _isMadrid(t):
 	if t == null:
@@ -1528,7 +1581,37 @@ func _playMadridGoal(teamIndex):
 	if madridGoalSound == null:
 		return
 	if _isMadrid(Global.t1 if teamIndex == 0 else Global.t2):
-		madridGoalSound.play()
+		madridGoalFade.stop_all()
+		madridGoalSound.stop()
+		madridGoalActive = true
+		madridGoalLeftPlay = false
+		madridGoalTimer.start()
+
+func _startMadridGoalTrack():
+	if not madridGoalActive:
+		return
+	madridGoalSound.volume_db = MADRID_GOAL_VOLUME_DB
+	madridGoalSound.play()
+
+func _inPlay():
+	return state == gameState.GAMEON or state == gameState.TAKEPEN or state == gameState.TAKEPENAI
+
+# The track waits for play to stop after the goal, then fades out as soon as play resumes
+# (kickoff, or the next penalty in a shootout).
+func _updateMadridGoalTrack():
+	if not madridGoalActive:
+		return
+	if not _inPlay():
+		madridGoalLeftPlay = true
+		return
+	if not madridGoalLeftPlay:
+		return
+	madridGoalActive = false
+	madridGoalTimer.stop()
+	if madridGoalSound.playing:
+		madridGoalFade.interpolate_property(madridGoalSound, "volume_db", madridGoalSound.volume_db, -60.0, 0.8)
+		madridGoalFade.interpolate_callback(madridGoalSound, 0.8, "stop")
+		madridGoalFade.start()
 
 func _on_team1_scored(_body):
 
