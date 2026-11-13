@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -47,6 +48,20 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: game3
+
+      # deploy-pages looks the artifact up straight away and sometimes misses it; wait until it's listed.
+      - name: Aguardar artefato
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 30); do
+            if gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" --jq '.artifacts[].name' | grep -qx github-pages; then
+              echo "Artifact listed after $((i * 2 - 2))s"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Artifact still not listed after 60s; trying to publish anyway"
 
       - name: Publicar
         id: deployment
