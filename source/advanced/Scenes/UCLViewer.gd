@@ -136,18 +136,18 @@ func _table(at):
 	var st = ucl.standings()
 	for r in range(st.size()):
 		var i = st[r]
-		var y = at.y + 22 + r * 13.6
+		var y = at.y + 22 + r * 13.0
 		var zone = ZONE_TOP if r < 8 else (ZONE_PLAYOFF if r < 24 else ZONE_OUT)
-		_rect(page, Vector2(at.x + 2, y), Vector2(w - 4, 13), zone)
+		_rect(page, Vector2(at.x + 2, y), Vector2(w - 4, 12.5), zone)
 		if i == ucl.tTeam:
-			_rect(page, Vector2(at.x + 2, y), Vector2(w - 4, 13), ME)
+			_rect(page, Vector2(at.x + 2, y), Vector2(w - 4, 12.5), ME)
 		var t = ucl.table[i]
 		var col = GOLD if i == ucl.tTeam else WHITE
 		var gd = t.gf - t.ga
 		var vals = [str(r + 1), ucl.names[i], str(t.p), str(t.w), str(t.d), str(t.l), ("+" if gd > 0 else "") + str(gd), str(t.pts)]
 		for c in range(cols.size()):
 			_label(page, vals[c], Vector2(at.x + cols[c][1], y - 1), Vector2(280 if c == 1 else 50, 14), fSmall, col)
-	_label(page, "1-8 last 16    9-24 play-off    25-36 out", Vector2(at.x + 8, at.y + 516 - 18), Vector2(w, 16), fSmall, DIM)
+	_label(page, "1-8 last 16    9-24 play-off    25-36 out", Vector2(at.x + 8, at.y + 494), Vector2(w, 16), fSmall, DIM)
 
 # --- Knockouts: bracket + next match --------------------------------------------------------
 
