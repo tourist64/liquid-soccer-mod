@@ -121,29 +121,36 @@ const MADRID_CROWD_BED_FADE_IN = 4.0
 const MADRID_GOAL_VOLUME_DB = 4.0
 const MADRID_GOAL_BUS = "MadridGoal"
 # Crowd atmosphere: ambience level during play, extra goal roar, and the 8v8 Bernabeu crowd boost.
-const CROWD_AMBIENCE_DB = -6.0
-const GOAL_ROAR_DB = 6.0
+const CROWD_AMBIENCE_DB = -4.0
+const GOAL_ROAR_DB = 10.5
 const BERNABEU_CROWD_DB = 3.0
 # The crowd rises as the ball nears either goal. Distances are shares of the centre-to-goal
 # distance: it starts building at CROWD_DANGER_START and is at full volume by CROWD_DANGER_FULL
 # (about the penalty spot). The edge of the box is about 0.31.
 # Peak: the murmur and the excited layer together land just under the goal roar (about -12 dBFS).
-const CROWD_DANGER_DB = 11.0
+const CROWD_DANGER_DB = 13.0
 const CROWD_DANGER_START = 0.6
 const CROWD_DANGER_FULL = 0.15
 const CROWD_PITCH_HALF_WIDTH = 90.0
 # A higher-pitched copy of the crowd fades in with the danger so it sounds agitated, not just louder.
-const CROWD_TENSION_DB = 2.0
+const CROWD_TENSION_DB = 4.0
 # Excitement builds toward the danger level (faster up than down), and pressure that lasts gets an
 # extra push: up to CROWD_SUSTAIN_BONUS more after CROWD_SUSTAIN_TIME seconds in a dangerous area.
-const CROWD_BUILD_UP = 0.5
+const CROWD_BUILD_UP = 0.7
 const CROWD_BUILD_DOWN = 0.3
 const CROWD_SUSTAIN_TIME = 4.0
 const CROWD_SUSTAIN_BONUS = 0.35
 # Outnumbered defence: when the side on the ball has only 2 (or fewer) outfield defenders between the
 # ball and goal, the crowd surges, faster than a normal build-up, even from the halfway line.
-const CROWD_OVERLOAD_BOOST = 0.55
-const CROWD_OVERLOAD_BUILD = 1.0
+# Defenders goal-side of the ball (outfield, keeper not counted) -> how excited the crowd gets.
+const CROWD_DEFENDERS_LEFT = {0: 1.0, 1: 0.85, 2: 0.6}
+# Fast surge for breakaways, shots and penalties.
+const CROWD_SURGE_BUILD = 1.8
+# Moments: a shot towards goal, a cross into the box, a set piece near the box, a penalty.
+const CROWD_SHOT = 1.0
+const CROWD_CROSS = 0.8
+const CROWD_SET_PIECE = 0.7
+const CROWD_PENALTY = 1.0
 const CROWD_TENSION_PITCH = 1.12
 # The anticipation "ooh" when the ball gets into the box, at most once per cooldown.
 const CROWD_BOX_DEPTH = 0.31
@@ -1615,28 +1622,33 @@ func _setupAtmosphere():
 	limiter.ceiling_db = -0.5
 	AudioServer.add_bus_effect(idx, limiter)
 
-# Only during open play; kickoffs, goals and full time keep setting the crowd level themselves.
+# The crowd follows how dangerous play is: how few defenders are left goal-side of the ball, how
+# close it is to goal, shots, crosses and set pieces near the box. Goals, kickoffs and full time
+# set the crowd level themselves.
 func _updateCrowdTension(delta):
 	crowdOohWait = max(crowdOohWait - delta, 0.0)
 	var crowd = $Sounds / CrowdSounds
-	if state != gameState.GAMEON or not crowd.playing:
+	var moment = _crowdMoment()
+	if (state != gameState.GAMEON and moment == 0.0) or not crowd.playing:
 		crowdExcitement = max(crowdExcitement - CROWD_BUILD_DOWN * delta, 0.0)
 		crowdPressure = 0.0
 		_fadeCrowdTension(delta)
 		return
 	var gx = abs($VPC / VP / GameGroup / Goal.translation.x)
 	var toGoal = (gx - abs(Global.ballpos.x)) / gx
-	var danger = smoothstep(CROWD_DANGER_START, CROWD_DANGER_FULL, toGoal)
-	danger *= 1.0 - 0.3 * clamp(abs(Global.ballpos.z) / CROWD_PITCH_HALF_WIDTH, 0.0, 1.0)
-	var overload = _overload()
-	danger = clamp(danger + CROWD_OVERLOAD_BOOST * overload, 0.0, 1.0)
-	# Sustained pressure builds the noise further; it drains twice as fast once the danger passes.
+	var close = smoothstep(CROWD_DANGER_START, CROWD_DANGER_FULL, toGoal)
+	close *= 1.0 - 0.3 * clamp(abs(Global.ballpos.z) / CROWD_PITCH_HALF_WIDTH, 0.0, 1.0)
+	var outnumbered = _defendersLeftDanger()
+	# Each adds to the other: a breakaway that reaches the box is louder than either alone.
+	var danger = clamp(max(close, outnumbered) + 0.35 * min(close, outnumbered), 0.0, 1.0)
+	danger = max(danger, moment)
 	if danger > 0.4:
 		crowdPressure = min(crowdPressure + delta, CROWD_SUSTAIN_TIME)
 	else:
 		crowdPressure = max(crowdPressure - 2.0 * delta, 0.0)
 	var target = clamp(danger * (1.0 - CROWD_SUSTAIN_BONUS + CROWD_SUSTAIN_BONUS * 2.0 * crowdPressure / CROWD_SUSTAIN_TIME), 0.0, 1.0)
-	var up = CROWD_OVERLOAD_BUILD if overload > 0.0 else CROWD_BUILD_UP
+	target = max(target, moment)
+	var up = CROWD_SURGE_BUILD if (outnumbered > 0.0 or moment > 0.0) else CROWD_BUILD_UP
 	var step = (up if target > crowdExcitement else CROWD_BUILD_DOWN) * delta
 	crowdExcitement += clamp(target - crowdExcitement, - step, step)
 	var level = sqrt(crowdExcitement)
@@ -1651,32 +1663,48 @@ func _updateCrowdTension(delta):
 	if not crowdTension.playing:
 		crowdTension.play(8.0)
 	crowdTension.volume_db = lerp(-40.0, _crowdBoost(CROWD_TENSION_DB), level) if crowdExcitement > 0.02 else -60.0
-	if toGoal < CROWD_BOX_DEPTH and abs(Global.ballpos.z) < CROWD_BOX_HALF_WIDTH and crowdOohWait <= 0.0:
+	if state == gameState.GAMEON and toGoal < CROWD_BOX_DEPTH and abs(Global.ballpos.z) < CROWD_BOX_HALF_WIDTH and crowdOohWait <= 0.0:
 		crowdOohWait = CROWD_OOH_COOLDOWN
 		$Sounds / CrowdCross.play()
 
-# 0 normally; 0.75 when the side on the ball has 2 outfield defenders goal-side of it, 1 for 1 or none.
-func _overload():
-	var att = null
-	if team1 and team1.posession:
-		att = team1
-	elif team2 and team2.posession:
-		att = team2
-	if att == null:
+# Who is on the ball: whoever holds it, otherwise whoever touched it last (a ball knocked ahead on a run).
+func _ballCarrier():
+	if ball.state == ball.bstate.TRAPPED and ball.player != null:
+		return ball.player
+	return ball.lastPlayer
+
+# 0 normally; higher the fewer outfield defenders are goal-side of the ball (see CROWD_DEFENDERS_LEFT).
+func _defendersLeftDanger():
+	var carrier = _ballCarrier()
+	if carrier == null or not is_instance_valid(carrier) or carrier.get("myTeam") == null:
+		return 0.0
+	var att = carrier.myTeam
+	var def = att.opponent
+	if def == null:
 		return 0.0
 	var dir = sign(att.goalL.x - Global.ballpos.x)
 	if dir == 0:
 		return 0.0
-	var def = att.opponent
 	var ahead = 0
 	# Outfield players on the pitch only (the bench is in the list too, off the pitch).
 	for i in range(1, min(Global.squad, def.players.size())):
 		if (def.players[i].translation.x - Global.ballpos.x) * dir > 0.0:
 			ahead += 1
-	if ahead <= 1:
-		return 1.0
-	if ahead == 2:
-		return 0.75
+	return CROWD_DEFENDERS_LEFT.get(ahead, 0.0)
+
+# Big moments regardless of position: shots, crosses into the box, set pieces near goal, penalties.
+func _crowdMoment():
+	if state == gameState.PENALTY or state == gameState.TAKEPEN or state == gameState.TAKEPENAI or Global.penShoot:
+		return CROWD_PENALTY
+	var gx = abs($VPC / VP / GameGroup / Goal.translation.x)
+	var nearBox = (gx - abs(Global.ballpos.x)) / gx < 0.45
+	if (state == gameState.CORNER or state == gameState.FREEKICK) and nearBox:
+		return CROWD_SET_PIECE
+	if state == gameState.GAMEON:
+		if ball.state == ball.bstate.SHOOTING:
+			return CROWD_SHOT
+		if ball.state == ball.bstate.CROSSING and nearBox:
+			return CROWD_CROSS
 	return 0.0
 
 func _fadeCrowdTension(delta):
