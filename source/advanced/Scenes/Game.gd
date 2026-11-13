@@ -1604,7 +1604,7 @@ func _nightEnv(env):
 	var e = env.duplicate()
 	e.background_mode = Environment.BG_COLOR
 	e.background_color = NIGHT_SKY
-	e.ambient_light_color = Color(0.45, 0.5, 0.66)
+	e.ambient_light_color = Color(0.42, 0.49, 0.68)
 	e.ambient_light_energy = 0.55
 	e.ambient_light_sky_contribution = 0.0
 	e.fog_color = Color(0.03, 0.05, 0.1)
@@ -1620,7 +1620,8 @@ func _nightLight():
 	var light = $VPC / VP / GameGroup / Stadium.get_node_or_null("DirectionalLight")
 	if light == null:
 		return
-	light.light_color = Color(0.93, 0.96, 1.0)
+	# Cool white floodlight (not warm).
+	light.light_color = Color(0.86, 0.92, 1.0)
 	light.light_energy = 1.6
 	# Floodlights from high above (slightly towards the main stand) instead of a low afternoon sun.
 	light.global_transform = Transform(Basis(), Vector3(40.0, 300.0, 90.0)).looking_at(Vector3.ZERO, Vector3.UP)

@@ -67,7 +67,7 @@ var paintText = false
 var night = false
 var lit = false
 const NIGHT_SHADE = 0.6
-const FLOOD = Color(1.0, 0.98, 0.9)
+const FLOOD = Color(0.92, 0.96, 1.0)
 const FLOOD_GAP = Color(0.18, 0.19, 0.22)
 var tifoBg = TIFO_BG
 # Per fan from the last seats() call: 0 = ordinary, 1 = tifo background (navy), 2 = on a letter.
