@@ -154,18 +154,21 @@ func _initBowlCrowd():
 	for c in get_children():
 		if c is MultiMeshInstance and c != $MultiMeshInstance and c != $MultiMeshInstance7:
 			c.visible = false
-	_fillCrowd($MultiMeshInstance7, bowl.seats(int(4800 * bowl.crowdScale), false))
+	if bowl.paintText:
+		# Tifo: fans on the letters wear the home shirt (Shirt2), the ones around them navy (Shirt).
+		mat.set_shader_param("Shirt", bowl.tifoBg)
+	_fillCrowd($MultiMeshInstance7, bowl.seats(int(4800 * bowl.crowdScale), false), bowl.lastTifo)
 	_fillCrowd($MultiMeshInstance, bowl.seats(int(700 * bowl.crowdScale), true))
 	var nearFans = $MultiMeshInstance7.duplicate()
 	nearFans.name = "NearUpperFans"
 	nearFans.multimesh = $MultiMeshInstance7.multimesh.duplicate()
 	nearFans.visible = false
 	add_child(nearFans)
-	_fillCrowd(nearFans, bowl.seats(int(1400 * bowl.crowdScale), false, true))
+	_fillCrowd(nearFans, bowl.seats(int(1400 * bowl.crowdScale), false, true), bowl.lastTifo)
 	bowl.nearCrowd = nearFans
 	crowd = true
 
-func _fillCrowd(mmi, pts):
+func _fillCrowd(mmi, pts, tifo = null):
 	var mm = mmi.multimesh
 	mm.instance_count = pts.size()
 	var inv = mmi.global_transform.affine_inverse()
@@ -174,7 +177,11 @@ func _fillCrowd(mmi, pts):
 		var t = Transform(Basis(), l).looking_at(l + Vector3(l.x, 0.0, l.z), Vector3.UP)
 		t.basis = t.basis.scaled(Vector3(0.0075, 0.0075, 0.0075))
 		mm.set_instance_transform(i, t)
-		mm.set_instance_custom_data(i, Color(randf(), randf(), randf(), randf()))
+		var data = Color(randf(), randf(), randf(), randf())
+		# Tifo fans: g picks the shirt (0 = Shirt, 1 = Shirt2); b and a stay low so no other shirt shows.
+		if tifo != null and i < tifo.size() and tifo[i] > 0:
+			data = Color(randf(), 1.0 if tifo[i] == 2 else 0.0, randf() * 0.55, randf() * 0.75)
+		mm.set_instance_custom_data(i, data)
 
 func _initCrowd():
 	if bowl:

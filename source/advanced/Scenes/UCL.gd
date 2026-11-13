@@ -28,6 +28,18 @@ const HOME_EDGE = 1.5
 # In the knockouts, AI clubs rated this high (and any finalist) play with the sharpest AI (level 0).
 const SHARP_AI_RATING = 84
 
+# The real 2026/27 league-phase draw: 8 matchdays of [home, away].
+const REAL_FIXTURES = [
+	[["AEK Athens", "LASK"], ["Club Brugge", "Aston Villa"], ["Dortmund", "Villarreal"], ["Porto", "Man City"], ["Lille", "Real Betis"], ["Real Madrid", "Inter"], ["Barcelona", "Feyenoord"], ["Stuttgart", "Viking"], ["Liverpool", "Atletico Madrid"], ["PSG", "Slovan Bratislava"], ["Sporting CP", "Galatasaray"], ["Napoli", "Arsenal"], ["Fenerbahce", "Roma"], ["PSV", "Shakhtar Donetsk"], ["Como", "RB Leipzig"], ["Bayern Munich", "Bodo Glimt"], ["Man Utd", "Sabah"], ["Slavia Prague", "Lens"]],
+	[["Lens", "Sporting CP"], ["Sabah", "Slavia Prague"], ["Arsenal", "Lille"], ["Atletico Madrid", "Man Utd"], ["Inter", "Club Brugge"], ["Galatasaray", "Barcelona"], ["RB Leipzig", "PSV"], ["Viking", "Bayern Munich"], ["Villarreal", "Napoli"], ["Feyenoord", "Como"], ["LASK", "Liverpool"], ["Roma", "Real Madrid"], ["Aston Villa", "Fenerbahce"], ["Shakhtar Donetsk", "AEK Athens"], ["Bodo Glimt", "Dortmund"], ["Man City", "PSG"], ["Real Betis", "Porto"], ["Slovan Bratislava", "Stuttgart"]],
+	[["Fenerbahce", "Slavia Prague"], ["Sabah", "Dortmund"], ["Roma", "Slovan Bratislava"], ["Porto", "PSV"], ["Liverpool", "Villarreal"], ["Man City", "AEK Athens"], ["PSG", "Barcelona"], ["Napoli", "Bodo Glimt"], ["Stuttgart", "Atletico Madrid"], ["Como", "Man Utd"], ["Lille", "Galatasaray"], ["Aston Villa", "Viking"], ["Club Brugge", "Lens"], ["Bayern Munich", "Arsenal"], ["Inter", "Shakhtar Donetsk"], ["Real Madrid", "RB Leipzig"], ["Real Betis", "Feyenoord"], ["Sporting CP", "LASK"]],
+	[["Shakhtar Donetsk", "Sporting CP"], ["Galatasaray", "Stuttgart"], ["Atletico Madrid", "Bayern Munich"], ["Barcelona", "Aston Villa"], ["Feyenoord", "Inter"], ["Bodo Glimt", "Lille"], ["LASK", "Slovan Bratislava"], ["Man Utd", "Roma"], ["Villarreal", "PSG"], ["AEK Athens", "Real Madrid"], ["Fenerbahce", "Liverpool"], ["Dortmund", "Real Betis"], ["Porto", "Napoli"], ["PSV", "Club Brugge"], ["RB Leipzig", "Man City"], ["Lens", "Como"], ["Slavia Prague", "Arsenal"], ["Viking", "Sabah"]],
+	[["Bodo Glimt", "LASK"], ["Galatasaray", "Aston Villa"], ["Arsenal", "Dortmund"], ["Como", "AEK Athens"], ["Feyenoord", "Porto"], ["Man City", "Napoli"], ["RB Leipzig", "Lens"], ["Real Madrid", "PSV"], ["Slovan Bratislava", "Real Betis"], ["Sabah", "Barcelona"], ["Slavia Prague", "Villarreal"], ["Atletico Madrid", "Viking"], ["Club Brugge", "Liverpool"], ["Inter", "Stuttgart"], ["Shakhtar Donetsk", "Fenerbahce"], ["Lille", "Bayern Munich"], ["PSG", "Roma"], ["Sporting CP", "Man Utd"]],
+	[["Viking", "Feyenoord"], ["Villarreal", "Sabah"], ["AEK Athens", "Galatasaray"], ["Roma", "Sporting CP"], ["Aston Villa", "PSG"], ["Barcelona", "Man City"], ["Bayern Munich", "Slavia Prague"], ["Man Utd", "RB Leipzig"], ["Napoli", "Club Brugge"], ["Real Betis", "Como"], ["Slovan Bratislava", "Shakhtar Donetsk"], ["Arsenal", "Real Madrid"], ["Dortmund", "Inter"], ["LASK", "Fenerbahce"], ["Liverpool", "Porto"], ["PSV", "Atletico Madrid"], ["Lens", "Bodo Glimt"], ["Stuttgart", "Lille"]],
+	[["Bodo Glimt", "Atletico Madrid"], ["Galatasaray", "Feyenoord"], ["AEK Athens", "Roma"], ["Aston Villa", "Dortmund"], ["Inter", "Liverpool"], ["Porto", "Slavia Prague"], ["Lille", "Slovan Bratislava"], ["Real Madrid", "LASK"], ["Stuttgart", "Club Brugge"], ["Fenerbahce", "Villarreal"], ["Sabah", "Napoli"], ["Como", "PSG"], ["Man Utd", "Bayern Munich"], ["RB Leipzig", "Shakhtar Donetsk"], ["Lens", "Man City"], ["Real Betis", "Arsenal"], ["Sporting CP", "Barcelona"], ["Viking", "PSV"]],
+	[["Arsenal", "Sabah"], ["Roma", "Lille"], ["Atletico Madrid", "Fenerbahce"], ["Dortmund", "AEK Athens"], ["Club Brugge", "Bodo Glimt"], ["Bayern Munich", "Real Betis"], ["Barcelona", "Como"], ["Shakhtar Donetsk", "Real Madrid"], ["Feyenoord", "RB Leipzig"], ["LASK", "Porto"], ["Liverpool", "Lens"], ["Man City", "Sporting CP"], ["PSG", "Galatasaray"], ["PSV", "Stuttgart"], ["Slavia Prague", "Aston Villa"], ["Napoli", "Viking"], ["Villarreal", "Man Utd"], ["Slovan Bratislava", "Inter"]]
+]
+
 # Read by Game.gd / Hud.gd like the other tournaments.
 var cup = 2
 var leg = 0
@@ -88,29 +100,17 @@ func start(player):
 	_makeFixtures()
 	saveState()
 
-# 8 rounds of a shuffled round-robin (circle method): every club plays 8 different opponents,
-# about half at home.
+# The real 2026/27 league-phase fixtures, home and away as drawn.
 func _makeFixtures():
-	var order = range(files.size())
-	order.shuffle()
-	var n = order.size()
-	var rounds = range(n - 1)
-	rounds.shuffle()
+	var idx = {}
+	for i in range(files.size()):
+		idx[files[i]] = i
 	fixtures = []
 	results = []
 	for m in range(MATCHDAYS):
-		var r = rounds[m]
-		var rot = [order[0]]
-		for k in range(1, n):
-			rot.append(order[1 + (k - 1 + r) % (n - 1)])
 		var day = []
-		for k in range(n / 2):
-			var a = rot[k]
-			var b = rot[n - 1 - k]
-			if (k + m) % 2 == 0:
-				day.append([a, b])
-			else:
-				day.append([b, a])
+		for f in REAL_FIXTURES[m]:
+			day.append([idx[f[0]], idx[f[1]]])
 		fixtures.append(day)
 		results.append([])
 

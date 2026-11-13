@@ -43,16 +43,29 @@ var roofEdge = ROOF_EDGE
 const BERNABEU_FASCIA = Color(0.97, 0.97, 0.98)
 const BERNABEU_ROOF = Color(0.80, 0.82, 0.85)
 const BERNABEU_ROOF_EDGE = Color(0.62, 0.65, 0.70)
-# Packed-crowd paint for the Bernabeu seats: mostly Madrid white, then greys, navy, dark clothes,
-# skin tones and a little purple and gold. Each seat row is cut into small patches of these.
-const CROWD_PALETTE = [
-	Color(0.93, 0.93, 0.95), Color(0.88, 0.88, 0.90), Color(0.96, 0.96, 0.97), Color(0.82, 0.83, 0.86),
-	Color(0.62, 0.63, 0.66), Color(0.14, 0.17, 0.32), Color(0.10, 0.10, 0.12), Color(0.20, 0.20, 0.22),
-	Color(0.80, 0.62, 0.50), Color(0.55, 0.38, 0.27), Color(0.42, 0.24, 0.58), Color(0.80, 0.66, 0.25)]
-const CROWD_SUBDIV = 3      # patches per bowl segment around the ring
-const CROWD_SUBROWS = 2     # patches per seat row (tread and riser each)
-var crowdRng = RandomNumberGenerator.new()
-var paintCrowd = false
+# "REAL MADRID" spelled in white seats along both long sides of the lower tier (a 5x7 pixel font),
+# mirrored on the near side so it reads from the pitch. Fans sitting on the letters wear the home
+# shirt colour and the fans around them navy, so the crowd shows it too (a tifo).
+const TEXT = "REAL MADRID"
+const TEXT_TIER = 0
+const TEXT_HALF = 130.0     # half the length of the lettering along the side
+const TEXT_TOP = 0.95       # share of the tier's depth where the letters start (from the front)
+const TEXT_BOTTOM = 0.12
+const SEAT_TEXT = Color(0.95, 0.95, 0.97)
+const TIFO_BG = Color(0.07, 0.11, 0.32)
+const FONT = {
+	"R": ["####.", "#...#", "#...#", "####.", "#.#..", "#..#.", "#...#"],
+	"E": ["#####", "#....", "#....", "####.", "#....", "#....", "#####"],
+	"A": [".###.", "#...#", "#...#", "#####", "#...#", "#...#", "#...#"],
+	"L": ["#....", "#....", "#....", "#....", "#....", "#....", "#####"],
+	"M": ["#...#", "##.##", "#.#.#", "#.#.#", "#...#", "#...#", "#...#"],
+	"D": ["####.", "#...#", "#...#", "#...#", "#...#", "#...#", "####."],
+	"I": ["#####", "..#..", "..#..", "..#..", "..#..", "..#..", "#####"],
+	" ": [".....", ".....", ".....", ".....", ".....", ".....", "....."]}
+var paintText = false
+var tifoBg = TIFO_BG
+# Per fan from the last seats() call: 0 = ordinary, 1 = tifo background (navy), 2 = on a letter.
+var lastTifo = []
 const BERNABEU_SCREEN = [Color(0.95, 0.96, 1.0), Color(0.83, 0.68, 0.24), Color(0.95, 0.96, 1.0), Color(0.36, 0.20, 0.62)]
 var st
 var stMain
@@ -68,13 +81,11 @@ func _ready():
 		fascia = BERNABEU_FASCIA
 		roof = BERNABEU_ROOF
 		roofEdge = BERNABEU_ROOF_EDGE
-		# About 16,000 home fans, ~2,300 away and ~4,600 on the near-side upper tiers; the seats are
-		# painted as crowd underneath so every tier looks packed.
-		crowdScale = 3.3
+		# About 25,000 fans: ~17,400 home, ~2,500 away and ~5,000 on the near-side upper tiers.
+		crowdScale = 3.62
 		evenSpread = true
 		tierWeights = [0.25, 0.29, 0.46]
-		paintCrowd = true
-		crowdRng.seed = 1902
+		paintText = true
 	for d in tiers:
 		d["a"] = [d["a"][0] * ratio, d["a"][1] * ratio, d["a"][2]]
 		d["b"] = [d["b"][0] * ratio, d["b"][1] * ratio, d["b"][2]]
@@ -88,6 +99,8 @@ func _ready():
 	for t in range(tiers.size()):
 		_buildTier(t)
 	_buildRoof()
+	if paintText:
+		_textOverlay()
 	_addMesh("BowlMesh", stMain)
 	nearMesh = _addMesh("BowlNearUpper", stNear)
 	nearMesh.visible = false
@@ -165,12 +178,8 @@ func _buildTier(t):
 		var hx1 = lerp(a[0], b[0], f1)
 		var hz1 = lerp(a[1], b[1], f1)
 		var y1 = lerp(a[2], b[2], f1)
-		if paintCrowd:
-			_crowdBand([hx0, hz0, y0], [hx1, hz1, y0], near)
-			_crowdBand([hx1, hz1, y0], [hx1, hz1, y1], near)
-		else:
-			_band([hx0, hz0, y0], [hx1, hz1, y0], seats, near)
-			_band([hx1, hz1, y0], [hx1, hz1, y1], RISER, near)
+		_band([hx0, hz0, y0], [hx1, hz1, y0], seats, near)
+		_band([hx1, hz1, y0], [hx1, hz1, y1], RISER, near)
 	# Concourse wall up to the next tier (or a short cap on the open near side).
 	var top = b[2] + 12.0
 	if t + 1 < tiers.size():
@@ -179,26 +188,69 @@ func _buildTier(t):
 	if near and t + 1 < tiers.size():
 		_nearCap(b)
 
-# Like _band, but split into small randomly coloured patches so the seats read as a packed crowd.
-func _crowdBand(p, q, nearAllowed):
-	for i in range(SEGMENTS):
-		st = stNear if _skip(i, q[0], q[1], nearAllowed) else stMain
-		for k in range(CROWD_SUBDIV):
-			var u0 = float(i) + float(k) / CROWD_SUBDIV
-			var u1 = float(i) + float(k + 1) / CROWD_SUBDIV
-			for r in range(CROWD_SUBROWS):
-				var f0 = float(r) / CROWD_SUBROWS
-				var f1 = float(r + 1) / CROWD_SUBROWS
-				var h0 = [lerp(p[0], q[0], f0), lerp(p[1], q[1], f0), lerp(p[2], q[2], f0)]
-				var h1 = [lerp(p[0], q[0], f1), lerp(p[1], q[1], f1), lerp(p[2], q[2], f1)]
-				var a0 = _ring(h0[0], h0[1], u0)
-				var a1 = _ring(h0[0], h0[1], u1)
-				var b0 = _ring(h1[0], h1[1], u0)
-				var b1 = _ring(h1[0], h1[1], u1)
-				var c = CROWD_PALETTE[crowdRng.randi() % CROWD_PALETTE.size()] * crowdRng.randf_range(0.85, 1.05)
-				c.a = 1.0
-				_tri(Vector3(a0.x, h0[2], a0.y), Vector3(a1.x, h0[2], a1.y), Vector3(b1.x, h1[2], b1.y), c)
-				_tri(Vector3(a0.x, h0[2], a0.y), Vector3(b1.x, h1[2], b1.y), Vector3(b0.x, h1[2], b0.y), c)
+# The lettering: white quads laid just on top of the lower tier's seat steps (tread and riser),
+# placed by distance along each long side so every letter pixel is the same size.
+func _textOverlay():
+	var d = tiers[TEXT_TIER]
+	var a = d["a"]
+	var b = d["b"]
+	var rows = d["rows"]
+	var cols = TEXT.length() * 6 - 1
+	var half = TEXT_HALF * ratio
+	var colW = 2.0 * half / cols
+	st = stMain
+	for r in range(rows):
+		var f0 = float(r) / rows
+		var f1 = float(r + 1) / rows
+		var prow = int(floor((TEXT_TOP - (f0 + f1) * 0.5) / ((TEXT_TOP - TEXT_BOTTOM) / 7.0)))
+		if prow < 0 or prow > 6:
+			continue
+		var hx0 = lerp(a[0], b[0], f0)
+		var hz0 = lerp(a[1], b[1], f0)
+		var y0 = lerp(a[2], b[2], f0)
+		var hx1 = lerp(a[0], b[0], f1)
+		var hz1 = lerp(a[1], b[1], f1)
+		var y1 = lerp(a[2], b[2], f1)
+		for col in range(cols):
+			if _pixel(col, prow) != 2:
+				continue
+			for side in [-1.0, 1.0]:
+				# Far side (z < 0) reads left to right along +x; the near side is mirrored.
+				var xa = - half + col * colW if side < 0 else half - (col + 1) * colW
+				var xb = xa + colW
+				var t0a = Vector3(xa, y0 + 0.15, side * _sideZ(hx0, hz0, xa))
+				var t0b = Vector3(xb, y0 + 0.15, side * _sideZ(hx0, hz0, xb))
+				var t1a = Vector3(xa, y0 + 0.15, side * _sideZ(hx1, hz1, xa) * 0.998)
+				var t1b = Vector3(xb, y0 + 0.15, side * _sideZ(hx1, hz1, xb) * 0.998)
+				_tri(t0a, t0b, t1b, SEAT_TEXT)
+				_tri(t0a, t1b, t1a, SEAT_TEXT)
+				var r1a = Vector3(xa, y1, t1a.z)
+				var r1b = Vector3(xb, y1, t1b.z)
+				_tri(t1a, t1b, r1b, SEAT_TEXT)
+				_tri(t1a, r1b, r1a, SEAT_TEXT)
+
+# The long side of a ring: z for a given x (the ring is |x/hx|^6 + |z/hz|^6 = 1).
+func _sideZ(hx, hz, x):
+	return hz * pow(max(0.0, 1.0 - pow(abs(x) / hx, CORNER_POWER)), 1.0 / CORNER_POWER)
+
+func _pixel(col, row):
+	if col % 6 == 5:
+		return 1
+	var glyph = FONT.get(TEXT[col / 6], FONT[" "])
+	return 2 if glyph[row][col % 6] == "#" else 1
+
+# 0 = away from the lettering, 1 = in its band but between letters, 2 = on a letter.
+# p: point on the ring (x, z); hz: the ring's half width there; f: share of the tier's depth.
+func _textAt(p, hz, f):
+	if abs(p.y) < hz * 0.82:
+		return 0
+	var cols = TEXT.length() * 6 - 1
+	var x = p.x if p.y < 0.0 else - p.x
+	var col = int(floor((x + TEXT_HALF * ratio) / (2.0 * TEXT_HALF * ratio / cols)))
+	var row = int(floor((TEXT_TOP - f) / ((TEXT_TOP - TEXT_BOTTOM) / 7.0)))
+	if col < 0 or col >= cols or row < 0 or row > 6:
+		return 0
+	return _pixel(col, row)
 
 func _nearCap(b):
 	st = stMain
@@ -228,6 +280,7 @@ func _buildRoof():
 # Random crowd positions in world space. The away end sits behind the -x goal.
 func seats(count, away, nearUpper = false):
 	var out = []
+	lastTifo = []
 	var guard = 0
 	while out.size() < count and guard < count * 40:
 		guard += 1
@@ -254,6 +307,7 @@ func seats(count, away, nearUpper = false):
 		if inAway != away:
 			continue
 		out.append(Vector3(p.x, lerp(a[2], b[2], f) + 0.5, p.y))
+		lastTifo.append(_textAt(p, hz, f) if paintText and t == TEXT_TIER else 0)
 	return out
 
 func _halton(i, base):
