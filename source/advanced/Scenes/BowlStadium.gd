@@ -43,6 +43,16 @@ var roofEdge = ROOF_EDGE
 const BERNABEU_FASCIA = Color(0.97, 0.97, 0.98)
 const BERNABEU_ROOF = Color(0.80, 0.82, 0.85)
 const BERNABEU_ROOF_EDGE = Color(0.62, 0.65, 0.70)
+# Packed-crowd paint for the Bernabeu seats: mostly Madrid white, then greys, navy, dark clothes,
+# skin tones and a little purple and gold. Each seat row is cut into small patches of these.
+const CROWD_PALETTE = [
+	Color(0.93, 0.93, 0.95), Color(0.88, 0.88, 0.90), Color(0.96, 0.96, 0.97), Color(0.82, 0.83, 0.86),
+	Color(0.62, 0.63, 0.66), Color(0.14, 0.17, 0.32), Color(0.10, 0.10, 0.12), Color(0.20, 0.20, 0.22),
+	Color(0.80, 0.62, 0.50), Color(0.55, 0.38, 0.27), Color(0.42, 0.24, 0.58), Color(0.80, 0.66, 0.25)]
+const CROWD_SUBDIV = 3      # patches per bowl segment around the ring
+const CROWD_SUBROWS = 2     # patches per seat row (tread and riser each)
+var crowdRng = RandomNumberGenerator.new()
+var paintCrowd = false
 const BERNABEU_SCREEN = [Color(0.95, 0.96, 1.0), Color(0.83, 0.68, 0.24), Color(0.95, 0.96, 1.0), Color(0.36, 0.20, 0.62)]
 var st
 var stMain
@@ -58,10 +68,13 @@ func _ready():
 		fascia = BERNABEU_FASCIA
 		roof = BERNABEU_ROOF
 		roofEdge = BERNABEU_ROOF_EDGE
-		# About 32,000 fans in all: ~22,300 home, ~3,250 away, ~6,500 on the near-side upper tiers.
-		crowdScale = 4.64
+		# About 16,000 home fans, ~2,300 away and ~4,600 on the near-side upper tiers; the seats are
+		# painted as crowd underneath so every tier looks packed.
+		crowdScale = 3.3
 		evenSpread = true
 		tierWeights = [0.25, 0.29, 0.46]
+		paintCrowd = true
+		crowdRng.seed = 1902
 	for d in tiers:
 		d["a"] = [d["a"][0] * ratio, d["a"][1] * ratio, d["a"][2]]
 		d["b"] = [d["b"][0] * ratio, d["b"][1] * ratio, d["b"][2]]
@@ -152,8 +165,12 @@ func _buildTier(t):
 		var hx1 = lerp(a[0], b[0], f1)
 		var hz1 = lerp(a[1], b[1], f1)
 		var y1 = lerp(a[2], b[2], f1)
-		_band([hx0, hz0, y0], [hx1, hz1, y0], seats, near)
-		_band([hx1, hz1, y0], [hx1, hz1, y1], RISER, near)
+		if paintCrowd:
+			_crowdBand([hx0, hz0, y0], [hx1, hz1, y0], near)
+			_crowdBand([hx1, hz1, y0], [hx1, hz1, y1], near)
+		else:
+			_band([hx0, hz0, y0], [hx1, hz1, y0], seats, near)
+			_band([hx1, hz1, y0], [hx1, hz1, y1], RISER, near)
 	# Concourse wall up to the next tier (or a short cap on the open near side).
 	var top = b[2] + 12.0
 	if t + 1 < tiers.size():
@@ -161,6 +178,27 @@ func _buildTier(t):
 	_band([b[0], b[1], b[2]], [b[0], b[1], top], CONCOURSE, near)
 	if near and t + 1 < tiers.size():
 		_nearCap(b)
+
+# Like _band, but split into small randomly coloured patches so the seats read as a packed crowd.
+func _crowdBand(p, q, nearAllowed):
+	for i in range(SEGMENTS):
+		st = stNear if _skip(i, q[0], q[1], nearAllowed) else stMain
+		for k in range(CROWD_SUBDIV):
+			var u0 = float(i) + float(k) / CROWD_SUBDIV
+			var u1 = float(i) + float(k + 1) / CROWD_SUBDIV
+			for r in range(CROWD_SUBROWS):
+				var f0 = float(r) / CROWD_SUBROWS
+				var f1 = float(r + 1) / CROWD_SUBROWS
+				var h0 = [lerp(p[0], q[0], f0), lerp(p[1], q[1], f0), lerp(p[2], q[2], f0)]
+				var h1 = [lerp(p[0], q[0], f1), lerp(p[1], q[1], f1), lerp(p[2], q[2], f1)]
+				var a0 = _ring(h0[0], h0[1], u0)
+				var a1 = _ring(h0[0], h0[1], u1)
+				var b0 = _ring(h1[0], h1[1], u0)
+				var b1 = _ring(h1[0], h1[1], u1)
+				var c = CROWD_PALETTE[crowdRng.randi() % CROWD_PALETTE.size()] * crowdRng.randf_range(0.85, 1.05)
+				c.a = 1.0
+				_tri(Vector3(a0.x, h0[2], a0.y), Vector3(a1.x, h0[2], a1.y), Vector3(b1.x, h1[2], b1.y), c)
+				_tri(Vector3(a0.x, h0[2], a0.y), Vector3(b1.x, h1[2], b1.y), Vector3(b0.x, h1[2], b0.y), c)
 
 func _nearCap(b):
 	st = stMain
