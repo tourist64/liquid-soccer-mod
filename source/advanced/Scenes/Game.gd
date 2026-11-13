@@ -140,6 +140,10 @@ const CROWD_BUILD_UP = 0.5
 const CROWD_BUILD_DOWN = 0.3
 const CROWD_SUSTAIN_TIME = 4.0
 const CROWD_SUSTAIN_BONUS = 0.35
+# Outnumbered defence: when the side on the ball has only 2 (or fewer) outfield defenders between the
+# ball and goal, the crowd surges, faster than a normal build-up, even from the halfway line.
+const CROWD_OVERLOAD_BOOST = 0.55
+const CROWD_OVERLOAD_BUILD = 1.0
 const CROWD_TENSION_PITCH = 1.12
 # The anticipation "ooh" when the ball gets into the box, at most once per cooldown.
 const CROWD_BOX_DEPTH = 0.31
@@ -1593,13 +1597,16 @@ func _updateCrowdTension(delta):
 	var toGoal = (gx - abs(Global.ballpos.x)) / gx
 	var danger = smoothstep(CROWD_DANGER_START, CROWD_DANGER_FULL, toGoal)
 	danger *= 1.0 - 0.3 * clamp(abs(Global.ballpos.z) / CROWD_PITCH_HALF_WIDTH, 0.0, 1.0)
+	var overload = _overload()
+	danger = clamp(danger + CROWD_OVERLOAD_BOOST * overload, 0.0, 1.0)
 	# Sustained pressure builds the noise further; it drains twice as fast once the danger passes.
 	if danger > 0.4:
 		crowdPressure = min(crowdPressure + delta, CROWD_SUSTAIN_TIME)
 	else:
 		crowdPressure = max(crowdPressure - 2.0 * delta, 0.0)
 	var target = clamp(danger * (1.0 - CROWD_SUSTAIN_BONUS + CROWD_SUSTAIN_BONUS * 2.0 * crowdPressure / CROWD_SUSTAIN_TIME), 0.0, 1.0)
-	var step = (CROWD_BUILD_UP if target > crowdExcitement else CROWD_BUILD_DOWN) * delta
+	var up = CROWD_OVERLOAD_BUILD if overload > 0.0 else CROWD_BUILD_UP
+	var step = (up if target > crowdExcitement else CROWD_BUILD_DOWN) * delta
 	crowdExcitement += clamp(target - crowdExcitement, - step, step)
 	var level = sqrt(crowdExcitement)
 	crowd.volume_db = _crowdBoost(CROWD_AMBIENCE_DB) + CROWD_DANGER_DB * level
@@ -1616,6 +1623,30 @@ func _updateCrowdTension(delta):
 	if toGoal < CROWD_BOX_DEPTH and abs(Global.ballpos.z) < CROWD_BOX_HALF_WIDTH and crowdOohWait <= 0.0:
 		crowdOohWait = CROWD_OOH_COOLDOWN
 		$Sounds / CrowdCross.play()
+
+# 0 normally; 0.75 when the side on the ball has 2 outfield defenders goal-side of it, 1 for 1 or none.
+func _overload():
+	var att = null
+	if team1 and team1.posession:
+		att = team1
+	elif team2 and team2.posession:
+		att = team2
+	if att == null:
+		return 0.0
+	var dir = sign(att.goalL.x - Global.ballpos.x)
+	if dir == 0:
+		return 0.0
+	var def = att.opponent
+	var ahead = 0
+	# Outfield players on the pitch only (the bench is in the list too, off the pitch).
+	for i in range(1, min(Global.squad, def.players.size())):
+		if (def.players[i].translation.x - Global.ballpos.x) * dir > 0.0:
+			ahead += 1
+	if ahead <= 1:
+		return 1.0
+	if ahead == 2:
+		return 0.75
+	return 0.0
 
 func _fadeCrowdTension(delta):
 	if crowdTension != null and crowdTension.playing:
