@@ -29,6 +29,8 @@ var ratio = 1.0
 # "bernabeu": white tier edges, a silver roof over every seat, a 360 screen ring and a bigger crowd.
 var style = ""
 var crowdScale = 1.0
+# Share of fans per tier (lower, middle, top). The Bernabeu fills every tier evenly by seating area.
+var tierWeights = [0.62, 0.23, 0.15]
 var fascia = FASCIA
 var roof = ROOF
 var roofEdge = ROOF_EDGE
@@ -50,7 +52,8 @@ func _ready():
 		fascia = BERNABEU_FASCIA
 		roof = BERNABEU_ROOF
 		roofEdge = BERNABEU_ROOF_EDGE
-		crowdScale = 1.5
+		crowdScale = 3.3
+		tierWeights = [0.25, 0.29, 0.46]
 	for d in tiers:
 		d["a"] = [d["a"][0] * ratio, d["a"][1] * ratio, d["a"][2]]
 		d["b"] = [d["b"][0] * ratio, d["b"][1] * ratio, d["b"][2]]
@@ -182,9 +185,9 @@ func seats(count, away, nearUpper = false):
 	var guard = 0
 	while out.size() < count and guard < count * 40:
 		guard += 1
-		# Most fans go in the lower tier, the part the sideline cameras actually see.
+		# By default most fans go in the lower tier, the part the sideline cameras actually see.
 		var roll = randf()
-		var t = 0 if roll < 0.62 else (1 if roll < 0.85 else 2)
+		var t = 0 if roll < tierWeights[0] else (1 if roll < tierWeights[0] + tierWeights[1] else 2)
 		var d = tiers[t]
 		var a = d["a"]
 		var b = d["b"]
