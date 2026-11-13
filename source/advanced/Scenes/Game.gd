@@ -118,6 +118,11 @@ const MADRID_GOAL_BUS = "MadridGoal"
 const CROWD_AMBIENCE_DB = -9.0
 const GOAL_ROAR_DB = 6.0
 const BERNABEU_CROWD_DB = 3.0
+# The crowd rises as the ball nears either goal: up to this many dB louder at the goal mouth,
+# starting once the ball is within this share of the halfway-to-goal distance, less out wide.
+const CROWD_DANGER_DB = 6.0
+const CROWD_DANGER_RANGE = 0.45
+const CROWD_PITCH_HALF_WIDTH = 90.0
 func initTeams():
 	team1 = $VPC / VP / GameGroup / Team
 	team1.opponent = $VPC / VP / GameGroup / Team2
@@ -714,6 +719,7 @@ func checkInput():
 
 func _process(delta):
 	_updateMadridGoalTrack()
+	_updateCrowdTension(delta)
 	if mp_replica:
 		_mp_apply_replica_state()
 		_mp_update_blobs()
@@ -1548,6 +1554,22 @@ func _setupAtmosphere():
 	limiter.threshold_db = -2.0
 	limiter.ceiling_db = -0.5
 	AudioServer.add_bus_effect(idx, limiter)
+
+# Only during open play; kickoffs, goals and full time keep setting the crowd level themselves.
+func _updateCrowdTension(delta):
+	if state != gameState.GAMEON:
+		return
+	var crowd = $Sounds / CrowdSounds
+	if not crowd.playing:
+		return
+	var gx = abs($VPC / VP / GameGroup / Goal.translation.x)
+	var toGoal = gx - abs(Global.ballpos.x)
+	var danger = 1.0 - clamp(toGoal / (gx * CROWD_DANGER_RANGE), 0.0, 1.0)
+	danger *= 1.0 - 0.5 * clamp(abs(Global.ballpos.z) / CROWD_PITCH_HALF_WIDTH, 0.0, 1.0)
+	var target = _crowdBoost(CROWD_AMBIENCE_DB) + CROWD_DANGER_DB * danger
+	var cur = crowd.volume_db
+	var rate = 6.0 if target > cur else 3.0
+	crowd.volume_db = cur + clamp(target - cur, - rate * delta, rate * delta)
 
 func _crowdBoost(db):
 	return db + BERNABEU_CROWD_DB if Global.eightMode else db
