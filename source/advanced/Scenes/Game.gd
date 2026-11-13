@@ -127,12 +127,13 @@ const BERNABEU_CROWD_DB = 3.0
 # The crowd rises as the ball nears either goal. Distances are shares of the centre-to-goal
 # distance: it starts building at CROWD_DANGER_START and is at full volume by CROWD_DANGER_FULL
 # (about the penalty spot). The edge of the box is about 0.31.
-const CROWD_DANGER_DB = 9.0
+# Peak: the murmur and the excited layer together land just under the goal roar (about -12 dBFS).
+const CROWD_DANGER_DB = 11.0
 const CROWD_DANGER_START = 0.6
 const CROWD_DANGER_FULL = 0.15
 const CROWD_PITCH_HALF_WIDTH = 90.0
 # A higher-pitched copy of the crowd fades in with the danger so it sounds agitated, not just louder.
-const CROWD_TENSION_DB = 0.0
+const CROWD_TENSION_DB = 2.0
 # Excitement builds toward the danger level (faster up than down), and pressure that lasts gets an
 # extra push: up to CROWD_SUSTAIN_BONUS more after CROWD_SUSTAIN_TIME seconds in a dangerous area.
 const CROWD_BUILD_UP = 0.5
