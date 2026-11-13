@@ -104,6 +104,8 @@ var madridGoalSound = null
 var madridGoalTimer = null
 var madridGoalFade = null
 var madridCrowdBed = null
+var crowdTension = null
+var crowdOohWait = 0.0
 var madridGoalActive = false
 var madridGoalLeftPlay = false
 const MADRID_GOAL_DELAY = 2.5
@@ -118,11 +120,20 @@ const MADRID_GOAL_BUS = "MadridGoal"
 const CROWD_AMBIENCE_DB = -9.0
 const GOAL_ROAR_DB = 6.0
 const BERNABEU_CROWD_DB = 3.0
-# The crowd rises as the ball nears either goal: up to this many dB louder at the goal mouth,
-# starting once the ball is within this share of the halfway-to-goal distance, less out wide.
-const CROWD_DANGER_DB = 6.0
-const CROWD_DANGER_RANGE = 0.45
+# The crowd rises as the ball nears either goal. Distances are shares of the centre-to-goal
+# distance: it starts building at CROWD_DANGER_START and is at full volume by CROWD_DANGER_FULL
+# (about the penalty spot). The edge of the box is about 0.31.
+const CROWD_DANGER_DB = 12.0
+const CROWD_DANGER_START = 0.6
+const CROWD_DANGER_FULL = 0.15
 const CROWD_PITCH_HALF_WIDTH = 90.0
+# A higher-pitched copy of the crowd fades in with the danger so it sounds agitated, not just louder.
+const CROWD_TENSION_DB = -2.0
+const CROWD_TENSION_PITCH = 1.12
+# The anticipation "ooh" when the ball gets into the box, at most once per cooldown.
+const CROWD_BOX_DEPTH = 0.31
+const CROWD_BOX_HALF_WIDTH = 53.0
+const CROWD_OOH_COOLDOWN = 8.0
 func initTeams():
 	team1 = $VPC / VP / GameGroup / Team
 	team1.opponent = $VPC / VP / GameGroup / Team2
@@ -1557,19 +1568,41 @@ func _setupAtmosphere():
 
 # Only during open play; kickoffs, goals and full time keep setting the crowd level themselves.
 func _updateCrowdTension(delta):
-	if state != gameState.GAMEON:
-		return
+	crowdOohWait = max(crowdOohWait - delta, 0.0)
 	var crowd = $Sounds / CrowdSounds
-	if not crowd.playing:
+	if state != gameState.GAMEON or not crowd.playing:
+		_fadeCrowdTension(delta)
 		return
 	var gx = abs($VPC / VP / GameGroup / Goal.translation.x)
-	var toGoal = gx - abs(Global.ballpos.x)
-	var danger = 1.0 - clamp(toGoal / (gx * CROWD_DANGER_RANGE), 0.0, 1.0)
-	danger *= 1.0 - 0.5 * clamp(abs(Global.ballpos.z) / CROWD_PITCH_HALF_WIDTH, 0.0, 1.0)
-	var target = _crowdBoost(CROWD_AMBIENCE_DB) + CROWD_DANGER_DB * danger
-	var cur = crowd.volume_db
-	var rate = 6.0 if target > cur else 3.0
-	crowd.volume_db = cur + clamp(target - cur, - rate * delta, rate * delta)
+	var toGoal = (gx - abs(Global.ballpos.x)) / gx
+	var danger = smoothstep(CROWD_DANGER_START, CROWD_DANGER_FULL, toGoal)
+	danger *= 1.0 - 0.3 * clamp(abs(Global.ballpos.z) / CROWD_PITCH_HALF_WIDTH, 0.0, 1.0)
+	crowd.volume_db = _approachDb(crowd.volume_db, _crowdBoost(CROWD_AMBIENCE_DB) + CROWD_DANGER_DB * danger, delta)
+	if crowdTension == null:
+		crowdTension = AudioStreamPlayer.new()
+		crowdTension.stream = crowd.stream
+		crowdTension.pitch_scale = CROWD_TENSION_PITCH
+		crowdTension.bus = "Crowd"
+		crowdTension.volume_db = -60.0
+		$Sounds.add_child(crowdTension)
+	if not crowdTension.playing:
+		crowdTension.play(8.0)
+	var tensionDb = lerp(-60.0, _crowdBoost(CROWD_TENSION_DB), sqrt(danger)) if danger > 0.01 else -60.0
+	crowdTension.volume_db = _approachDb(crowdTension.volume_db, tensionDb, delta)
+	if toGoal < CROWD_BOX_DEPTH and abs(Global.ballpos.z) < CROWD_BOX_HALF_WIDTH and crowdOohWait <= 0.0:
+		crowdOohWait = CROWD_OOH_COOLDOWN
+		$Sounds / CrowdCross.play()
+
+func _fadeCrowdTension(delta):
+	if crowdTension != null and crowdTension.playing:
+		crowdTension.volume_db = _approachDb(crowdTension.volume_db, -60.0, delta * 3.0)
+		if crowdTension.volume_db <= -59.0:
+			crowdTension.stop()
+
+# Rise quickly, settle slowly.
+func _approachDb(cur, target, delta):
+	var rate = 10.0 if target > cur else 4.0
+	return cur + clamp(target - cur, - rate * delta, rate * delta)
 
 func _crowdBoost(db):
 	return db + BERNABEU_CROWD_DB if Global.eightMode else db
