@@ -101,6 +101,8 @@ var mp_snapshot_elapsed = 0.0
 var mp_last_snapshot_version = 0
 var mp_last_presented_state = -1
 var madridGoalSound = null
+# True when this match is in the Bernabeu; the Madrid goal track only plays there.
+var atBernabeu = false
 var madridGoalTimer = null
 var madridGoalFade = null
 var madridCrowdBed = null
@@ -227,6 +229,7 @@ func initStadium():
 	elif Global.eightMode and (not _inUCL() or Global.t1.teamname == "Real Madrid"):
 		# 8v8 is played in a packed Bernabeu; in the Champions League only Real Madrid's home games are.
 		_useBowlStadium(gs, "bernabeu")
+		atBernabeu = true
 	awayFans = gs.find_node("AwayFans")
 	
 	
@@ -1700,7 +1703,7 @@ func _isMadrid(t):
 	return sn == "MAD" or "madrid" in tn or "mudrid" in tn or "athletic mads" in tn
 
 func _playMadridGoal(teamIndex):
-	if madridGoalSound == null:
+	if madridGoalSound == null or not atBernabeu:
 		return
 	if _isMadrid(Global.t1 if teamIndex == 0 else Global.t2):
 		madridGoalFade.stop_all()
