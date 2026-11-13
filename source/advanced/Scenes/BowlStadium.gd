@@ -63,6 +63,12 @@ const FONT = {
 	"I": ["#####", "..#..", "..#..", "..#..", "..#..", "..#..", "#####"],
 	" ": [".....", ".....", ".....", ".....", ".....", ".....", "....."]}
 var paintText = false
+# Night match: the stands (unshaded) are dimmed, floodlight banks line the roof edge and the screen glows.
+var night = false
+var lit = false
+const NIGHT_SHADE = 0.6
+const FLOOD = Color(1.0, 0.98, 0.9)
+const FLOOD_GAP = Color(0.18, 0.19, 0.22)
 var tifoBg = TIFO_BG
 # Per fan from the last seats() call: 0 = ordinary, 1 = tifo background (navy), 2 = on a letter.
 var lastTifo = []
@@ -81,8 +87,9 @@ func _ready():
 		fascia = BERNABEU_FASCIA
 		roof = BERNABEU_ROOF
 		roofEdge = BERNABEU_ROOF_EDGE
-		# About 25,000 fans: ~17,400 home, ~2,500 away and ~5,000 on the near-side upper tiers.
-		crowdScale = 3.62
+		# About 20,000 fans: ~13,900 home, ~2,000 away and ~4,100 on the near-side upper tiers (only drawn
+		# when the camera faces them, so usually ~16,000 on screen).
+		crowdScale = 2.9
 		evenSpread = true
 		tierWeights = [0.25, 0.29, 0.46]
 		paintText = true
@@ -157,6 +164,8 @@ func _band(p, q, col, nearAllowed):
 		_tri(Vector3(a0.x, p[2], a0.y), Vector3(b1.x, q[2], b1.y), Vector3(b0.x, q[2], b0.y), c)
 
 func _tri(a, b, c, col):
+	if night and not lit:
+		col = Color(col.r * NIGHT_SHADE, col.g * NIGHT_SHADE, col.b * NIGHT_SHADE * 1.05, 1.0)
 	for v in [a, b, c]:
 		st.add_color(col)
 		st.add_vertex(v)
@@ -272,10 +281,18 @@ func _buildRoof():
 		edgeX = 214.0 * ratio
 		edgeZ = 144.0 * ratio
 	_band([c[0] + 6.0, c[1] + 6.0, 170.0], [edgeX, edgeZ, 176.0], roof, false)
-	_band([edgeX, edgeZ, 176.0], [edgeX, edgeZ, 169.0], roofEdge, false)
+	if night:
+		# Floodlight banks along the roof edge (lit, not dimmed).
+		lit = true
+		_band([edgeX, edgeZ, 176.0], [edgeX, edgeZ, 169.0], [FLOOD, FLOOD, FLOOD_GAP], false)
+		lit = false
+	else:
+		_band([edgeX, edgeZ, 176.0], [edgeX, edgeZ, 169.0], roofEdge, false)
 	if style == "bernabeu":
 		# 360 video ring hanging under the roof edge.
+		lit = night
 		_band([edgeX, edgeZ, 169.0], [edgeX, edgeZ, 158.0], BERNABEU_SCREEN, false)
+		lit = false
 
 # Random crowd positions in world space. The away end sits behind the -x goal.
 func seats(count, away, nearUpper = false):
