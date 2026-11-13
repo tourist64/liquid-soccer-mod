@@ -226,8 +226,8 @@ func initStadium():
 		$Zones.scale *= Vector3(Global.ps, 1.0, Global.ps)
 		if Global.ELEVEN_CUSTOM_PRESENTATION:
 			_useBowlStadium(gs)
-	elif Global.eightMode and (not _inUCL() or Global.t1.teamname == "Real Madrid"):
-		# 8v8 is played in a packed Bernabeu; in the Champions League only Real Madrid's home games are.
+	elif Global.eightMode:
+		# 8v8, including every New UCL match, is played in a packed Bernabeu.
 		_useBowlStadium(gs, "bernabeu")
 		atBernabeu = true
 	awayFans = gs.find_node("AwayFans")
@@ -2723,10 +2723,7 @@ func _useBowlStadium(gs, style = ""):
 			c.visible = false
 	deco.get_node("adsg1/big_ads").visible = false
 	deco.get_node("adsg1/big_ads1").visible = false
-	var apron = SpatialMaterial.new()
-	apron.albedo_color = Color(0.20, 0.42, 0.20)
-	apron.flags_unshaded = true
-	deco.get_node("Surround").material_override = apron
+	# The pitch and the grass around it keep their original look; only the stands change.
 	var bowl = load("res://Scenes/BowlStadium.gd").new()
 	bowl.name = "Bowl"
 	bowl.style = style
