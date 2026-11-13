@@ -243,7 +243,10 @@ func initStadium():
 	
 	
 	
-	var ce = load(camenv)
+	var ce = _matchLook(load(camenv))
+	_grassDetail(gs)
+	# Real shadows replace the old position blobs under the players.
+	$VPC / VP / GameGroup / Blobs.visible = false
 	$VPC / VP / GameGroup / WorldEnvironment.set_environment(ce)
 	$VPC / VP / GameGroup / AltCameras / WinnerCamera.set_environment(ce)
 	worldEnv = ce
@@ -1553,6 +1556,53 @@ func goalScored():
 	$Timers / Timer.start()
 
 # Louder goal roar and a stadium reverb on the whole crowd, with a limiter so nothing clips.
+# Match look: a little more contrast and colour on the whole picture.
+func _matchLook(env):
+	var look = env.duplicate()
+	look.adjustment_enabled = true
+	look.adjustment_brightness = 0.97
+	look.adjustment_contrast = 1.14
+	look.adjustment_saturation = 1.2
+	return look
+
+# Pitch shader: fine blade speckle and faint worn patches on the grass, and grass pushed from olive
+# towards a fresher pitch green. Only grass-coloured pixels change, so the lines stay clean.
+const GRASS_SHADER = """
+shader_type spatial;
+render_mode diffuse_lambert, specular_disabled;
+uniform sampler2D texture_albedo : hint_albedo;
+varying vec2 world;
+void vertex() {
+	world = (WORLD_MATRIX * vec4(VERTEX, 1.0)).xz;
+}
+float speck(vec2 p) {
+	return fract(sin(dot(floor(p), vec2(12.9898, 78.233))) * 43758.5453);
+}
+void fragment() {
+	vec4 base = texture(texture_albedo, UV);
+	float grass = smoothstep(0.02, 0.12, base.g - max(base.r, base.b));
+	float fine = speck(world * 3.0) * 0.5 + speck(world * 1.1) * 0.5;
+	float worn = sin(world.x * 0.037 + sin(world.y * 0.021) * 2.0) * sin(world.y * 0.043) * 0.5 + 0.5;
+	vec3 col = base.rgb * mix(vec3(1.0), vec3(0.9, 1.06, 0.88), grass);
+	ALBEDO = col * (1.0 + grass * ((fine - 0.5) * 0.16 + (worn - 0.5) * 0.07));
+	ROUGHNESS = 1.0;
+}
+"""
+
+func _grassDetail(stadium):
+	var pitch = stadium.find_node("Pitch1", true, false)
+	if pitch == null:
+		return
+	var old = pitch.get_surface_material(0)
+	if old == null or not (old is ShaderMaterial):
+		return
+	var shader = Shader.new()
+	shader.code = GRASS_SHADER
+	var grass = ShaderMaterial.new()
+	grass.shader = shader
+	grass.set_shader_param("texture_albedo", old.get_shader_param("texture_albedo"))
+	pitch.set_surface_material(0, grass)
+
 func _setupAtmosphere():
 	$Sounds / GoalSounds.volume_db = _crowdBoost(GOAL_ROAR_DB)
 	$Sounds / CrowdExcited.volume_db = _crowdBoost($Sounds / CrowdExcited.volume_db + 4.0)

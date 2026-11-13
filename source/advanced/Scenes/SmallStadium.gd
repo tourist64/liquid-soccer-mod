@@ -304,6 +304,9 @@ func _applause():
 		mat.set_shader_param("startframe", 31.0)
 		mat.set_shader_param("framerange", 30.0)
 func _setShadows():
-	var shads = Global.config.get_value("gfx", "doshadows")
-	$DirectionalLight.shadow_enabled = shads
+	# Real shadows in every match, sharp over the whole pitch.
+	$DirectionalLight.shadow_enabled = true
+	$DirectionalLight.directional_shadow_mode = DirectionalLight.SHADOW_ORTHOGONAL
+	$DirectionalLight.directional_shadow_max_distance = 320.0
+	$DirectionalLight.shadow_color = Color(0.1, 0.13, 0.12)
 	
