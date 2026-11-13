@@ -103,11 +103,15 @@ var mp_last_presented_state = -1
 var madridGoalSound = null
 var madridGoalTimer = null
 var madridGoalFade = null
+var madridCrowdBed = null
 var madridGoalActive = false
 var madridGoalLeftPlay = false
 const MADRID_GOAL_DELAY = 2.5
 # The track starts from 1:03.5.
 const MADRID_GOAL_START = 63.5
+# A quieter crowd roar under the track once the big goal roar dies down (louder than normal ambience).
+const MADRID_CROWD_BED_DB = -3.0
+const MADRID_CROWD_BED_FADE_IN = 4.0
 const MADRID_GOAL_VOLUME_DB = 4.0
 const MADRID_GOAL_BUS = "MadridGoal"
 # Crowd atmosphere: ambience level during play, extra goal roar, and the 8v8 Bernabeu crowd boost.
@@ -1565,6 +1569,10 @@ func _setupMadridGoalSound():
 	$Sounds.add_child(madridGoalTimer)
 	madridGoalFade = Tween.new()
 	$Sounds.add_child(madridGoalFade)
+	madridCrowdBed = AudioStreamPlayer.new()
+	madridCrowdBed.stream = $Sounds / CrowdSounds.stream
+	madridCrowdBed.bus = "Crowd"
+	$Sounds.add_child(madridCrowdBed)
 
 # Stadium sound for the Madrid track: echo off the far stands, a big reverb tail and a limiter
 # so the extra volume never clips. It feeds the Music bus, so the music volume setting still applies.
@@ -1618,6 +1626,7 @@ func _playMadridGoal(teamIndex):
 	if _isMadrid(Global.t1 if teamIndex == 0 else Global.t2):
 		madridGoalFade.stop_all()
 		madridGoalSound.stop()
+		madridCrowdBed.stop()
 		madridGoalActive = true
 		madridGoalLeftPlay = false
 		madridGoalTimer.start()
@@ -1627,6 +1636,10 @@ func _startMadridGoalTrack():
 		return
 	madridGoalSound.volume_db = MADRID_GOAL_VOLUME_DB
 	madridGoalSound.play(MADRID_GOAL_START)
+	madridCrowdBed.volume_db = -40.0
+	madridCrowdBed.play()
+	madridGoalFade.interpolate_property(madridCrowdBed, "volume_db", -40.0, _crowdBoost(MADRID_CROWD_BED_DB), MADRID_CROWD_BED_FADE_IN)
+	madridGoalFade.start()
 
 func _inPlay():
 	return state == gameState.GAMEON or state == gameState.TAKEPEN or state == gameState.TAKEPENAI
@@ -1643,10 +1656,12 @@ func _updateMadridGoalTrack():
 		return
 	madridGoalActive = false
 	madridGoalTimer.stop()
-	if madridGoalSound.playing:
-		madridGoalFade.interpolate_property(madridGoalSound, "volume_db", madridGoalSound.volume_db, -60.0, 0.8)
-		madridGoalFade.interpolate_callback(madridGoalSound, 0.8, "stop")
-		madridGoalFade.start()
+	madridGoalFade.stop_all()
+	for snd in [madridGoalSound, madridCrowdBed]:
+		if snd.playing:
+			madridGoalFade.interpolate_property(snd, "volume_db", snd.volume_db, -60.0, 0.8)
+			madridGoalFade.interpolate_callback(snd, 0.8, "stop")
+	madridGoalFade.start()
 
 func _on_team1_scored(_body):
 
