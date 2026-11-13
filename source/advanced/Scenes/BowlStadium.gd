@@ -26,6 +26,16 @@ var tiers = [
 ]
 
 var ratio = 1.0
+# "bernabeu": white tier edges, a silver roof over every seat, a 360 screen ring and a bigger crowd.
+var style = ""
+var crowdScale = 1.0
+var fascia = FASCIA
+var roof = ROOF
+var roofEdge = ROOF_EDGE
+const BERNABEU_FASCIA = Color(0.97, 0.97, 0.98)
+const BERNABEU_ROOF = Color(0.80, 0.82, 0.85)
+const BERNABEU_ROOF_EDGE = Color(0.62, 0.65, 0.70)
+const BERNABEU_SCREEN = [Color(0.95, 0.96, 1.0), Color(0.83, 0.68, 0.24), Color(0.95, 0.96, 1.0), Color(0.36, 0.20, 0.62)]
 var st
 var stMain
 var stNear
@@ -36,6 +46,11 @@ var nearShown = false
 func _ready():
 	# The bowl is sized for the design pitch scale; keep it the same distance from a smaller pitch.
 	ratio = Global.ps / Global.ELEVEN_DESIGN_SCALE
+	if style == "bernabeu":
+		fascia = BERNABEU_FASCIA
+		roof = BERNABEU_ROOF
+		roofEdge = BERNABEU_ROOF_EDGE
+		crowdScale = 1.5
 	for d in tiers:
 		d["a"] = [d["a"][0] * ratio, d["a"][1] * ratio, d["a"][2]]
 		d["b"] = [d["b"][0] * ratio, d["b"][1] * ratio, d["b"][2]]
@@ -115,7 +130,7 @@ func _buildTier(t):
 	var b = d["b"]
 	var near = d["near"]
 	var rows = d["rows"]
-	_band([a[0], a[1], a[2] - 6.0], [a[0], a[1], a[2]], FASCIA, near)
+	_band([a[0], a[1], a[2] - 6.0], [a[0], a[1], a[2]], fascia, near)
 	var seats = [SEAT_A, SEAT_B]
 	for r in range(rows):
 		var f0 = float(r) / rows
@@ -148,11 +163,18 @@ func _nearCap(b):
 
 func _buildRoof():
 	var c = tiers[2]["b"]
-	_band([c[0], c[1], c[2]], [c[0] + 6.0, c[1] + 6.0, 170.0], ROOF, false)
+	_band([c[0], c[1], c[2]], [c[0] + 6.0, c[1] + 6.0, 170.0], roof, false)
 	var edgeX = 232.0 * ratio
 	var edgeZ = 162.0 * ratio
-	_band([c[0] + 6.0, c[1] + 6.0, 170.0], [edgeX, edgeZ, 176.0], ROOF, false)
-	_band([edgeX, edgeZ, 176.0], [edgeX, edgeZ, 169.0], ROOF_EDGE, false)
+	if style == "bernabeu":
+		# The roof reaches over the front rows.
+		edgeX = 214.0 * ratio
+		edgeZ = 144.0 * ratio
+	_band([c[0] + 6.0, c[1] + 6.0, 170.0], [edgeX, edgeZ, 176.0], roof, false)
+	_band([edgeX, edgeZ, 176.0], [edgeX, edgeZ, 169.0], roofEdge, false)
+	if style == "bernabeu":
+		# 360 video ring hanging under the roof edge.
+		_band([edgeX, edgeZ, 169.0], [edgeX, edgeZ, 158.0], BERNABEU_SCREEN, false)
 
 # Random crowd positions in world space. The away end sits behind the -x goal.
 func seats(count, away, nearUpper = false):

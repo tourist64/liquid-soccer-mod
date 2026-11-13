@@ -116,19 +116,6 @@ player6 = {
 "speed": 9.5
 }
 player7 = {
-"aggression": 8.0,
-"agility": 7.0,
-"curl": 5.0,
-"facehair": 2,
-"hair": Color( 0.080, 0.050, 0.040, 1 ),
-"hairtype": 3,
-"name": "Marquinhos",
-"shoot": 4.0,
-"skin": Color( 0.780, 0.570, 0.450, 1 ),
-"smart": 10.0,
-"speed": 7.0
-}
-player8 = {
 "aggression": 8.5,
 "agility": 6.0,
 "curl": 4.0,
@@ -140,6 +127,19 @@ player8 = {
 "skin": Color( 0.330, 0.210, 0.140, 1 ),
 "smart": 9.0,
 "speed": 8.0
+}
+player8 = {
+"aggression": 8.0,
+"agility": 7.0,
+"curl": 5.0,
+"facehair": 2,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 3,
+"name": "Marquinhos",
+"shoot": 4.0,
+"skin": Color( 0.780, 0.570, 0.450, 1 ),
+"smart": 10.0,
+"speed": 7.0
 }
 player9 = {
 "aggression": 6.0,

@@ -108,6 +108,10 @@ var madridGoalLeftPlay = false
 const MADRID_GOAL_DELAY = 2.5
 const MADRID_GOAL_VOLUME_DB = 4.0
 const MADRID_GOAL_BUS = "MadridGoal"
+# Crowd atmosphere: ambience level during play, extra goal roar, and the 8v8 Bernabeu crowd boost.
+const CROWD_AMBIENCE_DB = -9.0
+const GOAL_ROAR_DB = 6.0
+const BERNABEU_CROWD_DB = 3.0
 func initTeams():
 	team1 = $VPC / VP / GameGroup / Team
 	team1.opponent = $VPC / VP / GameGroup / Team2
@@ -190,6 +194,9 @@ func initStadium():
 		$Zones.scale *= Vector3(Global.ps, 1.0, Global.ps)
 		if Global.ELEVEN_CUSTOM_PRESENTATION:
 			_useBowlStadium(gs)
+	elif Global.eightMode:
+		# 8v8 is played in a packed Bernabeu.
+		_useBowlStadium(gs, "bernabeu")
 	awayFans = gs.find_node("AwayFans")
 	
 	
@@ -244,6 +251,7 @@ func _ready():
 	Global.enterFullWindow(self)
 	ball = $VPC / VP / GameGroup / Ball
 	_setupMadridGoalSound()
+	_setupAtmosphere()
 
 
 	gameFunc[gameState.LINEUP] = funcref(self, "goIntro")
@@ -341,7 +349,7 @@ func _ready():
 		
 	
 	$Sounds / CrowdSounds.playing = true
-	$Sounds / CrowdSounds.volume_db = - 15
+	$Sounds / CrowdSounds.volume_db = _crowdBoost(CROWD_AMBIENCE_DB)
 	ref = $VPC / VP / GameGroup / Ref
 	
 	
@@ -1513,6 +1521,31 @@ func goalScored():
 	$Timers / Timer.wait_time = 2
 	$Timers / Timer.start()
 
+# Louder goal roar and a stadium reverb on the whole crowd, with a limiter so nothing clips.
+func _setupAtmosphere():
+	$Sounds / GoalSounds.volume_db = _crowdBoost(GOAL_ROAR_DB)
+	$Sounds / CrowdExcited.volume_db = _crowdBoost($Sounds / CrowdExcited.volume_db + 4.0)
+	$Sounds / CrowdApplause.volume_db = _crowdBoost($Sounds / CrowdApplause.volume_db + 4.0)
+	var idx = AudioServer.get_bus_index("Crowd")
+	if idx == -1 or AudioServer.get_bus_effect_count(idx) > 0:
+		return
+	var reverb = AudioEffectReverb.new()
+	reverb.room_size = 0.85
+	reverb.damping = 0.4
+	reverb.spread = 1.0
+	reverb.predelay_msec = 60.0
+	reverb.hipass = 0.1
+	reverb.dry = 1.0
+	reverb.wet = 0.25
+	AudioServer.add_bus_effect(idx, reverb)
+	var limiter = AudioEffectLimiter.new()
+	limiter.threshold_db = -2.0
+	limiter.ceiling_db = -0.5
+	AudioServer.add_bus_effect(idx, limiter)
+
+func _crowdBoost(db):
+	return db + BERNABEU_CROWD_DB if Global.eightMode else db
+
 func _setupMadridGoalSound():
 	var stream = load("res://Res/madrid_goal.mp3")
 	if not stream:
@@ -2579,7 +2612,7 @@ func _setupStuck(limit_ms):
 
 # 11v11 replaces the 7-a-side stands with the generated bowl (see BowlStadium.gd). Only the
 # pitch, perimeter boards, benches and flags of the small stadium stay.
-func _useBowlStadium(gs):
+func _useBowlStadium(gs, style = ""):
 	var deco = gs.get_node("SmallStadium/Decoration")
 	for c in deco.get_children():
 		var n = String(c.name)
@@ -2593,5 +2626,6 @@ func _useBowlStadium(gs):
 	deco.get_node("Surround").material_override = apron
 	var bowl = load("res://Scenes/BowlStadium.gd").new()
 	bowl.name = "Bowl"
+	bowl.style = style
 	$VPC / VP / GameGroup.add_child(bowl)
 	gs.bowl = bowl

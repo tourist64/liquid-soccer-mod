@@ -147,6 +147,19 @@ player7 = {
 }
 player8 = {
 "aggression": 8.0,
+"agility": 8.0,
+"curl": 6.0,
+"facehair": 2,
+"hair": Color( 0.150, 0.100, 0.100, 1 ),
+"hairtype": 1,
+"name": "V Gyokeres",
+"shoot": 9.5,
+"skin": Color( 0.880, 0.670, 0.550, 1 ),
+"smart": 9.0,
+"speed": 9.0
+}
+player9 = {
+"aggression": 8.0,
 "agility": 8.5,
 "curl": 8.5,
 "facehair": 2,
@@ -158,7 +171,7 @@ player8 = {
 "smart": 10.0,
 "speed": 7.0
 }
-player9 = {
+player10 = {
 "aggression": 5.0,
 "agility": 10.0,
 "curl": 9.5,
@@ -170,19 +183,6 @@ player9 = {
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
 "smart": 9.0,
 "speed": 8.5
-}
-player10 = {
-"aggression": 8.0,
-"agility": 8.0,
-"curl": 6.0,
-"facehair": 2,
-"hair": Color( 0.150, 0.100, 0.100, 1 ),
-"hairtype": 1,
-"name": "V Gyokeres",
-"shoot": 9.5,
-"skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 9.0,
-"speed": 9.0
 }
 player11 = {
 "aggression": 6.0,

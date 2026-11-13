@@ -154,14 +154,14 @@ func _initBowlCrowd():
 	for c in get_children():
 		if c is MultiMeshInstance and c != $MultiMeshInstance and c != $MultiMeshInstance7:
 			c.visible = false
-	_fillCrowd($MultiMeshInstance7, bowl.seats(4800, false))
-	_fillCrowd($MultiMeshInstance, bowl.seats(700, true))
+	_fillCrowd($MultiMeshInstance7, bowl.seats(int(4800 * bowl.crowdScale), false))
+	_fillCrowd($MultiMeshInstance, bowl.seats(int(700 * bowl.crowdScale), true))
 	var nearFans = $MultiMeshInstance7.duplicate()
 	nearFans.name = "NearUpperFans"
 	nearFans.multimesh = $MultiMeshInstance7.multimesh.duplicate()
 	nearFans.visible = false
 	add_child(nearFans)
-	_fillCrowd(nearFans, bowl.seats(1400, false, true))
+	_fillCrowd(nearFans, bowl.seats(int(1400 * bowl.crowdScale), false, true))
 	bowl.nearCrowd = nearFans
 	crowd = true
 

@@ -121,6 +121,19 @@ player6 = {
 "speed": 9.5
 }
 player7 = {
+"aggression": 6.5,
+"agility": 9.5,
+"curl": 9.0,
+"facehair": 1,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 1,
+"name": "D Villa",
+"shoot": 9.5,
+"skin": Color( 0.780, 0.570, 0.450, 1 ),
+"smart": 9.0,
+"speed": 9.0
+}
+player8 = {
 "aggression": 10.0,
 "agility": 7.5,
 "aerial": 9.0,
@@ -134,7 +147,7 @@ player7 = {
 "smart": 9.5,
 "speed": 8.0
 }
-player8 = {
+player9 = {
 "aggression": 8.0,
 "agility": 7.5,
 "curl": 6.5,
@@ -146,19 +159,6 @@ player8 = {
 "skin": Color( 0.330, 0.210, 0.140, 1 ),
 "smart": 9.0,
 "speed": 8.5
-}
-player9 = {
-"aggression": 6.5,
-"agility": 9.5,
-"curl": 9.0,
-"facehair": 1,
-"hair": Color( 0.080, 0.050, 0.040, 1 ),
-"hairtype": 1,
-"name": "D Villa",
-"shoot": 9.5,
-"skin": Color( 0.780, 0.570, 0.450, 1 ),
-"smart": 9.0,
-"speed": 9.0
 }
 player10 = {
 "aggression": 7.5,

@@ -117,17 +117,17 @@ player6 = {
 "speed": 11.0
 }
 player7 = {
-"aggression": 7.0,
-"agility": 7.0,
-"curl": 8.0,
+"aggression": 6.5,
+"agility": 10.0,
+"curl": 8.5,
 "facehair": 0,
-"hair": Color( 0.550, 0.380, 0.200, 1 ),
-"hairtype": 0,
-"name": "D Huijsen",
-"shoot": 4.0,
-"skin": Color( 0.960, 0.800, 0.690, 1 ),
-"smart": 9.0,
-"speed": 7.5
+"hair": Color( 0.050, 0.040, 0.030, 1 ),
+"hairtype": 2,
+"name": "Y Diomande",
+"shoot": 8.0,
+"skin": Color( 0.420, 0.270, 0.190, 1 ),
+"smart": 8.5,
+"speed": 9.5
 }
 player8 = {
 "aggression": 8.5,
