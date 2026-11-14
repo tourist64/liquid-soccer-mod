@@ -2093,7 +2093,7 @@ func _shapeToPitch(v):
 		return Vector2(range_lerp(v.y, 0, 1, 150 * Global.ps, - 150 * Global.ps), range_lerp(v.x, 0, 1, - 100 * Global.ps, 100 * Global.ps))
 	return Vector2(range_lerp(v.y, 0, 1, - 150 * Global.ps, 150 * Global.ps), range_lerp(v.x, 0, 1, 100 * Global.ps, - 100 * Global.ps))
 
-# Last minute and leading by 1 or 2: every winger (Mbappe included) drops to 74% depth to see it out.
+# Last two minutes and leading by 1 or 2: every winger (Mbappe included) drops to 74% depth to see it out.
 const LOCKDOWN_WINGERS = ["Vini Jr", "K Mbappe", "Y Diomande", "Rodrygo"]
 const LOCKDOWN_DEF_DEPTH = 0.74
 const LOCKDOWN_MID_DEPTH = 0.6
