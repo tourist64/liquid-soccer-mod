@@ -91,17 +91,17 @@ player4 = {
 "speed": 8.0
 }
 player5 = {
-"aggression": 8.0,
-"agility": 9.5,
-"curl": 9.5,
-"facehair": 1,
-"hair": Color( 0.080, 0.050, 0.040, 1 ),
-"hairtype": 2,
-"name": "Raphinha",
-"shoot": 10.0,
-"skin": Color( 0.700, 0.480, 0.360, 1 ),
-"smart": 9.5,
-"speed": 9.5
+"aggression": 7.0,
+"agility": 9.0,
+"curl": 8.0,
+"facehair": 0,
+"hair": Color( 0.300, 0.200, 0.110, 1 ),
+"hairtype": 1,
+"name": "F Torres",
+"shoot": 8.5,
+"skin": Color( 0.920, 0.760, 0.650, 1 ),
+"smart": 9.0,
+"speed": 9.0
 }
 player6 = {
 "aggression": 5.0,
@@ -117,17 +117,17 @@ player6 = {
 "speed": 10.0
 }
 player7 = {
-"aggression": 6.0,
-"agility": 8.0,
-"curl": 8.0,
-"facehair": 0,
-"hair": Color( 0.300, 0.200, 0.110, 1 ),
-"hairtype": 1,
-"name": "R Lewandowski",
+"aggression": 8.0,
+"agility": 9.5,
+"curl": 9.5,
+"facehair": 1,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 2,
+"name": "Raphinha",
 "shoot": 10.0,
-"skin": Color( 0.920, 0.760, 0.650, 1 ),
-"smart": 10.0,
-"speed": 6.5
+"skin": Color( 0.700, 0.480, 0.360, 1 ),
+"smart": 9.5,
+"speed": 9.5
 }
 player8 = {
 "aggression": 8.5,
