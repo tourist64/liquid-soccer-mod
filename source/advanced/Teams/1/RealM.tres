@@ -87,8 +87,9 @@ player3 = {
 "speed": 8.0
 }
 player4 = {
+"ballWin": 0.6,
 "aerial": 10.0,
-"aggression": 8.5,
+"aggression": 9.0,
 "agility": 9.5,
 "curl": 9.5,
 "facehair": 0,
@@ -194,7 +195,7 @@ player11 = {
 "smart": 9.0,
 "speed": 9.0
 }
-def = [ Vector2( 0.33, 0.83 ), Vector2( 0.67, 0.83 ), Vector2( 0.5, 0.87 ), Vector2( 0.42, 0.66 ), Vector2( 0.25, 0.5 ), Vector2( 0.5, 0.46 ) ]
-mid = [ Vector2( 0.27, 0.66 ), Vector2( 0.73, 0.66 ), Vector2( 0.5, 0.72 ), Vector2( 0.42, 0.45 ), Vector2( 0.2, 0.32 ), Vector2( 0.58, 0.28 ) ]
+def = [ Vector2( 0.33, 0.83 ), Vector2( 0.67, 0.83 ), Vector2( 0.5, 0.87 ), Vector2( 0.45, 0.7 ), Vector2( 0.25, 0.5 ), Vector2( 0.5, 0.46 ) ]
+mid = [ Vector2( 0.27, 0.66 ), Vector2( 0.73, 0.66 ), Vector2( 0.5, 0.72 ), Vector2( 0.48, 0.46 ), Vector2( 0.2, 0.32 ), Vector2( 0.58, 0.28 ) ]
 att = [ Vector2( 0.22, 0.5 ), Vector2( 0.78, 0.5 ), Vector2( 0.5, 0.62 ), Vector2( 0.44, 0.11 ), Vector2( 0.18, 0.16 ), Vector2( 0.66, 0.13 ) ]
 cor = [ Vector2( 0.451, 0.258 ), Vector2( 0.472, 0.456 ), Vector2( 0.5, 0.1 ), Vector2( 0.308, 0.155 ), Vector2( 0.522, 0.138 ), Vector2( 0.473, 0.15 ) ]
