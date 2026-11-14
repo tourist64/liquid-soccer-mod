@@ -20,7 +20,7 @@ const RATINGS = {"Real Madrid": 93, "PSG": 92, "Arsenal": 91, "Bayern Munich": 9
 	"Man City": 89, "Liverpool": 89, "Inter": 87, "Atletico Madrid": 85, "Napoli": 84, "Dortmund": 83,
 	"Aston Villa": 83, "Man Utd": 82, "Roma": 81, "Porto": 80, "Sporting CP": 80, "Villarreal": 80,
 	"RB Leipzig": 80, "Fenerbahce": 80, "Galatasaray": 80, "Como": 79, "Stuttgart": 79, "Real Betis": 79,
-	"Lille": 78, "PSV": 77, "Feyenoord": 77, "Lens": 77, "Club Brugge": 76, "Shakhtar Donetsk": 75,
+	"Lille": 78, "PSV": 77, "Feyenoord": 74, "Lens": 77, "Club Brugge": 76, "Shakhtar Donetsk": 75,
 	"AEK Athens": 74, "Bodo Glimt": 74, "Slavia Prague": 73, "LASK": 70, "Viking": 69, "Sabah": 67,
 	"Slovan Bratislava": 67}
 
@@ -199,8 +199,11 @@ func _advance(playerScore):
 		var pens = false
 		var w
 		var mine = t[0] == tTeam or t[1] == tTeam
+		var legs = []
 		if playerScore != null and mine:
 			s = playerScore
+			if _twoLegged() and firstLeg.size() == 2:
+				legs = [[firstLeg[1], firstLeg[0]], [s[0] - firstLeg[1], s[1] - firstLeg[0]]]
 			# Game.gd adds the shootout to the score, so a level score here can't happen; just in case:
 			w = t[0] if s[0] >= s[1] else t[1]
 		else:
@@ -209,6 +212,7 @@ func _advance(playerScore):
 				var l1 = firstLeg if (mine and koLeg == 2 and firstLeg.size() == 2) else _simScore(t[1], t[0], true)
 				var l2 = _simScore(t[0], t[1], true)
 				s = [l1[1] + l2[0], l1[0] + l2[1]]
+				legs = [[l1[1], l1[0]], [l2[0], l2[1]]]
 			else:
 				s = _simScore(t[0], t[1], false)
 			if s[0] == s[1]:
@@ -218,7 +222,7 @@ func _advance(playerScore):
 				w = t[0] if s[0] > s[1] else t[1]
 		if (t[0] == tTeam or t[1] == tTeam) and w != tTeam:
 			playerOut = true
-		rnd.append({"a": t[0], "b": t[1], "s": s, "pens": pens, "w": w})
+		rnd.append({"a": t[0], "b": t[1], "s": s, "pens": pens, "w": w, "l": legs})
 		winners.append(w)
 	koResults.append(rnd)
 	koLeg = 1
@@ -385,7 +389,7 @@ func loadState():
 	for rnd in d.koResults:
 		var rr = []
 		for t in rnd:
-			rr.append({"a": m[int(t.a)], "b": m[int(t.b)], "s": _ints(t.s), "pens": bool(t.pens), "w": _map(m, int(t.w))})
+			rr.append({"a": m[int(t.a)], "b": m[int(t.b)], "s": _ints(t.s), "pens": bool(t.pens), "w": _map(m, int(t.w)), "l": _ints(t.get("l", []))})
 		koResults.append(rr)
 	champion = _map(m, int(d.champion))
 	playerOut = bool(d.playerOut)

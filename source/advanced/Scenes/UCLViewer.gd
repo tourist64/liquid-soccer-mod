@@ -190,6 +190,7 @@ func _tieBox(at, w, rnd, k):
 	var s = null
 	var win = -1
 	var pens = false
+	var legs = []
 	if rnd < ucl.koResults.size():
 		var t = ucl.koResults[rnd][k]
 		a = t.a
@@ -197,6 +198,7 @@ func _tieBox(at, w, rnd, k):
 		s = t.s
 		win = t.w
 		pens = t.pens
+		legs = t.get("l", [])
 	elif rnd == ucl.koRound and k < ucl.ties.size():
 		a = ucl.ties[k][0]
 		b = ucl.ties[k][1]
@@ -210,10 +212,14 @@ func _tieBox(at, w, rnd, k):
 			col = GOLD
 		if win != -1 and team != win:
 			col = col.darkened(0.45)
-		_label(page, nm, Vector2(at.x + 6, y), Vector2(w - 40, 18), fSmall, col)
+		_label(page, nm, Vector2(at.x + 6, y), Vector2(w - (96 if legs.size() == 2 else 40), 18), fSmall, col)
 		if s != null:
 			var score = str(s[row[1]]) + ("p" if pens and team == win else "")
 			_label(page, score, Vector2(at.x + w - 34, y), Vector2(30, 18), fSmall, col, Label.ALIGN_RIGHT)
+			# Two-legged ties: each leg's goals, dimmed, before the aggregate.
+			if legs.size() == 2 and legs[1][0] >= 0 and legs[1][1] >= 0:
+				var lt = str(legs[0][row[1]]) + " + " + str(legs[1][row[1]])
+				_label(page, lt, Vector2(at.x + w - 92, y), Vector2(54, 18), fSmall, DIM, Label.ALIGN_RIGHT)
 
 # The next-match box with the right button: play, simulate a round, simulate to the end, or done.
 func _nextBox(at, w):
