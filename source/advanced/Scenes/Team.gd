@@ -2077,6 +2077,29 @@ func _counterBonus():
 		return 0.0
 	return counter * 2.5
 
+# --- Outlet winger -------------------------------------------------------------------------
+# When Madrid are losing or two goals up, Diomande stops tracking back and stays high on the right
+# like Vini and Mbappe (still behind the last defender) as a counter-attack outlet.
+const OUTLET_PLAYER = "Y Diomande"
+const OUTLET_DEF = Vector2(0.8, 0.4)
+const OUTLET_MID = Vector2(0.82, 0.3)
+
+# Shape coordinates (0-1 across, 0-1 from the attacked goal) to this team's pitch position.
+func _shapeToPitch(v):
+	if playDir == 1:
+		return Vector2(range_lerp(v.y, 0, 1, 150 * Global.ps, - 150 * Global.ps), range_lerp(v.x, 0, 1, - 100 * Global.ps, 100 * Global.ps))
+	return Vector2(range_lerp(v.y, 0, 1, - 150 * Global.ps, 150 * Global.ps), range_lerp(v.x, 0, 1, 100 * Global.ps, - 100 * Global.ps))
+
+func _setOutlet(on):
+	if tdata == null or formation.size() < 2 * Global.squad:
+		return
+	for pid in range(1, Global.squad):
+		var pp = tdata.get("player" + str(pid))
+		if typeof(pp) == TYPE_DICTIONARY and pp.get("name", "") == OUTLET_PLAYER:
+			formation[pid] = _shapeToPitch(OUTLET_DEF if on else tdata.def[pid - 1])
+			formation[Global.squad + pid] = _shapeToPitch(OUTLET_MID if on else tdata.mid[pid - 1])
+			return
+
 # --- Real Madrid remontada --------------------------------------------------------------
 # Losing with under 20% of the match left: every player gets aggression 10, +1 speed and +1 shooting
 # (capped at 10). Switched off again as soon as the side is level or ahead.
