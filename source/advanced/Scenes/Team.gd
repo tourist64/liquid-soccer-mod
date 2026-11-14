@@ -2093,16 +2093,33 @@ func _shapeToPitch(v):
 		return Vector2(range_lerp(v.y, 0, 1, 150 * Global.ps, - 150 * Global.ps), range_lerp(v.x, 0, 1, - 100 * Global.ps, 100 * Global.ps))
 	return Vector2(range_lerp(v.y, 0, 1, - 150 * Global.ps, 150 * Global.ps), range_lerp(v.x, 0, 1, 100 * Global.ps, - 100 * Global.ps))
 
-# margin: this team's goals minus the opponent's.
-func _setOutlet(margin):
+# Last minute and leading by 1 or 2: every winger (Mbappe included) drops to 74% depth to see it out.
+const LOCKDOWN_WINGERS = ["Vini Jr", "K Mbappe", "Y Diomande", "Rodrygo"]
+const LOCKDOWN_DEF_DEPTH = 0.74
+const LOCKDOWN_MID_DEPTH = 0.6
+
+# margin: this team's goals minus the opponent's; lastMinute: under a minute left in the match.
+func _setOutlet(margin, lastMinute = false):
 	if tdata == null or formation.size() < 2 * Global.squad:
 		return
+	var lockdown = lastMinute and margin >= 1 and margin <= 2
 	for pid in range(1, Global.squad):
 		var pp = tdata.get("player" + str(pid))
-		if typeof(pp) == TYPE_DICTIONARY and pp.get("name", "") == OUTLET_PLAYER:
+		if typeof(pp) != TYPE_DICTIONARY:
+			continue
+		var nm = pp.get("name", "")
+		if nm in LOCKDOWN_WINGERS and nm != OUTLET_PLAYER:
+			var d0 = tdata.def[pid - 1]
+			var m0 = tdata.mid[pid - 1]
+			formation[pid] = _shapeToPitch(Vector2(d0.x, LOCKDOWN_DEF_DEPTH) if lockdown else d0)
+			formation[Global.squad + pid] = _shapeToPitch(Vector2(m0.x, LOCKDOWN_MID_DEPTH) if lockdown else m0)
+		elif nm == OUTLET_PLAYER:
 			var d = tdata.def[pid - 1]
 			var m = tdata.mid[pid - 1]
-			if margin < 0 or margin >= 2:
+			if lockdown:
+				d = Vector2(d.x, LOCKDOWN_DEF_DEPTH)
+				m = Vector2(m.x, LOCKDOWN_MID_DEPTH)
+			elif margin < 0 or margin >= 2:
 				d = OUTLET_DEF
 				m = OUTLET_MID
 			elif margin == 1:
@@ -2110,7 +2127,6 @@ func _setOutlet(margin):
 				m = PROTECT_MID
 			formation[pid] = _shapeToPitch(d)
 			formation[Global.squad + pid] = _shapeToPitch(m)
-			return
 
 # --- Real Madrid remontada --------------------------------------------------------------
 # Losing with under 20% of the match left: every player gets aggression 10, +1 speed and +1 shooting

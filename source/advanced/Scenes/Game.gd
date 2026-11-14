@@ -1701,10 +1701,11 @@ func _updateRemontada():
 	team1._setRemontada(_isRealMadrid(team1.tdata) and score.x < score.y and left < 0.2)
 	team2._setRemontada(_isRealMadrid(team2.tdata) and score.y < score.x and left < 0.2)
 	# Diomande's defensive spot follows Madrid's score (see Team._setOutlet).
+	var lastMinute = half == 1 and gametimer.time_left < 60.0
 	if _isRealMadrid(team1.tdata):
-		team1._setOutlet(int(score.x - score.y))
+		team1._setOutlet(int(score.x - score.y), lastMinute)
 	if _isRealMadrid(team2.tdata):
-		team2._setOutlet(int(score.y - score.x))
+		team2._setOutlet(int(score.y - score.x), lastMinute)
 
 func _isRealMadrid(td):
 	if td == null:
