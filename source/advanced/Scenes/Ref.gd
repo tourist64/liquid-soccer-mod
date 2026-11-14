@@ -166,6 +166,11 @@ func _bookPlayer( var p):
 	p.foulCount += 1
 	if p.foulCount > foulTolerance:
 		offender = p
+		# The computer's players are booked so rarely that their first card is a straight red.
+		if p.carded == 0 and p.myTeam.AIteam:
+			p.foulCount = 0
+			_sendOffPlayer(p)
+			return true
 		if p.carded == 0:
 			cardshad.set_shader_param("albedo_color", Color(1, 1, 0))
 			target = p.translation + Vector3(0, 0, - 5)
