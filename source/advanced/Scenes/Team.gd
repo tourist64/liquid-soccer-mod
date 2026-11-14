@@ -2078,11 +2078,14 @@ func _counterBonus():
 	return counter * 2.5
 
 # --- Outlet winger -------------------------------------------------------------------------
-# When Madrid are losing or two goals up, Diomande stops tracking back and stays high on the right
-# like Vini and Mbappe (still behind the last defender) as a counter-attack outlet.
+# Diomande's defensive job follows the score: losing or two goals up he stays high on the right like
+# Vini and Mbappe (still behind the last defender) as a counter outlet; one goal up he tracks back
+# deep to protect the lead; otherwise he uses his normal spot from the team file.
 const OUTLET_PLAYER = "Y Diomande"
 const OUTLET_DEF = Vector2(0.8, 0.4)
 const OUTLET_MID = Vector2(0.82, 0.3)
+const PROTECT_DEF = Vector2(0.72, 0.74)
+const PROTECT_MID = Vector2(0.8, 0.5)
 
 # Shape coordinates (0-1 across, 0-1 from the attacked goal) to this team's pitch position.
 func _shapeToPitch(v):
@@ -2090,14 +2093,23 @@ func _shapeToPitch(v):
 		return Vector2(range_lerp(v.y, 0, 1, 150 * Global.ps, - 150 * Global.ps), range_lerp(v.x, 0, 1, - 100 * Global.ps, 100 * Global.ps))
 	return Vector2(range_lerp(v.y, 0, 1, - 150 * Global.ps, 150 * Global.ps), range_lerp(v.x, 0, 1, 100 * Global.ps, - 100 * Global.ps))
 
-func _setOutlet(on):
+# margin: this team's goals minus the opponent's.
+func _setOutlet(margin):
 	if tdata == null or formation.size() < 2 * Global.squad:
 		return
 	for pid in range(1, Global.squad):
 		var pp = tdata.get("player" + str(pid))
 		if typeof(pp) == TYPE_DICTIONARY and pp.get("name", "") == OUTLET_PLAYER:
-			formation[pid] = _shapeToPitch(OUTLET_DEF if on else tdata.def[pid - 1])
-			formation[Global.squad + pid] = _shapeToPitch(OUTLET_MID if on else tdata.mid[pid - 1])
+			var d = tdata.def[pid - 1]
+			var m = tdata.mid[pid - 1]
+			if margin < 0 or margin >= 2:
+				d = OUTLET_DEF
+				m = OUTLET_MID
+			elif margin == 1:
+				d = PROTECT_DEF
+				m = PROTECT_MID
+			formation[pid] = _shapeToPitch(d)
+			formation[Global.squad + pid] = _shapeToPitch(m)
 			return
 
 # --- Real Madrid remontada --------------------------------------------------------------

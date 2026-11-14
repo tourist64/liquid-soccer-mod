@@ -1700,11 +1700,11 @@ func _updateRemontada():
 	var left = (gametimer.time_left + (length if half == 0 else 0.0)) / (2.0 * length)
 	team1._setRemontada(_isRealMadrid(team1.tdata) and score.x < score.y and left < 0.2)
 	team2._setRemontada(_isRealMadrid(team2.tdata) and score.y < score.x and left < 0.2)
-	# Diomande goes high on the right when Madrid are losing or 2+ goals up.
+	# Diomande's defensive spot follows Madrid's score (see Team._setOutlet).
 	if _isRealMadrid(team1.tdata):
-		team1._setOutlet(score.x < score.y or score.x - score.y >= 2)
+		team1._setOutlet(int(score.x - score.y))
 	if _isRealMadrid(team2.tdata):
-		team2._setOutlet(score.y < score.x or score.y - score.x >= 2)
+		team2._setOutlet(int(score.y - score.x))
 
 func _isRealMadrid(td):
 	if td == null:
