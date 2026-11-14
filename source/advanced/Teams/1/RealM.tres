@@ -141,7 +141,7 @@ player7 = {
 }
 player8 = {
 "aggression": 5.0,
-"agility": 9.5,
+"agility": 10.5,
 "curl": 11.5,
 "facehair": 0,
 "hair": Color( 0.550, 0.380, 0.200, 1 ),
@@ -150,7 +150,7 @@ player8 = {
 "shoot": 8.5,
 "skin": Color( 0.960, 0.800, 0.690, 1 ),
 "smart": 10.0,
-"speed": 7.0
+"speed": 8.5
 }
 player9 = {
 "aerial": 11.0,
