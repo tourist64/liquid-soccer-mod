@@ -20,6 +20,7 @@ var ucl = null
 var page = null
 var showTable = false
 var busy = false
+var saveBtn = null
 var fTitle
 var fBig
 var fMed
@@ -124,8 +125,9 @@ func _league():
 		_label(page, "No games yet.", Vector2(x + 14, y), Vector2(390, 20), fSmall, DIM)
 	_nextBox(Vector2(x, 360), 412)
 	if ucl.knockoutStage:
-		_button(page, "bracket", Vector2(x + 14, 508), Vector2(160, 52), "_toggleTable", [], fMed)
-	_button(page, "menu", Vector2(x + 238, 508), Vector2(160, 52), "_menu", [], fMed)
+		_button(page, "bracket", Vector2(x + 14, 508), Vector2(120, 52), "_toggleTable", [], fMed)
+	_saveButton(Vector2(x + 146, 508), Vector2(120, 52))
+	_button(page, "menu", Vector2(x + 278, 508), Vector2(120, 52), "_menu", [], fMed)
 
 func _table(at):
 	var w = 566
@@ -164,6 +166,7 @@ func _bracket():
 			var y = 76 + slot * k + (slot - 42) / 2
 			_tieBox(Vector2(x, y), colW, c, k)
 	_nextBox(Vector2(16, 446), 1000)
+	_saveButton(Vector2(16, 512), Vector2(180, 52))
 	_button(page, "table", Vector2(612, 512), Vector2(180, 52), "_toggleTable", [], fMed)
 	_button(page, "menu", Vector2(818, 512), Vector2(180, 52), "_menu", [], fMed)
 
@@ -265,6 +268,15 @@ func _play():
 	trans._wipeOff()
 	yield(trans.tween, "tween_completed")
 	var _foo = get_tree().change_scene("res://Scenes/Game.tscn")
+
+# Save button: writes the tournament now (it also saves itself after every match).
+func _saveButton(at, size):
+	saveBtn = _button(page, "save", at, size, "_save", [], fMed)
+
+func _save():
+	ucl.saveState()
+	if saveBtn and is_instance_valid(saveBtn):
+		saveBtn.text = "saved!"
 
 func _simRound():
 	ucl.simulateRound()
