@@ -269,7 +269,8 @@ func _shootBall( var shootr, var direction, var curldirection):
 	
 	
 	
-func _passBall( var direction, var passer):
+# maxSpeed: a higher speed cap for long through balls by good passers (0 = the normal cap).
+func _passBall( var direction, var passer, var maxSpeed = 0.0):
 	# Keepers pass themselves as their AI node; the rest of the game expects the player.
 	if passer.get("myPlayer") != null:
 		passer = passer.myPlayer
@@ -288,7 +289,7 @@ func _passBall( var direction, var passer):
 	
 	var dl = direction.length()
 	var dr = direction
-	var ddl = max(minPassSpeed, min(dl, maxPassSpeed))
+	var ddl = max(minPassSpeed, min(dl, max(maxPassSpeed, maxSpeed)))
 	
 	isShot = false
 	$BallPassed.play()
