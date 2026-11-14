@@ -16,7 +16,7 @@ const MATCHDAYS = 8
 const ROUND_NAMES = ["Knockout play-off", "Round of 16", "Quarter-finals", "Semi-finals", "Final"]
 
 # Club strength (about 65-92) for simulated results; also orders the clubs.
-const RATINGS = {"PSG": 92, "Real Madrid": 91, "Arsenal": 91, "Bayern Munich": 91, "Barcelona": 90,
+const RATINGS = {"PSG": 93, "Real Madrid": 92, "Arsenal": 91, "Bayern Munich": 91, "Barcelona": 90,
 	"Man City": 89, "Liverpool": 89, "Inter": 87, "Atletico Madrid": 85, "Napoli": 84, "Dortmund": 83,
 	"Aston Villa": 83, "Man Utd": 82, "Roma": 81, "Porto": 80, "Sporting CP": 80, "Villarreal": 80,
 	"RB Leipzig": 80, "Fenerbahce": 80, "Galatasaray": 80, "Como": 79, "Stuttgart": 79, "Real Betis": 79,
