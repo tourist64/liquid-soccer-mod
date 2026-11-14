@@ -109,12 +109,10 @@ var tackledBall = false
 
 var foulCount = 0
 var carded = 0
-# Set when this player's last foul was a hard tackle (at full sprint, or from behind).
+# Set when this player's last foul was a hard tackle (from behind the attacker).
 var hardFoul = false
 
 func _isHardTackle(victim):
-	# The sprint rule only applies to the computer's team; from behind applies to everyone.
-	var fast = myTeam.AIteam and velocity.length() > pSpeed * 1.05
 	var behind = false
 	var run = victim.velocity
 	run.y = 0.0
@@ -122,7 +120,7 @@ func _isHardTackle(victim):
 		var toVictim = victim.translation - translation
 		toVictim.y = 0.0
 		behind = toVictim.normalized().dot(run.normalized()) > 0.5
-	return fast or behind
+	return behind
 var yellowI = null
 var playersay = null
 
