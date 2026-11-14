@@ -560,20 +560,30 @@ func _findThruPass(pos, lookD, _id):
 	var dopass = false
 	var dl = 0
 	
-	for i in range(1, Global.squad):
-		diff = (players[i].translation) + ((players[i].velocity).normalized() * 1.0) - Global.ballpos
-		
-		
-		var score = diff.normalized().dot(lookD.normalized())
-		
-		if _isOffsidePosition(players[i]):
-			score = - 1000
-		if score > 0.55 and (players[i].myID != _id):
-			dl = diff.length()
-			if (dl < best):
-				candidate = players[i]
-				
-				best = dl
+	# No direction held: aim at the goal we're attacking.
+	if lookD.length_squared() < 0.01:
+		lookD = goal - Global.ballpos
+		lookD.y = 0.0
+	# First look in a tight cone around the chosen direction; if nobody onside is there, widen
+	# it so the pass still goes to the nearest onside runner roughly that way instead of the
+	# button doing nothing (which just lost the ball against high lines).
+	for cone in [0.55, 0.15]:
+		for i in range(1, Global.squad):
+			diff = (players[i].translation) + ((players[i].velocity).normalized() * 1.0) - Global.ballpos
+			
+			
+			var score = diff.normalized().dot(lookD.normalized())
+			
+			if _isOffsidePosition(players[i]) or players[i].carded > 1:
+				score = - 1000
+			if score > cone and (players[i].myID != _id):
+				dl = diff.length()
+				if (dl < best):
+					candidate = players[i]
+					
+					best = dl
+		if candidate:
+			break
 	
 	if (candidate):
 		
