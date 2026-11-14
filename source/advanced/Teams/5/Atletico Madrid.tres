@@ -40,7 +40,7 @@ player0 = {
 "speed": 5.5
 }
 player1 = {
-"aggression": 8.0,
+"aggression": 8.5,
 "agility": 8.0,
 "curl": 7.5,
 "facehair": 0,
@@ -67,7 +67,7 @@ player2 = {
 "speed": 7.5
 }
 player3 = {
-"aggression": 8.5,
+"aggression": 9.0,
 "agility": 8.5,
 "curl": 8.0,
 "facehair": 1,
@@ -77,11 +77,11 @@ player3 = {
 "shoot": 7.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 9.0,
-"speed": 9.5
+"speed": 10.0
 }
 player4 = {
 "aggression": 8.0,
-"agility": 8.5,
+"agility": 8.0,
 "curl": 9.0,
 "facehair": 2,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
@@ -93,7 +93,7 @@ player4 = {
 "speed": 6.5
 }
 player5 = {
-"aggression": 6.5,
+"aggression": 7.0,
 "agility": 9.5,
 "curl": 9.5,
 "facehair": 1,
@@ -103,7 +103,7 @@ player5 = {
 "shoot": 9.0,
 "skin": Color( 0.960, 0.800, 0.690, 1 ),
 "smart": 10.0,
-"speed": 8.0
+"speed": 7.5
 }
 player6 = {
 "aggression": 8.5,
@@ -119,7 +119,7 @@ player6 = {
 "speed": 8.0
 }
 player7 = {
-"aggression": 7.5,
+"aggression": 8.0,
 "agility": 9.5,
 "curl": 9.0,
 "facehair": 0,
@@ -147,7 +147,7 @@ player8 = {
 player9 = {
 "aggression": 6.0,
 "agility": 9.5,
-"curl": 9.5,
+"curl": 10.0,
 "facehair": 1,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 3,
@@ -158,20 +158,20 @@ player9 = {
 "speed": 8.0
 }
 player10 = {
-"aggression": 8.0,
+"aggression": 8.5,
 "agility": 9.0,
 "curl": 8.0,
 "facehair": 2,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 4,
 "name": "G Simeone",
-"shoot": 8.0,
+"shoot": 7.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 8.5,
 "speed": 9.5
 }
 player11 = {
-"aggression": 9.5,
+"aggression": 10.0,
 "agility": 7.0,
 "curl": 5.0,
 "facehair": 0,
