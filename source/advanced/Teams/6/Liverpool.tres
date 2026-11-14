@@ -27,37 +27,37 @@ League = 1
 player0 = {
 "aggression": 7.0,
 "agility": 9.5,
-"curl": 5.5,
+"curl": 6.0,
 "facehair": 0,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 0,
 "name": "Alisson",
 "shoot": 5.0,
 "skin": Color( 0.780, 0.570, 0.450, 1 ),
-"smart": 9.5,
+"smart": 10.0,
 "speed": 6.0
 }
 player1 = {
 "aerial": 10.5,
 "hitbox": 1.15,
-"aggression": 9.0,
+"aggression": 9.5,
 "agility": 8.0,
-"curl": 6.0,
+"curl": 7.0,
 "facehair": 2,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 6,
 "name": "V van Dijk",
-"shoot": 5.0,
+"shoot": 6.0,
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
-"smart": 9.5,
-"speed": 9.0
+"smart": 10.0,
+"speed": 8.5
 }
 player2 = {
 "aerial": 10.5,
 "hitbox": 1.15,
-"aggression": 9.0,
-"agility": 8.0,
-"curl": 6.0,
+"aggression": 9.5,
+"agility": 7.5,
+"curl": 5.5,
 "facehair": 1,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 5,
@@ -68,27 +68,27 @@ player2 = {
 "speed": 9.0
 }
 player3 = {
-"aggression": 8.0,
+"aggression": 8.5,
 "agility": 9.5,
-"curl": 9.5,
+"curl": 9.0,
 "facehair": 1,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 1,
 "name": "R Gravenberch",
-"shoot": 8.0,
+"shoot": 7.0,
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
 "smart": 9.5,
-"speed": 8.0
+"speed": 8.5
 }
 player4 = {
-"aggression": 8.0,
-"agility": 9.5,
+"aggression": 7.0,
+"agility": 10.0,
 "curl": 10.0,
 "facehair": 0,
 "hair": Color( 0.300, 0.200, 0.110, 1 ),
 "hairtype": 2,
 "name": "F Wirtz",
-"shoot": 8.0,
+"shoot": 8.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 10.0,
 "speed": 8.0
@@ -101,88 +101,88 @@ player5 = {
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 6,
 "name": "A Isak",
-"shoot": 9.0,
+"shoot": 9.5,
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
 "smart": 9.5,
-"speed": 10.0
+"speed": 9.5
 }
 player6 = {
 "aggression": 5.5,
 "agility": 9.5,
-"curl": 8.5,
+"curl": 8.0,
 "facehair": 0,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 2,
 "name": "B Barcola",
-"shoot": 9.0,
+"shoot": 8.0,
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
-"smart": 9.0,
-"speed": 11.0
+"smart": 8.5,
+"speed": 10.0
 }
 player7 = {
-"aggression": 8.0,
+"aggression": 8.5,
 "agility": 9.5,
 "curl": 10.0,
 "facehair": 0,
 "hair": Color( 0.300, 0.200, 0.110, 1 ),
 "hairtype": 4,
 "name": "A Mac Allister",
-"shoot": 8.0,
+"shoot": 8.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 9.5,
-"speed": 8.0
+"smart": 10.0,
+"speed": 7.5
 }
 player8 = {
-"aggression": 8.0,
-"agility": 9.5,
-"curl": 9.0,
+"aggression": 9.0,
+"agility": 9.0,
+"curl": 9.5,
 "facehair": 0,
 "hair": Color( 0.700, 0.560, 0.330, 1 ),
 "hairtype": 6,
 "name": "D Szoboszlai",
-"shoot": 8.5,
+"shoot": 9.0,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 9.5,
-"speed": 8.0
+"speed": 8.5
 }
 player9 = {
-"aggression": 5.5,
-"agility": 9.5,
-"curl": 8.5,
+"aggression": 6.0,
+"agility": 9.0,
+"curl": 8.0,
 "facehair": 0,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 4,
 "name": "H Ekitike",
-"shoot": 9.0,
+"shoot": 8.5,
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
-"smart": 9.0,
-"speed": 11.0
+"smart": 8.5,
+"speed": 10.0
 }
 player10 = {
-"aggression": 8.5,
-"agility": 7.5,
-"curl": 5.5,
+"aggression": 7.0,
+"agility": 9.0,
+"curl": 7.5,
 "facehair": 0,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 2,
 "name": "J Frimpong",
-"shoot": 4.5,
+"shoot": 6.5,
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
-"smart": 9.0,
-"speed": 9.5
+"smart": 8.5,
+"speed": 10.5
 }
 player11 = {
 "aggression": 8.5,
-"agility": 7.5,
-"curl": 5.5,
+"agility": 8.0,
+"curl": 7.5,
 "facehair": 1,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 4,
 "name": "M Kerkez",
-"shoot": 4.5,
+"shoot": 5.0,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 9.0,
-"speed": 8.5
+"smart": 8.5,
+"speed": 9.0
 }
 def = [ Vector2( 0.35, 0.82743 ), Vector2( 0.592117, 0.834043 ), Vector2( 0.470552, 0.769525 ), Vector2( 0.301458, 0.68602 ), Vector2( 0.534688, 0.513662 ), Vector2( 0.619963, 0.683642 ), Vector2( 0.44, 0.64 ) ]
 mid = [ Vector2( 0.3, 0.68 ), Vector2( 0.65, 0.68 ), Vector2( 0.56573, 0.545717 ), Vector2( 0.25, 0.35 ), Vector2( 0.7, 0.35 ), Vector2( 0.384668, 0.545014 ), Vector2( 0.46, 0.47 ) ]
