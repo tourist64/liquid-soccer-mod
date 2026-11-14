@@ -33,7 +33,7 @@ cornerLockdown = 1.0
 anchorId = 3
 player0 = {
 "aggression": 6.0,
-"agility": 9.5,
+"agility": 10.0,
 "curl": 5.0,
 "facehair": 2,
 "hair": Color( 0.550, 0.380, 0.200, 1 ),

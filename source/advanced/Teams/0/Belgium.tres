@@ -23,7 +23,7 @@ approach = 8.0
 league = "Eng"
 player0 = {
 "aggression": 7.0,
-"agility": 7.0,
+"agility": 10.0,
 "curl": 5.0,
 "facehair": 0,
 "hair": Color( 0.0588235, 0.0392157, 0.0392157, 1 ),

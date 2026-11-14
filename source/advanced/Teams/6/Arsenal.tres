@@ -31,7 +31,7 @@ cornerLockdown = 1.0
 midBlock = 1.0
 player0 = {
 "aggression": 6.0,
-"agility": 9.5,
+"agility": 10.0,
 "curl": 7.5,
 "facehair": 2,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
