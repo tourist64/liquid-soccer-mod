@@ -108,7 +108,14 @@ var anthemSound = null
 var anthemFade = null
 var anthemLayer = null
 var anthemPlaying = false
-const ANTHEM_VOLUME_DB = 0.0
+var anthemDuck = null
+var anthemDuckTween = null
+# The anthem is pushed well above the crowd: +9 dB into its own bus, where a limiter keeps the
+# peaks from clipping, and the crowd is turned down while it plays.
+const ANTHEM_VOLUME_DB = 9.0
+const ANTHEM_BUS = "Anthem"
+const ANTHEM_CROWD_DUCK_DB = -8.0
+const ANTHEM_CROWD_RESTORE = 1.5
 const ANTHEM_FADE_IN = 0.4
 const ANTHEM_FADE_OUT = 1.0
 const ANTHEM_SKIP_FADE = 0.5
@@ -1745,7 +1752,7 @@ func _startAnthem():
 		return false
 	anthemSound = AudioStreamPlayer.new()
 	anthemSound.stream = stream
-	anthemSound.bus = "Music"
+	anthemSound.bus = _anthemBus()
 	anthemSound.volume_db = -40.0
 	$Sounds.add_child(anthemSound)
 	var _a = anthemSound.connect("finished", self, "_endAnthem")
@@ -1761,6 +1768,7 @@ func _startAnthem():
 	Global._musicOff()
 	anthemSound.play()
 	anthemFade.start()
+	_duckCrowdForAnthem()
 	_showSkipAnthem()
 	return true
 
@@ -1805,7 +1813,54 @@ func _endAnthem():
 		anthemLayer = null
 	anthemFade.stop_all()
 	anthemSound.stop()
+	_restoreCrowdAfterAnthem()
 	emit_signal("anthem_finished")
+
+# Feeds the Music bus, so the music volume setting still applies.
+func _anthemBus():
+	if AudioServer.get_bus_index(ANTHEM_BUS) != -1:
+		return ANTHEM_BUS
+	var idx = AudioServer.get_bus_count()
+	AudioServer.add_bus(idx)
+	AudioServer.set_bus_name(idx, ANTHEM_BUS)
+	AudioServer.set_bus_send(idx, "Music")
+	var limiter = AudioEffectLimiter.new()
+	limiter.threshold_db = -1.0
+	limiter.ceiling_db = -0.3
+	AudioServer.add_bus_effect(idx, limiter)
+	return ANTHEM_BUS
+
+# A temporary gain stage at the front of the Crowd bus, so the player's crowd volume setting is
+# left alone.
+func _duckCrowdForAnthem():
+	_removeAnthemDuck()
+	var idx = AudioServer.get_bus_index("Crowd")
+	if idx == -1:
+		return
+	anthemDuck = AudioEffectAmplify.new()
+	anthemDuck.volume_db = 0.0
+	AudioServer.add_bus_effect(idx, anthemDuck, 0)
+	anthemDuckTween = Tween.new()
+	$Sounds.add_child(anthemDuckTween)
+	anthemDuckTween.interpolate_property(anthemDuck, "volume_db", 0.0, ANTHEM_CROWD_DUCK_DB, 1.0)
+	anthemDuckTween.start()
+
+func _restoreCrowdAfterAnthem():
+	if anthemDuck == null or anthemDuckTween == null:
+		return
+	anthemDuckTween.stop_all()
+	anthemDuckTween.interpolate_property(anthemDuck, "volume_db", anthemDuck.volume_db, 0.0, ANTHEM_CROWD_RESTORE)
+	anthemDuckTween.interpolate_callback(self, ANTHEM_CROWD_RESTORE, "_removeAnthemDuck")
+	anthemDuckTween.start()
+
+func _removeAnthemDuck():
+	var idx = AudioServer.get_bus_index("Crowd")
+	if idx == -1:
+		return
+	for i in range(AudioServer.get_bus_effect_count(idx) - 1, -1, -1):
+		if AudioServer.get_bus_effect(idx, i) is AudioEffectAmplify:
+			AudioServer.remove_bus_effect(idx, i)
+	anthemDuck = null
 
 func _setupMadridGoalSound():
 	var stream = load("res://Res/madrid_goal.mp3")
@@ -2975,6 +3030,8 @@ func _shushCrowd():
 
 func _exit_tree():
 	Global.exitFullWindow(self)
+	# Quitting mid-anthem must not leave the crowd turned down for the next match.
+	_removeAnthemDuck()
 
 # True once a set-piece setup has been waiting longer than limit_ms (then resets).
 func _setupStuck(limit_ms):
