@@ -2843,7 +2843,7 @@ func _cancelSub():
 func checkBooking( var cstate, var offender):
 		
 	
-	if ref._bookPlayer(offender):
+	if ref._bookPlayer(offender, _lastDefender(offender)):
 		bookingWaitTicks = 0
 		nextState = cstate
 		offender.AI._bookMe()
@@ -2852,6 +2852,18 @@ func checkBooking( var cstate, var offender):
 		mainCam.fov = 35
 	
 	
+# True when no outfield team-mate of the offender is nearer his own goal than he is.
+func _lastDefender(p):
+	var tm = p.myTeam
+	if tm == null:
+		return false
+	var mine = p.translation.distance_squared_to(tm.dGoal)
+	for i in range(1, Global.squad):
+		var o = tm.players[i]
+		if o != p and o.carded < 2 and o.translation.distance_squared_to(tm.dGoal) < mine:
+			return false
+	return true
+
 func _doneBooking():
 	# Called by the referee (yellow) or the sent-off player (red); only act once.
 	if state != gameState.BOOKING:

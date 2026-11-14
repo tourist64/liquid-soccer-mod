@@ -130,14 +130,16 @@ func cardPlayer():
 	target = offender.translation + Vector3(0, 0, - 10)
 	var close = seek(target)
 	la = offender.translation
-	if close < 5.0:
+	# Yellows are quick: shown from where the ref is, card animation at double speed.
+	# Reds keep the long walk over and the full animation.
+	if close < (30.0 if offender.carded == 1 else 5.0):
 		card.visible = true
 		if offender.carded == 1:
 			carded = true
 			game.hud._yellowCard()
 			anim = true
 			offender._say(3)
-			myAPlayer.play("refcard")
+			myAPlayer.play("refcard", -1, 2.0)
 		else:
 			carded = true
 			game.hud._redCard()
@@ -160,11 +162,12 @@ func _animDone():
 	changeState(tostate)
 	
 		
-func _bookPlayer( var p):
+# lastMan: the offender was his side's last outfield defender, which is always a booking.
+func _bookPlayer( var p, var lastMan = false):
 	
 	
 	p.foulCount += 1
-	if p.foulCount > foulTolerance:
+	if lastMan or p.foulCount > foulTolerance:
 		offender = p
 		# The computer's players are booked so rarely that their first card is a straight red.
 		if p.carded == 0 and p.myTeam.AIteam:
