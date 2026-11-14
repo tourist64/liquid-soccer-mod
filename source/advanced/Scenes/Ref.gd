@@ -19,6 +19,7 @@ var game = null
 var cardshad = null
 var carded = false
 var foulTolerance = 2
+const HARD_BOOK_CHANCE = 0.5
 func _ready():
 	stateFunc[rstate.IDLE] = funcref(self, "idleState")
 	stateFunc[rstate.GAMEON] = funcref(self, "gameOnState")
@@ -167,6 +168,13 @@ func _bookPlayer( var p, var lastMan = false):
 	
 	
 	p.foulCount += 1
+	# Hard tackles: half are booked on the spot, the rest count as two fouls.
+	if p.get("hardFoul"):
+		p.hardFoul = false
+		if randf() < HARD_BOOK_CHANCE:
+			lastMan = true
+		else:
+			p.foulCount += 1
 	if lastMan or p.foulCount > foulTolerance:
 		offender = p
 		# The computer's players are booked so rarely that their first card is a straight red.

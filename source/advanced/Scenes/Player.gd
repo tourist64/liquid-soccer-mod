@@ -109,6 +109,19 @@ var tackledBall = false
 
 var foulCount = 0
 var carded = 0
+# Set when this player's last foul was a hard tackle (at full sprint, or from behind).
+var hardFoul = false
+
+func _isHardTackle(victim):
+	var fast = velocity.length() > pSpeed * 1.05
+	var behind = false
+	var run = victim.velocity
+	run.y = 0.0
+	if run.length() > 4.0:
+		var toVictim = victim.translation - translation
+		toVictim.y = 0.0
+		behind = toVictim.normalized().dot(run.normalized()) > 0.5
+	return fast or behind
 var yellowI = null
 var playersay = null
 
@@ -1013,6 +1026,7 @@ func _on_TrapArea_body_entered(body):
 						continue
 					if b.get_parent().myTeam.teamID != myTeam.teamID and not ball._isShooting() and randf() >= pBallWin * 0.7:
 						fouled = true
+						hardFoul = _isHardTackle(b.get_parent())
 						b.get_parent().AI._fouled()
 			
 				
