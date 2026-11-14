@@ -2077,6 +2077,33 @@ func _counterBonus():
 		return 0.0
 	return counter * 2.5
 
+# --- Real Madrid remontada --------------------------------------------------------------
+# Losing with under 20% of the match left: every player gets aggression 10, +1 speed and +1 shooting
+# (capped at 10). Switched off again as soon as the side is level or ahead.
+const REMONTADA_SPEED = 0.6     # +1 speed rating (pSpeed = 23 + speed * 0.6)
+const REMONTADA_SHOOT = 0.1     # +1 shooting rating
+var remontada = false
+
+func _setRemontada(on):
+	if on == remontada:
+		return
+	remontada = on
+	for p in players:
+		if on:
+			var shoot = min(p.pShoot + REMONTADA_SHOOT, 1.0) - p.pShoot
+			p.set_meta("remontada", [p.pAggression, shoot])
+			p.pAggression = 1.0
+			p.pShoot += shoot
+			for k in ["pSpeed", "pOSpeed", "pDSpeed", "pBurst", "dBurst"]:
+				p.set(k, p.get(k) + REMONTADA_SPEED)
+		elif p.has_meta("remontada"):
+			var before = p.get_meta("remontada")
+			p.pAggression = before[0]
+			p.pShoot -= before[1]
+			for k in ["pSpeed", "pOSpeed", "pDSpeed", "pBurst", "dBurst"]:
+				p.set(k, p.get(k) - REMONTADA_SPEED)
+			p.remove_meta("remontada")
+
 # --- Comeback ---------------------------------------------------------------------------
 const COMEBACK_PRESS = 0.3      # team aggression rises by up to 0.3 (on a 0-1 scale)
 const COMEBACK_TACKLE = 0.3     # each player's tackling eagerness rises by up to 0.3

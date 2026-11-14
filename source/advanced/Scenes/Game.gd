@@ -762,6 +762,7 @@ func _process(delta):
 		return
 	_mp_apply_remote_controls()
 	_mp_publish_replica_state(delta)
+	_updateRemontada()
 
 	if recording:
 		frame += 1
@@ -1690,6 +1691,21 @@ func _approachDb(cur, target, delta):
 # A New UCL match (the menu clears the tournament, so 8v8 friendlies afterwards don't count).
 func _inUCL():
 	return Global.tType == 6 and Global.tournament != null and Global.tournament.has_method("simulateRound")
+
+# Real Madrid sides losing with under 20% of the match left go into remontada mode (see Team.gd).
+func _updateRemontada():
+	var length = float(Global.gameLength)
+	if length <= 0.0 or team1 == null or team2 == null:
+		return
+	var left = (gametimer.time_left + (length if half == 0 else 0.0)) / (2.0 * length)
+	team1._setRemontada(_isRealMadrid(team1.tdata) and score.x < score.y and left < 0.2)
+	team2._setRemontada(_isRealMadrid(team2.tdata) and score.y < score.x and left < 0.2)
+
+func _isRealMadrid(td):
+	if td == null:
+		return false
+	var n = str(td.get("teamname")).to_lower()
+	return "real madrid" in n or "mudrid" in n
 
 func _crowdBoost(db):
 	return db + BERNABEU_CROWD_DB if Global.eightMode else db
