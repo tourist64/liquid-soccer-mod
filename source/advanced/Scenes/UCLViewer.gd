@@ -77,17 +77,30 @@ func _picker():
 			b.grab_focus()
 	tmp.free()
 	_button(page, "back", Vector2(22, 500), Vector2(150, 56), "_menu", [], fBig)
-	if UCL.hasSave():
+	# Two separate campaigns: pick a slot, then continue it or pick a club to start a new one there.
+	for n in [1, 2]:
+		var tag = ("> slot " if n == _slot() else "slot ") + str(n) + (" (saved)" if UCL.hasSave(n) else "")
+		_button(page, tag, Vector2(190 + (n - 1) * 290, 500), Vector2(280, 56), "_setSlot", [n], fMed)
+	if UCL.hasSave(_slot()):
 		_button(page, "continue saved", Vector2(780, 500), Vector2(228, 56), "_continue", [], fBig)
+
+func _slot():
+	return Global.get_meta("ucl_slot") if Global.has_meta("ucl_slot") else 1
+
+func _setSlot(n):
+	Global.set_meta("ucl_slot", n)
+	_show()
 
 func _pick(i):
 	ucl = UCL.new()
+	ucl.slot = _slot()
 	ucl.start(i)
 	Global.tournament = ucl
 	_show()
 
 func _continue():
 	var u = UCL.new()
+	u.slot = _slot()
 	if u.loadState():
 		ucl = u
 		Global.tournament = ucl
@@ -100,7 +113,7 @@ func _continue():
 
 func _league():
 	_title("CHAMPIONS LEAGUE 2026/27")
-	_label(page, ucl.stageName(), Vector2(500, 16), Vector2(510, 30), fMed, WHITE, Label.ALIGN_RIGHT)
+	_label(page, "Slot " + str(ucl.slot) + "  -  " + ucl.stageName(), Vector2(440, 16), Vector2(570, 30), fMed, WHITE, Label.ALIGN_RIGHT)
 	_table(Vector2(18, 58))
 	var x = 600
 	_rect(page, Vector2(x, 58), Vector2(412, 512), PANEL)

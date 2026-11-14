@@ -8,6 +8,10 @@ extends Node
 
 const TEAM_DIR = "res://Teams/6/"
 const SAVE_FILE = "user://newucl2627.save"
+# Two separate campaigns: slot 1 keeps the original save file, slot 2 has its own.
+var slot = 1
+static func slotFile(n):
+	return SAVE_FILE if n == 1 else "user://newucl2627_%d.save" % n
 const MATCHDAYS = 8
 const ROUND_NAMES = ["Knockout play-off", "Round of 16", "Quarter-finals", "Semi-finals", "Final"]
 
@@ -287,19 +291,19 @@ func simulateToEnd():
 
 func saveState():
 	var f = File.new()
-	if f.open(SAVE_FILE, File.WRITE) != OK:
+	if f.open(slotFile(slot), File.WRITE) != OK:
 		return
 	f.store_line(to_json({"files": files, "tTeam": tTeam, "fixtures": fixtures, "results": results,
 		"matchday": matchday, "table": table, "koRound": koRound, "ties": ties, "koResults": koResults,
 		"champion": champion, "playerOut": playerOut, "knockoutStage": knockoutStage}))
 	f.close()
 
-static func hasSave():
-	return File.new().file_exists(SAVE_FILE)
+static func hasSave(n = 1):
+	return File.new().file_exists(slotFile(n))
 
 func loadState():
 	var f = File.new()
-	if not f.file_exists(SAVE_FILE) or f.open(SAVE_FILE, File.READ) != OK:
+	if not f.file_exists(slotFile(slot)) or f.open(slotFile(slot), File.READ) != OK:
 		return false
 	var d = parse_json(f.get_line())
 	f.close()
