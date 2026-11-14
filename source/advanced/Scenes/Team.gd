@@ -1243,6 +1243,12 @@ func _getDefendFKPos(pid):
 	
 
 func _getPenPosition(pid):
+	# The taker is always the last player (Team._penalty sets kickTaker that way): stand behind
+	# the ball. In 8v8 that's player 7, so player 6 joins the others on the edge of the box.
+	if pid == Global.squad - 1:
+		return Vector3(Game.penend * - 91 * Global.ps, 0, 0)
+	if pid == 6:
+		return Vector3(Game.penend * - 70 * Global.ps, 0, 14)
 	match pid:
 		1, 2:
 			return _getSupportPos(pid)
@@ -1741,6 +1747,9 @@ func _penalty():
 		if players[i].carded < 2:
 			Game.kickTaker = players[i]
 	pplayer = Game.kickTaker
+	# Whoever takes it (the last player not sent off) stands just behind the spot.
+	if pplayer != null:
+		pplayer.AI.target = Vector3(Game.penend * - 91 * Global.ps, 0, 0)
 
 func _corner( var side, var e):
 	var posi = Vector3(138.0, 0.0, 88.0) * Global.ps
