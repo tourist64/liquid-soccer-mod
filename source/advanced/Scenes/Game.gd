@@ -121,8 +121,8 @@ const MADRID_CROWD_BED_FADE_IN = 4.0
 const MADRID_GOAL_VOLUME_DB = 4.0
 const MADRID_GOAL_BUS = "MadridGoal"
 # Crowd atmosphere: ambience level during play, extra goal roar, and the 8v8 Bernabeu crowd boost.
-const CROWD_AMBIENCE_DB = -4.0
-const GOAL_ROAR_DB = 10.5
+const CROWD_AMBIENCE_DB = -7.0
+const GOAL_ROAR_DB = 7.5
 const BERNABEU_CROWD_DB = 3.0
 # The crowd rises as the ball nears either goal. Distances are shares of the centre-to-goal
 # distance: it starts building at CROWD_DANGER_START and is at full volume by CROWD_DANGER_FULL
@@ -133,7 +133,7 @@ const CROWD_DANGER_START = 0.6
 const CROWD_DANGER_FULL = 0.15
 const CROWD_PITCH_HALF_WIDTH = 90.0
 # A higher-pitched copy of the crowd fades in with the danger so it sounds agitated, not just louder.
-const CROWD_TENSION_DB = 4.0
+const CROWD_TENSION_DB = 1.0
 # Excitement builds toward the danger level (faster up than down), and pressure that lasts gets an
 # extra push: up to CROWD_SUSTAIN_BONUS more after CROWD_SUSTAIN_TIME seconds in a dangerous area.
 const CROWD_BUILD_UP = 0.7
