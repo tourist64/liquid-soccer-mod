@@ -127,19 +127,6 @@ player6 = {
 "speed": 11.0
 }
 player7 = {
-"aggression": 6.5,
-"agility": 10.0,
-"curl": 8.5,
-"facehair": 0,
-"hair": Color( 0.050, 0.040, 0.030, 1 ),
-"hairtype": 2,
-"name": "Y Diomande",
-"shoot": 8.0,
-"skin": Color( 0.420, 0.270, 0.190, 1 ),
-"smart": 8.5,
-"speed": 10.5
-}
-player8 = {
 "aggression": 5.0,
 "agility": 10.5,
 "curl": 11.5,
@@ -151,6 +138,19 @@ player8 = {
 "skin": Color( 0.960, 0.800, 0.690, 1 ),
 "smart": 10.0,
 "speed": 8.5
+}
+player8 = {
+"aggression": 6.5,
+"agility": 10.0,
+"curl": 8.5,
+"facehair": 0,
+"hair": Color( 0.050, 0.040, 0.030, 1 ),
+"hairtype": 2,
+"name": "Y Diomande",
+"shoot": 8.0,
+"skin": Color( 0.420, 0.270, 0.190, 1 ),
+"smart": 8.5,
+"speed": 10.5
 }
 player9 = {
 "aerial": 11.0,
