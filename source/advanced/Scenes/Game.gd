@@ -239,11 +239,9 @@ func initStadium():
 		if Global.ELEVEN_CUSTOM_PRESENTATION:
 			_useBowlStadium(gs)
 	elif Global.eightMode:
-		# 8v8 is played in a packed Bernabeu. In New UCL each match is at the home team's ground: the
-		# Bernabeu when Real Madrid are at home, a standard big stadium for everyone else.
-		if _inUCL() and Global.t1.teamname != "Real Madrid":
-			_useBowlStadium(gs, "away")
-		else:
+		# 8v8 is played in a packed Bernabeu. In New UCL only Real Madrid's home games are; every
+		# other match uses the game's default stadium.
+		if not _inUCL() or Global.t1.teamname == "Real Madrid":
 			_useBowlStadium(gs, "bernabeu")
 			atBernabeu = true
 	awayFans = gs.find_node("AwayFans")
