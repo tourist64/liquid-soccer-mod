@@ -446,6 +446,9 @@ func _on_Ball_body_entered(body):
 	# A deflection off anyone but the passer is a new ball: it can go out like any other.
 	if passGuard and body.get_collision_layer_bit(7) and body.get_parent() != shooter:
 		passGuard = false
+	# The woodwork rings whenever the ball hits it, not only on shots (passes, crosses, rebounds).
+	if body.get_collision_layer_bit(22) and state != bstate.SHOOTING and linear_velocity.length() > 2.0:
+		$PostSounds.play()
 	if (state == bstate.SHOOTING):
 		
 		
