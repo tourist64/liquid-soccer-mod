@@ -25,9 +25,9 @@ const RATINGS = {"Real Madrid": 93, "PSG": 92, "Arsenal": 91, "Bayern Munich": 9
 	"Slovan Bratislava": 67}
 
 # Simulated scorelines: each side's expected goals is BASE_GOALS scaled by the strength gap.
-# A 25-point gap (PSG v Slovan Bratislava) is about 3.5 v 0.5 goals; level clubs about 1.3 each.
+# A 25-point gap (Madrid v Slovan Bratislava) is about 4.5 v 0.3 goals; level clubs about 1.3 each.
 const BASE_GOALS = 1.3
-const GAP_FACTOR = 0.04
+const GAP_FACTOR = 0.06
 const HOME_EDGE = 1.5
 # In the knockouts, AI clubs rated this high (and any finalist) play with the sharpest AI (level 0).
 const SHARP_AI_RATING = 84
@@ -247,8 +247,8 @@ func _record(h, a, s):
 
 func _simScore(a, b, homeEdge):
 	var gap = ratings[a] - ratings[b] + (HOME_EDGE if homeEdge else 0.0)
-	return [_poisson(clamp(BASE_GOALS * exp(GAP_FACTOR * gap), 0.25, 4.0)),
-		_poisson(clamp(BASE_GOALS * exp(- GAP_FACTOR * gap), 0.25, 4.0))]
+	return [_poisson(clamp(BASE_GOALS * exp(GAP_FACTOR * gap), 0.25, 4.5)),
+		_poisson(clamp(BASE_GOALS * exp(- GAP_FACTOR * gap), 0.25, 4.5))]
 
 func _poisson(lam):
 	var l = exp(- lam)
