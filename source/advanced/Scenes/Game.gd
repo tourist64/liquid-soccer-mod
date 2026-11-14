@@ -179,7 +179,7 @@ const CROWD_OOH_COOLDOWN = 8.0
 # Crowd reactions (foul, big ooh, cross, applause) sit above the background murmur: each gets a
 # boost (dB on top of its scene volume), and while it plays the murmur and the agitated layer duck
 # by its duck amount, then come back at CROWD_DUCK_RECOVER dB per second.
-const CROWD_FOUL_DB = 12.0
+const CROWD_FOUL_DB = 4.0
 const CROWD_BIG_OOH_DB = 10.0
 const CROWD_CROSS_DB = 5.0
 const CROWD_APPLAUSE_DB = 3.0
