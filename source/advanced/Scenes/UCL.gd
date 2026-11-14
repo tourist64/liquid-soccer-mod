@@ -16,7 +16,7 @@ const MATCHDAYS = 8
 const ROUND_NAMES = ["Knockout play-off", "Round of 16", "Quarter-finals", "Semi-finals", "Final"]
 
 # Club strength (about 65-92) for simulated results; also orders the clubs.
-const RATINGS = {"PSG": 93, "Real Madrid": 92, "Arsenal": 91, "Bayern Munich": 91, "Barcelona": 90,
+const RATINGS = {"Real Madrid": 93, "PSG": 92, "Arsenal": 91, "Bayern Munich": 91, "Barcelona": 90,
 	"Man City": 89, "Liverpool": 89, "Inter": 87, "Atletico Madrid": 85, "Napoli": 84, "Dortmund": 83,
 	"Aston Villa": 83, "Man Utd": 82, "Roma": 81, "Porto": 80, "Sporting CP": 80, "Villarreal": 80,
 	"RB Leipzig": 80, "Fenerbahce": 80, "Galatasaray": 80, "Como": 79, "Stuttgart": 79, "Real Betis": 79,
@@ -347,33 +347,56 @@ func loadState():
 		return false
 	var d = parse_json(f.get_line())
 	f.close()
-	if typeof(d) != TYPE_DICTIONARY or str(d.get("files", [])) != str(files):
+	if typeof(d) != TYPE_DICTIONARY:
 		return false
-	tTeam = int(d.tTeam)
-	fixtures = _ints(d.fixtures)
+	# Saves store clubs by position in the rating order; if the ratings changed since, map the
+	# saved positions onto today's order (same clubs, different order).
+	var saved = d.get("files", [])
+	if saved.size() != files.size():
+		return false
+	var m = []
+	for fname in saved:
+		var k = files.find(fname)
+		if k == -1:
+			return false
+		m.append(k)
+	tTeam = _map(m, int(d.tTeam))
+	fixtures = []
+	for md in _ints(d.fixtures):
+		var day = []
+		for fx in md:
+			day.append([m[fx[0]], m[fx[1]]])
+		fixtures.append(day)
 	results = _ints(d.results)
 	matchday = int(d.matchday)
 	table = []
-	for row in d.table:
+	for _i in range(files.size()):
+		table.append({})
+	for i in range(d.table.size()):
 		var r = {}
-		for k in row:
-			r[k] = int(row[k])
-		table.append(r)
+		for k in d.table[i]:
+			r[k] = int(d.table[i][k])
+		table[m[i]] = r
 	koRound = int(d.koRound)
-	ties = _ints(d.ties)
+	ties = []
+	for tie in _ints(d.ties):
+		ties.append([m[tie[0]], m[tie[1]]])
 	koResults = []
 	for rnd in d.koResults:
 		var rr = []
 		for t in rnd:
-			rr.append({"a": int(t.a), "b": int(t.b), "s": _ints(t.s), "pens": bool(t.pens), "w": int(t.w)})
+			rr.append({"a": m[int(t.a)], "b": m[int(t.b)], "s": _ints(t.s), "pens": bool(t.pens), "w": _map(m, int(t.w))})
 		koResults.append(rr)
-	champion = int(d.champion)
+	champion = _map(m, int(d.champion))
 	playerOut = bool(d.playerOut)
 	knockoutStage = bool(d.knockoutStage)
 	koLeg = int(d.get("koLeg", 1))
 	firstLeg = _ints(d.get("firstLeg", []))
 	_syncLeg()
 	return true
+
+func _map(m, i):
+	return m[i] if i >= 0 and i < m.size() else i
 
 # JSON brings numbers back as floats; turn nested arrays of numbers back into ints.
 func _ints(v):
