@@ -87,6 +87,12 @@ func _ready():
 		evenSpread = true
 		tierWeights = [0.25, 0.29, 0.46]
 		paintText = true
+	elif style == "away":
+		# Other clubs' grounds in New UCL: the standard bowl (blue seats, normal roof, no screen or
+		# lettering) with a smaller crowd, about 11,000.
+		crowdScale = 1.6
+		evenSpread = true
+		tierWeights = [0.25, 0.29, 0.46]
 	for d in tiers:
 		d["a"] = [d["a"][0] * ratio, d["a"][1] * ratio, d["a"][2]]
 		d["b"] = [d["b"][0] * ratio, d["b"][1] * ratio, d["b"][2]]
