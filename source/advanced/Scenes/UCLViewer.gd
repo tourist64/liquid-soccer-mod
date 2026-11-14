@@ -241,7 +241,7 @@ func _nextBox(at, w):
 		_label(page, ucl.names[f[0]] + "  vs  " + ucl.names[f[1]], at + Vector2(14, 28), Vector2(w - 28 if w < 500 else 560, 30), fBig, WHITE)
 		var b = _button(page, "play match", at + Vector2(14, 66) if w < 500 else Vector2(210, 512), Vector2(220 if w < 500 else 190, 52), "_play", [], fBig)
 		# Skip a match: simulated from the clubs' real strength like every other result.
-		_button(page, "simulate", at + Vector2(244, 66) if w < 500 else Vector2(410, 512), Vector2(154 if w < 500 else 190, 52), "_simRound", [], fMed)
+		_button(page, "simulate", at + Vector2(244, 66) if w < 500 else Vector2(410, 512), Vector2(154 if w < 500 else 190, 52), "_simMatch", [], fMed)
 		b.grab_focus()
 		return
 	if ucl.playerOut:
@@ -325,6 +325,10 @@ func _bigGame(td):
 
 func _simRound():
 	ucl.simulateRound()
+	_show()
+
+func _simMatch():
+	ucl.simulateMatch()
 	_show()
 
 func _simEnd():

@@ -324,6 +324,18 @@ func simulateRound():
 	_advance(null)
 	saveState()
 
+# The player's own "simulate" button: in a two-legged tie only the next leg is simulated, so
+# either leg can still be played by hand. Everything else plays out with the round as before.
+func simulateMatch():
+	var f = nextMatch()
+	if f.size() == 2 and _twoLegged() and koLeg == 1:
+		firstLeg = _simScore(f[0], f[1], true)
+		koLeg = 2
+		_syncLeg()
+		saveState()
+		return
+	simulateRound()
+
 # After the player is knocked out: play everything out to the final.
 func simulateToEnd():
 	while champion == -1:
