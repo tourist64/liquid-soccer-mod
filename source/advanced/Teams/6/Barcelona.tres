@@ -40,16 +40,16 @@ player0 = {
 }
 player1 = {
 "aggression": 7.5,
-"agility": 8.0,
-"curl": 8.0,
+"agility": 7.5,
+"curl": 7.0,
 "facehair": 0,
 "hair": Color( 0.120, 0.080, 0.050, 1 ),
 "hairtype": 1,
 "name": "G Martin",
-"shoot": 5.0,
+"shoot": 4.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 8.5,
-"speed": 8.5
+"smart": 7.5,
+"speed": 8.0
 }
 player2 = {
 "aggression": 8.5,
