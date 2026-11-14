@@ -31,6 +31,8 @@ const GAP_FACTOR = 0.04
 const HOME_EDGE = 1.5
 # In the knockouts, AI clubs rated this high (and any finalist) play with the sharpest AI (level 0).
 const SHARP_AI_RATING = 84
+# Big-game players: in the quarter-finals and later they step up (rating -> new value, capped at 10).
+const BIG_GAME_PLAYERS = {"F Valverde": {"speed": 1.0, "aggression": 1.5, "agility": 1.0, "curl": 1.0, "smart": 0.5, "shoot": 1.0}}
 
 # The real 2026/27 league-phase draw: 8 matchdays of [home, away].
 const REAL_FIXTURES = [

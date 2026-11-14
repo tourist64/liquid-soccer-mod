@@ -278,6 +278,10 @@ func _play():
 			else:
 				Global.t2 = Global.t2.duplicate()
 				Global.t2.level = 0.0
+	# Quarter-finals and later: big-game players step up (this match's copy of the team only).
+	if ucl.knockoutStage and ucl.koRound >= 2:
+		Global.t1 = _bigGame(Global.t1)
+		Global.t2 = _bigGame(Global.t2)
 	Global.toLoad = 1
 	Global.stadium = 3 - int(Global.t1.level)
 	trans._wipeOff()
@@ -292,6 +296,22 @@ func _save():
 	ucl.saveState()
 	if saveBtn and is_instance_valid(saveBtn):
 		saveBtn.text = "saved!"
+
+func _bigGame(td):
+	var copy = null
+	for i in range(12):
+		var key = "player" + str(i)
+		var pp = td.get(key)
+		if typeof(pp) != TYPE_DICTIONARY or not UCL.BIG_GAME_PLAYERS.has(pp.get("name", "")):
+			continue
+		if copy == null:
+			copy = td.duplicate()
+		var boosted = pp.duplicate()
+		var plus = UCL.BIG_GAME_PLAYERS[pp["name"]]
+		for k in plus:
+			boosted[k] = min(float(boosted.get(k, 5.0)) + plus[k], 10.0)
+		copy.set(key, boosted)
+	return copy if copy != null else td
 
 func _simRound():
 	ucl.simulateRound()
