@@ -1701,11 +1701,17 @@ func _updateRemontada():
 	team1._setRemontada(_isRealMadrid(team1.tdata) and score.x < score.y and left < 0.2)
 	team2._setRemontada(_isRealMadrid(team2.tdata) and score.y < score.x and left < 0.2)
 	# Diomande's defensive spot follows Madrid's score (see Team._setOutlet).
+	# The late lockdown only applies while the opponent has the ball; loose balls and Madrid's own
+	# possession are for sprinting forward on the counter.
 	var lastMinute = half == 1 and gametimer.time_left < 120.0
+	var carrier = _ballCarrier()
+	var onBall = null
+	if carrier != null and is_instance_valid(carrier) and ball.state == ball.bstate.TRAPPED:
+		onBall = carrier.get("myTeam")
 	if _isRealMadrid(team1.tdata):
-		team1._setOutlet(int(score.x - score.y), lastMinute)
+		team1._setOutlet(int(score.x - score.y), lastMinute and onBall == team2)
 	if _isRealMadrid(team2.tdata):
-		team2._setOutlet(int(score.y - score.x), lastMinute)
+		team2._setOutlet(int(score.y - score.x), lastMinute and onBall == team1)
 
 func _isRealMadrid(td):
 	if td == null:

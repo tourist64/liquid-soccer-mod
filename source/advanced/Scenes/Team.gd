@@ -2098,7 +2098,7 @@ const LOCKDOWN_WINGERS = ["Vini Jr", "K Mbappe", "Y Diomande", "Rodrygo"]
 const LOCKDOWN_DEF_DEPTH = 0.74
 const LOCKDOWN_MID_DEPTH = 0.6
 
-# margin: this team's goals minus the opponent's; lastMinute: under a minute left in the match.
+# margin: this team's goals minus the opponent's; lastMinute: the last two minutes with the opponent on the ball.
 func _setOutlet(margin, lastMinute = false):
 	if tdata == null or formation.size() < 2 * Global.squad:
 		return
