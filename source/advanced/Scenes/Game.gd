@@ -118,6 +118,8 @@ const ANTHEM_BUS = "Anthem"
 const ANTHEM_BUS_GAIN_DB = 6.0
 const ANTHEM_CROWD_DUCK_DB = -8.0
 const ANTHEM_CROWD_RESTORE = 1.5
+# The stadium sings along: the crowd loop is lifted over its usual murmur while the anthem plays.
+const ANTHEM_CHANT_DB = 6.0
 const ANTHEM_FADE_IN = 0.4
 const ANTHEM_FADE_OUT = 1.0
 const ANTHEM_SKIP_FADE = 0.5
@@ -1649,6 +1651,8 @@ func _updateCrowdTension(delta):
 		# Play has stopped (foul, goal, restart): the murmur settles instead of holding its peak.
 		if crowd.playing:
 			crowd.volume_db = _crowdBoost(CROWD_AMBIENCE_DB) + CROWD_DANGER_DB * sqrt(crowdExcitement) + crowdDuck
+			if anthemPlaying:
+				crowd.volume_db = max(crowd.volume_db, _crowdBoost(CROWD_AMBIENCE_DB) + ANTHEM_CHANT_DB)
 		_fadeCrowdTension(delta)
 		return
 	var gx = abs($VPC / VP / GameGroup / Goal.translation.x)
@@ -1794,7 +1798,6 @@ func _startAnthem():
 	Global._musicOff()
 	anthemSound.play()
 	anthemFade.start()
-	_duckCrowdForAnthem()
 	_showSkipAnthem()
 	return true
 
