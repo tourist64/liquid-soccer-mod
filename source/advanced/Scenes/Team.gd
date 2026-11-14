@@ -2093,7 +2093,7 @@ func _shapeToPitch(v):
 		return Vector2(range_lerp(v.y, 0, 1, 150 * Global.ps, - 150 * Global.ps), range_lerp(v.x, 0, 1, - 100 * Global.ps, 100 * Global.ps))
 	return Vector2(range_lerp(v.y, 0, 1, - 150 * Global.ps, 150 * Global.ps), range_lerp(v.x, 0, 1, 100 * Global.ps, - 100 * Global.ps))
 
-# Last two minutes and leading by 1 or 2: every winger (Mbappe included) drops to 74% depth to see it out.
+# Last two minutes and winning by any margin: every winger (Mbappe included) drops to 74% depth to see it out.
 const LOCKDOWN_WINGERS = ["Vini Jr", "K Mbappe", "Y Diomande", "Rodrygo"]
 const LOCKDOWN_DEF_DEPTH = 0.74
 const LOCKDOWN_MID_DEPTH = 0.6
@@ -2102,7 +2102,7 @@ const LOCKDOWN_MID_DEPTH = 0.6
 func _setOutlet(margin, lastMinute = false):
 	if tdata == null or formation.size() < 2 * Global.squad:
 		return
-	var lockdown = lastMinute and margin >= 1 and margin <= 2
+	var lockdown = lastMinute and margin >= 1
 	for pid in range(1, Global.squad):
 		var pp = tdata.get("player" + str(pid))
 		if typeof(pp) != TYPE_DICTIONARY:
