@@ -269,6 +269,8 @@ func initStadium():
 	penTarget = $VPC / VP / GameGroup / Goal / Target
 	
 	$VPC / VP / GameGroup / Stadium._setShadows()
+	if atBernabeu:
+		_nightLight()
 	
 
 func _ready():
@@ -1572,19 +1574,32 @@ func goalScored():
 	$Timers / Timer.start()
 
 # Louder goal roar and a stadium reverb on the whole crowd, with a limiter so nothing clips.
-
-# Night match in the Bernabeu: only the sky goes dark. The pitch, players and lighting stay as in a
-# day match: the sky used to provide the fill light, so a matching sky-blue fill replaces it.
+# Night match in the Bernabeu: dark sky, cool floodlight from high above, a soft glow on the lights.
 const NIGHT_SKY = Color(0.015, 0.022, 0.055)
 func _nightEnv(env):
 	var e = env.duplicate()
 	e.background_mode = Environment.BG_COLOR
 	e.background_color = NIGHT_SKY
-	e.ambient_light_color = Color(0.55, 0.74, 0.88)
+	e.ambient_light_color = Color(0.45, 0.5, 0.66)
+	e.ambient_light_energy = 0.55
 	e.ambient_light_sky_contribution = 0.0
 	e.fog_color = Color(0.03, 0.05, 0.1)
 	e.fog_sun_amount = 0.0
+	e.glow_enabled = true
+	e.glow_intensity = 0.6
+	e.glow_strength = 0.9
+	e.glow_bloom = 0.0
+	e.glow_hdr_threshold = 0.92
 	return e
+
+func _nightLight():
+	var light = $VPC / VP / GameGroup / Stadium.get_node_or_null("DirectionalLight")
+	if light == null:
+		return
+	light.light_color = Color(0.93, 0.96, 1.0)
+	light.light_energy = 1.6
+	# Floodlights from high above (slightly towards the main stand) instead of a low afternoon sun.
+	light.global_transform = Transform(Basis(), Vector3(40.0, 300.0, 90.0)).looking_at(Vector3.ZERO, Vector3.UP)
 
 func _setupAtmosphere():
 	$Sounds / GoalSounds.volume_db = _crowdBoost(GOAL_ROAR_DB)

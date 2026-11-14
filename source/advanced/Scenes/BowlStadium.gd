@@ -63,10 +63,11 @@ const FONT = {
 	"I": ["#####", "..#..", "..#..", "..#..", "..#..", "..#..", "#####"],
 	" ": [".....", ".....", ".....", ".....", ".....", ".....", "....."]}
 var paintText = false
-# Night match: floodlight banks line the roof edge (the stands keep their normal colours).
+# Night match: the stands (unshaded) are dimmed, floodlight banks line the roof edge and the screen glows.
 var night = false
 var lit = false
-const FLOOD = Color(0.92, 0.96, 1.0)
+const NIGHT_SHADE = 0.6
+const FLOOD = Color(1.0, 0.98, 0.9)
 const FLOOD_GAP = Color(0.18, 0.19, 0.22)
 var tifoBg = TIFO_BG
 # Per fan from the last seats() call: 0 = ordinary, 1 = tifo background (navy), 2 = on a letter.
@@ -163,6 +164,8 @@ func _band(p, q, col, nearAllowed):
 		_tri(Vector3(a0.x, p[2], a0.y), Vector3(b1.x, q[2], b1.y), Vector3(b0.x, q[2], b0.y), c)
 
 func _tri(a, b, c, col):
+	if night and not lit:
+		col = Color(col.r * NIGHT_SHADE, col.g * NIGHT_SHADE, col.b * NIGHT_SHADE * 1.05, 1.0)
 	for v in [a, b, c]:
 		st.add_color(col)
 		st.add_vertex(v)
