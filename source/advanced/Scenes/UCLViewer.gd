@@ -227,6 +227,10 @@ func _nextBox(at, w):
 	if f.size() == 2:
 		var label = ("Matchday " + str(ucl.matchday + 1)) if not ucl.knockoutStage else UCL.ROUND_NAMES[ucl.koRound]
 		label += "  -  " + ("home" if f[0] == ucl.tTeam else "away")
+		if ucl._twoLegged():
+			label += "  -  " + ("1st leg" if ucl.koLeg == 1 else "2nd leg")
+			if ucl.koLeg == 2 and ucl.firstLeg.size() == 2:
+				label += " (1st leg " + ucl.names[f[1]] + " " + str(ucl.firstLeg[0]) + "-" + str(ucl.firstLeg[1]) + " " + ucl.names[f[0]] + ")"
 		_label(page, label, at + Vector2(14, 6), Vector2(w - 28, 22), fMed, DIM)
 		_label(page, ucl.names[f[0]] + "  vs  " + ucl.names[f[1]], at + Vector2(14, 28), Vector2(w - 28 if w < 500 else 560, 30), fBig, WHITE)
 		var b = _button(page, "play match", at + Vector2(14, 66) if w < 500 else Vector2(210, 512), Vector2(220 if w < 500 else 190, 52), "_play", [], fBig)

@@ -66,6 +66,10 @@ var koRound = 0
 var ties = []          # current knockout round: Array of [a, b]
 var koResults = []     # [round] -> Array of {"a", "b", "s": [a goals, b goals], "pens", "w"}
 var champion = -1
+# Two-legged ties (all knockout rounds except the final): the lower seed hosts the first leg.
+# koLeg is the player's next leg (1 or 2); firstLeg is that tie's first-leg score [home, away].
+var koLeg = 1
+var firstLeg = []
 var playerOut = false
 
 func _init():
@@ -134,8 +138,18 @@ func nextMatch():
 		return []
 	for t in ties:
 		if t[0] == tTeam or t[1] == tTeam:
+			if _twoLegged() and koLeg == 1:
+				return [t[1], t[0]]
 			return t
 	return []
+
+func _twoLegged():
+	return knockoutStage and koRound < 4
+
+# Read by Game.gd: 1 = first leg (no shootout), 2 = second leg (aggregate + shootout), 0 = single.
+func _syncLeg():
+	leg = (1 if koLeg == 1 else 2) if _twoLegged() else 0
+	aggscore = Vector2(firstLeg[0], firstLeg[1]) if (leg == 2 and firstLeg.size() == 2) else Vector2.ZERO
 
 func isFinal():
 	return knockoutStage and koRound == 4
@@ -145,15 +159,24 @@ func stageName():
 		return "Champions: " + names[champion]
 	if not knockoutStage:
 		return "League phase - Matchday " + str(matchday + 1) + " of " + str(MATCHDAYS)
+	if _twoLegged() and nextMatch().size() == 2:
+		return ROUND_NAMES[koRound] + (" - 1st leg" if koLeg == 1 else " - 2nd leg")
 	return ROUND_NAMES[koRound]
 
 # --- Results --------------------------------------------------------------------------------
 
 # Called by Hud.gd after the player's match: score.x is the home side (team1), score.y the away.
+# Second legs arrive as the aggregate (Game.gd adds the first leg and any shootout), seen from
+# the second leg's home side, which is the tie's first club.
 func _gamePlayed(score):
 	var f = nextMatch()
 	if f.size() == 2:
-		_advance([int(score.x), int(score.y)])
+		if _twoLegged() and koLeg == 1:
+			firstLeg = [int(score.x), int(score.y)]
+			koLeg = 2
+		else:
+			_advance([int(score.x), int(score.y)])
+	_syncLeg()
 	saveState()
 
 # Plays out the rest of the current matchday or round around the player's result.
@@ -175,12 +198,19 @@ func _advance(playerScore):
 		var s
 		var pens = false
 		var w
-		if playerScore != null and (t[0] == tTeam or t[1] == tTeam):
+		var mine = t[0] == tTeam or t[1] == tTeam
+		if playerScore != null and mine:
 			s = playerScore
 			# Game.gd adds the shootout to the score, so a level score here can't happen; just in case:
 			w = t[0] if s[0] >= s[1] else t[1]
 		else:
-			s = _simScore(t[0], t[1], false)
+			if _twoLegged():
+				# Aggregate over both legs: first at the lower seed's ground (t[1]), then at t[0].
+				var l1 = firstLeg if (mine and koLeg == 2 and firstLeg.size() == 2) else _simScore(t[1], t[0], true)
+				var l2 = _simScore(t[0], t[1], true)
+				s = [l1[1] + l2[0], l1[0] + l2[1]]
+			else:
+				s = _simScore(t[0], t[1], false)
 			if s[0] == s[1]:
 				pens = true
 				w = t[0] if randf() < _penEdge(t[0], t[1]) else t[1]
@@ -191,7 +221,10 @@ func _advance(playerScore):
 		rnd.append({"a": t[0], "b": t[1], "s": s, "pens": pens, "w": w})
 		winners.append(w)
 	koResults.append(rnd)
+	koLeg = 1
+	firstLeg = []
 	_nextRound(winners)
+	_syncLeg()
 
 func _record(h, a, s):
 	for side in [[h, s[0], s[1]], [a, s[1], s[0]]]:
@@ -259,6 +292,9 @@ func _startKnockouts():
 	for k in range(8):
 		ties.append([st[8 + k], st[23 - k]])
 	koResults = []
+	koLeg = 1
+	firstLeg = []
+	_syncLeg()
 
 func _nextRound(winners):
 	koRound += 1
@@ -298,7 +334,8 @@ func saveState():
 		return
 	f.store_line(to_json({"files": files, "tTeam": tTeam, "fixtures": fixtures, "results": results,
 		"matchday": matchday, "table": table, "koRound": koRound, "ties": ties, "koResults": koResults,
-		"champion": champion, "playerOut": playerOut, "knockoutStage": knockoutStage}))
+		"champion": champion, "playerOut": playerOut, "knockoutStage": knockoutStage,
+		"koLeg": koLeg, "firstLeg": firstLeg}))
 	f.close()
 
 static func hasSave(n = 1):
@@ -333,6 +370,9 @@ func loadState():
 	champion = int(d.champion)
 	playerOut = bool(d.playerOut)
 	knockoutStage = bool(d.knockoutStage)
+	koLeg = int(d.get("koLeg", 1))
+	firstLeg = _ints(d.get("firstLeg", []))
+	_syncLeg()
 	return true
 
 # JSON brings numbers back as floats; turn nested arrays of numbers back into ints.
