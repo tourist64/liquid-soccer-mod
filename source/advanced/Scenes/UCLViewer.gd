@@ -202,6 +202,9 @@ func _tieBox(at, w, rnd, k):
 	elif rnd == ucl.koRound and k < ucl.ties.size():
 		a = ucl.ties[k][0]
 		b = ucl.ties[k][1]
+		# Your tie between the legs: show the first-leg score so far.
+		if (a == ucl.tTeam or b == ucl.tTeam) and ucl.koLeg == 2 and ucl.firstLeg.size() == 2:
+			s = [ucl.firstLeg[1], ucl.firstLeg[0]]
 	var rows = [[a, 0], [b, 1]]
 	for row in rows:
 		var team = row[0]
@@ -239,6 +242,9 @@ func _nextBox(at, w):
 				label += " (1st leg " + ucl.names[f[1]] + " " + str(ucl.firstLeg[0]) + "-" + str(ucl.firstLeg[1]) + " " + ucl.names[f[0]] + ")"
 		_label(page, label, at + Vector2(14, 6), Vector2(w - 28, 22), fMed, DIM)
 		_label(page, ucl.names[f[0]] + "  vs  " + ucl.names[f[1]], at + Vector2(14, 28), Vector2(w - 28 if w < 500 else 560, 30), fBig, WHITE)
+		# Between the legs: the first-leg result in big gold text next to the fixture.
+		if ucl._twoLegged() and ucl.koLeg == 2 and ucl.firstLeg.size() == 2 and w >= 500:
+			_label(page, "1st leg: " + ucl.names[f[1]] + " " + str(ucl.firstLeg[0]) + "-" + str(ucl.firstLeg[1]) + " " + ucl.names[f[0]], at + Vector2(580, 28), Vector2(w - 594, 30), fMed, GOLD, Label.ALIGN_RIGHT)
 		var b = _button(page, "play match", at + Vector2(14, 66) if w < 500 else Vector2(210, 512), Vector2(220 if w < 500 else 190, 52), "_play", [], fBig)
 		# Skip a match: simulated from the clubs' real strength like every other result.
 		_button(page, "simulate", at + Vector2(244, 66) if w < 500 else Vector2(410, 512), Vector2(154 if w < 500 else 190, 52), "_simMatch", [], fMed)
