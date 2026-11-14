@@ -2739,7 +2739,108 @@ func doWinner():
 	
 	$VPC / VP / Cups.visible = true
 	wteam._winners()
+	_trophyCelebration(wteam)
 	
+# Trophy lift: the cup rises out of the pitch with a little overshoot, then spins and bobs;
+# confetti in gold, white and the winners' colours, fireworks behind it, a slow camera push-in
+# and a big roar.
+const TROPHY_LIFT_TIME = 1.6
+const FIREWORK_COLORS = [Color(1.0, 0.85, 0.3), Color(1.0, 1.0, 1.0), Color(0.55, 0.35, 1.0), Color(0.3, 0.8, 1.0)]
+func _trophyCelebration(wteam):
+	var cup = $VPC / VP / Cups
+	var tw = Tween.new()
+	add_child(tw)
+	var base = cup.translation
+	var size = cup.scale
+	cup.translation = base - Vector3(0, 6, 0)
+	cup.scale = size * 0.15
+	tw.interpolate_property(cup, "translation", cup.translation, base + Vector3(0, 1.5, 0), TROPHY_LIFT_TIME, Tween.TRANS_BACK, Tween.EASE_OUT)
+	tw.interpolate_property(cup, "scale", cup.scale, size, TROPHY_LIFT_TIME, Tween.TRANS_BACK, Tween.EASE_OUT)
+	var cam = $VPC / VP / GameGroup / AltCameras / WinnerCamera
+	tw.interpolate_property(cam, "fov", cam.fov, cam.fov - 14.0, 7.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
+	tw.start()
+	$Sounds / GoalSounds.play()
+	$Sounds / CrowdApplause.play()
+	var shirt = Global.t1.Shirt1Color if wteam == team1 else Global.t2.Shirt1Color
+	var vp = $VPC / VP
+	for c in [Color(1.0, 0.82, 0.25), Color(1.0, 1.0, 1.0), shirt]:
+		vp.add_child(_confetti(base + Vector3(0, 22, 0), c))
+	_spinTrophy(cup, base + Vector3(0, 1.5, 0))
+	for i in range(6):
+		yield(get_tree().create_timer(0.9 + i * 0.75), "timeout")
+		if not is_inside_tree():
+			return
+		var at = base + Vector3(rand_range(-35, 35), rand_range(14, 24), rand_range(-70, -45))
+		vp.add_child(_firework(at, FIREWORK_COLORS[i % FIREWORK_COLORS.size()] if i % 3 else shirt))
+
+func _spinTrophy(cup, top):
+	yield(get_tree().create_timer(TROPHY_LIFT_TIME), "timeout")
+	var t = 0.0
+	# Spin the cup model itself (its own centre), not the holder, so it stays in place.
+	var model = cup.get_node_or_null("Cups")
+	while is_inside_tree() and cup.visible:
+		var dt = get_process_delta_time()
+		t += dt
+		(model if model else cup).rotate_y(dt * 0.9)
+		cup.translation = top + Vector3(0, sin(t * 2.2) * 0.35, 0)
+		yield(get_tree(), "idle_frame")
+
+func _particleMaterial():
+	var m = SpatialMaterial.new()
+	m.flags_unshaded = true
+	m.vertex_color_use_as_albedo = true
+	m.params_cull_mode = SpatialMaterial.CULL_DISABLED
+	m.flags_transparent = true
+	return m
+
+func _confetti(at, col):
+	var p = CPUParticles.new()
+	p.translation = at
+	var q = QuadMesh.new()
+	q.size = Vector2(0.45, 0.25)
+	q.material = _particleMaterial()
+	p.mesh = q
+	p.amount = 220
+	p.lifetime = 7.0
+	p.preprocess = 1.5
+	p.emission_shape = CPUParticles.EMISSION_SHAPE_BOX
+	p.emission_box_extents = Vector3(34, 1, 26)
+	p.direction = Vector3(0, -1, 0)
+	p.spread = 25.0
+	p.gravity = Vector3(0, -2.2, 0)
+	p.initial_velocity = 2.0
+	p.initial_velocity_random = 0.6
+	p.angular_velocity = 260.0
+	p.angular_velocity_random = 1.0
+	p.angle_random = 1.0
+	p.color = col
+	p.emitting = true
+	return p
+
+func _firework(at, col):
+	var p = CPUParticles.new()
+	p.translation = at
+	var q = QuadMesh.new()
+	q.size = Vector2(0.9, 0.9)
+	q.material = _particleMaterial()
+	p.mesh = q
+	p.amount = 90
+	p.lifetime = 1.8
+	p.one_shot = true
+	p.explosiveness = 1.0
+	p.direction = Vector3(0, 1, 0)
+	p.spread = 180.0
+	p.initial_velocity = 16.0
+	p.initial_velocity_random = 0.3
+	p.gravity = Vector3(0, -4.0, 0)
+	p.damping = 3.0
+	var ramp = Gradient.new()
+	ramp.set_color(0, col)
+	ramp.set_color(1, Color(col.r, col.g, col.b, 0.0))
+	p.color_ramp = ramp
+	p.emitting = true
+	return p
+
 func doLap():
 	
 	var wteam = team1
