@@ -176,6 +176,20 @@ const CROWD_TENSION_PITCH = 1.12
 const CROWD_BOX_DEPTH = 0.31
 const CROWD_BOX_HALF_WIDTH = 53.0
 const CROWD_OOH_COOLDOWN = 8.0
+# Crowd reactions (foul, big ooh, cross, applause) sit above the background murmur: each gets a
+# boost (dB on top of its scene volume), and while it plays the murmur and the agitated layer duck
+# by its duck amount, then come back at CROWD_DUCK_RECOVER dB per second.
+const CROWD_FOUL_DB = 12.0
+const CROWD_BIG_OOH_DB = 10.0
+const CROWD_CROSS_DB = 5.0
+const CROWD_APPLAUSE_DB = 3.0
+const CROWD_REACT_DUCK_DB = -10.0
+const CROWD_CROSS_DUCK_DB = -5.0
+const CROWD_APPLAUSE_DUCK_DB = -4.0
+const CROWD_DUCK_HOLD_MAX = 2.5
+const CROWD_DUCK_RECOVER = 5.0
+var crowdDuck = 0.0
+var crowdDuckHold = 0.0
 func initTeams():
 	team1 = $VPC / VP / GameGroup / Team
 	team1.opponent = $VPC / VP / GameGroup / Team2
@@ -1597,7 +1611,10 @@ func goalScored():
 func _setupAtmosphere():
 	$Sounds / GoalSounds.volume_db = _crowdBoost(GOAL_ROAR_DB)
 	$Sounds / CrowdExcited.volume_db = _crowdBoost($Sounds / CrowdExcited.volume_db + 4.0)
-	$Sounds / CrowdApplause.volume_db = _crowdBoost($Sounds / CrowdApplause.volume_db + 4.0)
+	$Sounds / CrowdApplause.volume_db = _crowdBoost($Sounds / CrowdApplause.volume_db + 4.0 + CROWD_APPLAUSE_DB)
+	$Sounds / CrowdFoul.volume_db = _crowdBoost($Sounds / CrowdFoul.volume_db + CROWD_FOUL_DB)
+	$Sounds / CrowdBigOOH.volume_db = _crowdBoost($Sounds / CrowdBigOOH.volume_db + CROWD_BIG_OOH_DB)
+	$Sounds / CrowdCross.volume_db = _crowdBoost($Sounds / CrowdCross.volume_db + CROWD_CROSS_DB)
 	var idx = AudioServer.get_bus_index("Crowd")
 	if idx == -1 or AudioServer.get_bus_effect_count(idx) > 0:
 		return
@@ -1620,11 +1637,18 @@ func _setupAtmosphere():
 # set the crowd level themselves.
 func _updateCrowdTension(delta):
 	crowdOohWait = max(crowdOohWait - delta, 0.0)
+	if crowdDuckHold > 0.0:
+		crowdDuckHold = max(crowdDuckHold - delta, 0.0)
+	else:
+		crowdDuck = min(crowdDuck + CROWD_DUCK_RECOVER * delta, 0.0)
 	var crowd = $Sounds / CrowdSounds
 	var moment = _crowdMoment()
 	if (state != gameState.GAMEON and moment == 0.0) or not crowd.playing:
 		crowdExcitement = max(crowdExcitement - CROWD_BUILD_DOWN * delta, 0.0)
 		crowdPressure = 0.0
+		# Play has stopped (foul, goal, restart): the murmur settles instead of holding its peak.
+		if crowd.playing:
+			crowd.volume_db = _crowdBoost(CROWD_AMBIENCE_DB) + CROWD_DANGER_DB * sqrt(crowdExcitement) + crowdDuck
 		_fadeCrowdTension(delta)
 		return
 	var gx = abs($VPC / VP / GameGroup / Goal.translation.x)
@@ -1645,7 +1669,7 @@ func _updateCrowdTension(delta):
 	var step = (up if target > crowdExcitement else CROWD_BUILD_DOWN) * delta
 	crowdExcitement += clamp(target - crowdExcitement, - step, step)
 	var level = sqrt(crowdExcitement)
-	crowd.volume_db = _crowdBoost(CROWD_AMBIENCE_DB) + CROWD_DANGER_DB * level
+	crowd.volume_db = _crowdBoost(CROWD_AMBIENCE_DB) + CROWD_DANGER_DB * level + crowdDuck
 	if crowdTension == null:
 		crowdTension = AudioStreamPlayer.new()
 		crowdTension.stream = crowd.stream
@@ -1655,10 +1679,10 @@ func _updateCrowdTension(delta):
 		$Sounds.add_child(crowdTension)
 	if not crowdTension.playing:
 		crowdTension.play(8.0)
-	crowdTension.volume_db = lerp(-40.0, _crowdBoost(CROWD_TENSION_DB), level) if crowdExcitement > 0.02 else -60.0
+	crowdTension.volume_db = lerp(-40.0, _crowdBoost(CROWD_TENSION_DB), level) + crowdDuck if crowdExcitement > 0.02 else -60.0
 	if state == gameState.GAMEON and toGoal < CROWD_BOX_DEPTH and abs(Global.ballpos.z) < CROWD_BOX_HALF_WIDTH and crowdOohWait <= 0.0:
 		crowdOohWait = CROWD_OOH_COOLDOWN
-		$Sounds / CrowdCross.play()
+		_crowdReact($Sounds / CrowdCross, CROWD_CROSS_DUCK_DB)
 
 # Who is on the ball: whoever holds it, otherwise whoever touched it last (a ball knocked ahead on a run).
 func _ballCarrier():
@@ -2072,7 +2096,7 @@ func setControls( var t):
 
 func _foul( var _position, var victim, var offender):
 	$Sounds / WhistleSounds.play()
-	$Sounds / CrowdFoul.playing = true
+	_crowdReact($Sounds / CrowdFoul, CROWD_REACT_DUCK_DB)
 	mainCam.shake = 10
 	gametimer.paused = true
 	
@@ -2108,7 +2132,7 @@ func _offsideCall( var victim):
 
 func _penalty( var offender, var fteam):
 	$Sounds / WhistleSounds.play()
-	$Sounds / CrowdFoul.playing = true
+	_crowdReact($Sounds / CrowdFoul, CROWD_REACT_DUCK_DB)
 	hud._penalty()
 	$VPC / VP / GameGroup / Stadium._celebrate()
 	gametimer.paused = true
@@ -2439,16 +2463,25 @@ func _hitP():
 	team2._rebound()
 	
 func _catch():
-	$Sounds / CrowdBigOOH.playing = true
+	_crowdReact($Sounds / CrowdBigOOH, CROWD_REACT_DUCK_DB)
 	_applause()
 func _crowdooh():
-	$Sounds / CrowdBigOOH.playing = true
+	_crowdReact($Sounds / CrowdBigOOH, CROWD_REACT_DUCK_DB)
 	_applause()
 func _cross():
-	$Sounds / CrowdCross.playing = true
+	_crowdReact($Sounds / CrowdCross, CROWD_CROSS_DUCK_DB)
 func _applause():
-	$Sounds / CrowdApplause.playing = true
+	_crowdReact($Sounds / CrowdApplause, CROWD_APPLAUSE_DUCK_DB)
 	$VPC / VP / GameGroup / Stadium._applause()
+# Plays a crowd reaction and ducks the background murmur under it (the deepest duck wins).
+func _crowdReact(snd, duckDb):
+	snd.play()
+	if duckDb < crowdDuck:
+		crowdDuck = duckDb
+	var hold = CROWD_DUCK_HOLD_MAX
+	if snd.stream != null:
+		hold = min(snd.stream.get_length(), CROWD_DUCK_HOLD_MAX)
+	crowdDuckHold = max(crowdDuckHold, hold)
 func setupWeather():
 
 	$ViewportContainer / Viewport.set_update_mode(Viewport.UPDATE_ONCE)
