@@ -101,7 +101,7 @@ var mp_snapshot_elapsed = 0.0
 var mp_last_snapshot_version = 0
 var mp_last_presented_state = -1
 var madridGoalSound = null
-# New UCL: the anthem (0:25-1:05 of the original, cut into ucl_anthem.mp3) plays while the teams
+# New UCL: the anthem (0:25-1:10 of the original, cut into ucl_anthem.mp3) plays while the teams
 # line up before kickoff; the Skip Anthem button in the top-right corner goes straight to the game.
 signal anthem_finished
 var anthemSound = null
@@ -110,7 +110,7 @@ var anthemLayer = null
 var anthemPlaying = false
 const ANTHEM_VOLUME_DB = 0.0
 const ANTHEM_FADE_IN = 0.4
-const ANTHEM_FADE_OUT = 2.5
+const ANTHEM_FADE_OUT = 1.0
 const ANTHEM_SKIP_FADE = 0.5
 # True when this match is in the Bernabeu; the Madrid goal track only plays there.
 var atBernabeu = false
@@ -1751,7 +1751,7 @@ func _startAnthem():
 	var _a = anthemSound.connect("finished", self, "_endAnthem")
 	anthemFade = Tween.new()
 	$Sounds.add_child(anthemFade)
-	# Fade in over the cut at 0:25 and out ahead of the cut at 1:05.
+	# Fade in over the cut at 0:25; the final chorus ends at 1:10, so only a short fade there.
 	var length = stream.get_length()
 	anthemFade.interpolate_property(anthemSound, "volume_db", -40.0, ANTHEM_VOLUME_DB, ANTHEM_FADE_IN)
 	anthemFade.interpolate_property(anthemSound, "volume_db", ANTHEM_VOLUME_DB, -40.0, ANTHEM_FADE_OUT,
