@@ -261,8 +261,6 @@ func initStadium():
 	var ce = load(camenv)
 	if atBernabeu:
 		ce = _nightEnv(ce)
-	# Real shadows replace the old position blobs under the players.
-	$VPC / VP / GameGroup / Blobs.visible = false
 	$VPC / VP / GameGroup / WorldEnvironment.set_environment(ce)
 	$VPC / VP / GameGroup / AltCameras / WinnerCamera.set_environment(ce)
 	worldEnv = ce
