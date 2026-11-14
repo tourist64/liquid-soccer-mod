@@ -113,7 +113,8 @@ var carded = 0
 var hardFoul = false
 
 func _isHardTackle(victim):
-	var fast = velocity.length() > pSpeed * 1.05
+	# The sprint rule only applies to the computer's team; from behind applies to everyone.
+	var fast = myTeam.AIteam and velocity.length() > pSpeed * 1.05
 	var behind = false
 	var run = victim.velocity
 	run.y = 0.0
