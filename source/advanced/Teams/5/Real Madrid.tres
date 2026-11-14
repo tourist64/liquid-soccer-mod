@@ -134,19 +134,6 @@ player6 = {
 "speed": 11.0
 }
 player7 = {
-"aggression": 5.0,
-"agility": 10.5,
-"curl": 11.5,
-"facehair": 0,
-"hair": Color( 0.550, 0.380, 0.200, 1 ),
-"hairtype": 0,
-"name": "A Guler",
-"shoot": 8.5,
-"skin": Color( 0.960, 0.800, 0.690, 1 ),
-"smart": 10.0,
-"speed": 8.5
-}
-player8 = {
 "aggression": 6.5,
 "agility": 10.0,
 "curl": 8.5,
@@ -158,6 +145,19 @@ player8 = {
 "skin": Color( 0.420, 0.270, 0.190, 1 ),
 "smart": 8.5,
 "speed": 10.5
+}
+player8 = {
+"aggression": 5.0,
+"agility": 10.5,
+"curl": 11.5,
+"facehair": 0,
+"hair": Color( 0.550, 0.380, 0.200, 1 ),
+"hairtype": 0,
+"name": "A Guler",
+"shoot": 8.5,
+"skin": Color( 0.960, 0.800, 0.690, 1 ),
+"smart": 10.0,
+"speed": 8.5
 }
 player9 = {
 "aggression": 8.5,
@@ -198,7 +198,7 @@ player11 = {
 "smart": 9.0,
 "speed": 9.0
 }
-def = [ Vector2( 0.36, 0.85 ), Vector2( 0.67, 0.83 ), Vector2( 0.5, 0.87 ), Vector2( 0.45, 0.7 ), Vector2( 0.24, 0.4 ), Vector2( 0.5, 0.36 ), Vector2( 0.6, 0.72 ) ]
-mid = [ Vector2( 0.36, 0.74 ), Vector2( 0.78, 0.64 ), Vector2( 0.5, 0.72 ), Vector2( 0.48, 0.46 ), Vector2( 0.18, 0.3 ), Vector2( 0.56, 0.26 ), Vector2( 0.58, 0.58 ) ]
-att = [ Vector2( 0.38, 0.6 ), Vector2( 0.81, 0.45 ), Vector2( 0.5, 0.62 ), Vector2( 0.44, 0.11 ), Vector2( 0.18, 0.14 ), Vector2( 0.62, 0.08 ), Vector2( 0.6, 0.42 ) ]
+def = [ Vector2( 0.36, 0.85 ), Vector2( 0.67, 0.83 ), Vector2( 0.5, 0.87 ), Vector2( 0.45, 0.7 ), Vector2( 0.24, 0.4 ), Vector2( 0.5, 0.36 ), Vector2( 0.76, 0.56 ) ]
+mid = [ Vector2( 0.36, 0.74 ), Vector2( 0.78, 0.64 ), Vector2( 0.5, 0.72 ), Vector2( 0.48, 0.46 ), Vector2( 0.18, 0.3 ), Vector2( 0.56, 0.26 ), Vector2( 0.82, 0.3 ) ]
+att = [ Vector2( 0.38, 0.6 ), Vector2( 0.81, 0.45 ), Vector2( 0.5, 0.62 ), Vector2( 0.44, 0.11 ), Vector2( 0.18, 0.14 ), Vector2( 0.62, 0.08 ), Vector2( 0.82, 0.14 ) ]
 cor = [ Vector2( 0.62, 0.08 ), Vector2( 0.47, 0.1 ), Vector2( 0.5, 0.1 ), Vector2( 0.56, 0.22 ), Vector2( 0.4, 0.06 ), Vector2( 0.53, 0.12 ), Vector2( 0.45, 0.16 ) ]
