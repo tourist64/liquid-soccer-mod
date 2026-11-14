@@ -101,6 +101,17 @@ var mp_snapshot_elapsed = 0.0
 var mp_last_snapshot_version = 0
 var mp_last_presented_state = -1
 var madridGoalSound = null
+# New UCL: the anthem (0:25-1:05 of the original, cut into ucl_anthem.mp3) plays while the teams
+# line up before kickoff; the Skip Anthem button in the top-right corner goes straight to the game.
+signal anthem_finished
+var anthemSound = null
+var anthemFade = null
+var anthemLayer = null
+var anthemPlaying = false
+const ANTHEM_VOLUME_DB = 0.0
+const ANTHEM_FADE_IN = 0.4
+const ANTHEM_FADE_OUT = 2.5
+const ANTHEM_SKIP_FADE = 0.5
 # True when this match is in the Bernabeu; the Madrid goal track only plays there.
 var atBernabeu = false
 var madridGoalTimer = null
@@ -966,7 +977,10 @@ func goIntro():
 	team2._introTeam( - 1)
 	
 	Global.ballpos = Vector3(0, 0, 1000)
-	yield(get_tree().create_timer(5), "timeout")
+	if _startAnthem():
+		yield(self, "anthem_finished")
+	else:
+		yield(get_tree().create_timer(5), "timeout")
 	$VPC / VP / GameGroup / Replays / ReplayCamera2A._pickCamera()
 	team1._resetTeam(false, true)
 	team2._resetTeam(true, false)
@@ -1721,6 +1735,77 @@ func _isRealMadrid(td):
 
 func _crowdBoost(db):
 	return db + BERNABEU_CROWD_DB if Global.eightMode else db
+
+func _startAnthem():
+	if not _inUCL() or mp_replica:
+		return false
+	var stream = load("res://Res/ucl_anthem.mp3")
+	if not stream:
+		push_error("couldn't load UCL anthem")
+		return false
+	anthemSound = AudioStreamPlayer.new()
+	anthemSound.stream = stream
+	anthemSound.bus = "Music"
+	anthemSound.volume_db = -40.0
+	$Sounds.add_child(anthemSound)
+	var _a = anthemSound.connect("finished", self, "_endAnthem")
+	anthemFade = Tween.new()
+	$Sounds.add_child(anthemFade)
+	# Fade in over the cut at 0:25 and out ahead of the cut at 1:05.
+	var length = stream.get_length()
+	anthemFade.interpolate_property(anthemSound, "volume_db", -40.0, ANTHEM_VOLUME_DB, ANTHEM_FADE_IN)
+	anthemFade.interpolate_property(anthemSound, "volume_db", ANTHEM_VOLUME_DB, -40.0, ANTHEM_FADE_OUT,
+		Tween.TRANS_LINEAR, Tween.EASE_IN, max(0.0, length - ANTHEM_FADE_OUT))
+	anthemPlaying = true
+	# The menu theme is still fading out from the scene change; cut it so the anthem plays alone.
+	Global._musicOff()
+	anthemSound.play()
+	anthemFade.start()
+	_showSkipAnthem()
+	return true
+
+# Its own layer so the button sits in the window's top-right corner (the HUD is centred).
+func _showSkipAnthem():
+	anthemLayer = CanvasLayer.new()
+	anthemLayer.layer = 5
+	add_child(anthemLayer)
+	var btn = Button.new()
+	btn.name = "SkipAnthem"
+	btn.theme = load("res://Res/UI.tres")
+	btn.text = "SKIP ANTHEM  >>"
+	btn.focus_mode = Control.FOCUS_ALL
+	btn.anchor_left = 1.0
+	btn.anchor_right = 1.0
+	btn.margin_left = -230.0
+	btn.margin_right = -16.0
+	btn.margin_top = 16.0
+	btn.margin_bottom = 60.0
+	anthemLayer.add_child(btn)
+	var _b = btn.connect("pressed", self, "_skipAnthem")
+	btn.grab_focus()
+
+func _skipAnthem():
+	if not anthemPlaying:
+		return
+	if anthemLayer != null:
+		anthemLayer.queue_free()
+		anthemLayer = null
+	anthemFade.stop_all()
+	anthemFade.interpolate_property(anthemSound, "volume_db", anthemSound.volume_db, -40.0, ANTHEM_SKIP_FADE)
+	anthemFade.start()
+	yield(get_tree().create_timer(ANTHEM_SKIP_FADE), "timeout")
+	_endAnthem()
+
+func _endAnthem():
+	if not anthemPlaying:
+		return
+	anthemPlaying = false
+	if anthemLayer != null:
+		anthemLayer.queue_free()
+		anthemLayer = null
+	anthemFade.stop_all()
+	anthemSound.stop()
+	emit_signal("anthem_finished")
 
 func _setupMadridGoalSound():
 	var stream = load("res://Res/madrid_goal.mp3")
