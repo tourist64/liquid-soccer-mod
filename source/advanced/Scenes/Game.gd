@@ -114,6 +114,8 @@ var anthemDuckTween = null
 # peaks from clipping, and the crowd is turned down while it plays.
 const ANTHEM_VOLUME_DB = 9.0
 const ANTHEM_BUS = "Anthem"
+# After the limiter: makes up the 6 dB the music slider takes off at its default 75%.
+const ANTHEM_BUS_GAIN_DB = 6.0
 const ANTHEM_CROWD_DUCK_DB = -8.0
 const ANTHEM_CROWD_RESTORE = 1.5
 const ANTHEM_FADE_IN = 0.4
@@ -1828,6 +1830,7 @@ func _anthemBus():
 	limiter.threshold_db = -1.0
 	limiter.ceiling_db = -0.3
 	AudioServer.add_bus_effect(idx, limiter)
+	AudioServer.set_bus_volume_db(idx, ANTHEM_BUS_GAIN_DB)
 	return ANTHEM_BUS
 
 # A temporary gain stage at the front of the Crowd bus, so the player's crowd volume setting is
