@@ -56,7 +56,9 @@ func _show():
 	add_child(page)
 	if trans:
 		move_child(trans, get_child_count() - 1)
-	if ucl == null:
+	if ucl == null and madridPick >= 0:
+		_madridChoice()
+	elif ucl == null:
 		_picker()
 	elif ucl.knockoutStage and not showTable:
 		_bracket()
@@ -91,9 +93,38 @@ func _setSlot(n):
 	Global.set_meta("ucl_slot", n)
 	_show()
 
+var madridPick = -1
+
 func _pick(i):
+	var tmp = UCL.new()
+	var isMadrid = tmp.files[i] == "Real Madrid"
+	tmp.free()
+	if isMadrid:
+		madridPick = i
+		_show()
+		return
+	_begin(i, false)
+
+# Real Madrid: choose today's squad or the 2017 one.
+func _madridChoice():
+	_title("CHAMPIONS LEAGUE 2026/27")
+	_label(page, "Which Real Madrid?", Vector2(0, 120), Vector2(1031, 40), fBig, WHITE, Label.ALIGN_CENTER)
+	var b = _button(page, "2026", Vector2(250, 220), Vector2(240, 90), "_begin", [madridPick, false], fBig)
+	b.grab_focus()
+	_button(page, "2017", Vector2(540, 220), Vector2(240, 90), "_begin", [madridPick, true], fBig)
+	_label(page, "Vini, Mbappe, Bellingham", Vector2(230, 320), Vector2(280, 30), fMed, WHITE, Label.ALIGN_CENTER)
+	_label(page, "Ronaldo, Modric, Kroos", Vector2(520, 320), Vector2(280, 30), fMed, WHITE, Label.ALIGN_CENTER)
+	_button(page, "back", Vector2(22, 500), Vector2(150, 56), "_cancelMadrid", [], fBig)
+
+func _cancelMadrid():
+	madridPick = -1
+	_show()
+
+func _begin(i, old):
+	madridPick = -1
 	ucl = UCL.new()
 	ucl.slot = _slot()
+	ucl.madrid2017 = old
 	ucl.start(i)
 	Global.tournament = ucl
 	_show()

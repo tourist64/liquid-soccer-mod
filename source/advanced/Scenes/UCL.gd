@@ -90,7 +90,13 @@ func _byRating(a, b):
 		return RATINGS[a] > RATINGS[b]
 	return a < b
 
+# Picking Real Madrid you can take the 2017 side (Ronaldo, Modric, Kroos) instead of today's.
+const MADRID_2017 = "res://Teams/5/Real Madrid 2017.tres"
+var madrid2017 = false
+
 func path(i):
+	if madrid2017 and files[i] == "Real Madrid":
+		return MADRID_2017
 	return TEAM_DIR + files[i] + ".tres"
 
 # --- New tournament -------------------------------------------------------------------------
@@ -351,7 +357,7 @@ func saveState():
 	f.store_line(to_json({"files": files, "tTeam": tTeam, "fixtures": fixtures, "results": results,
 		"matchday": matchday, "table": table, "koRound": koRound, "ties": ties, "koResults": koResults,
 		"champion": champion, "playerOut": playerOut, "knockoutStage": knockoutStage,
-		"koLeg": koLeg, "firstLeg": firstLeg}))
+		"koLeg": koLeg, "firstLeg": firstLeg, "madrid2017": madrid2017}))
 	f.close()
 
 static func hasSave(n = 1):
@@ -377,6 +383,7 @@ func loadState():
 			return false
 		m.append(k)
 	tTeam = _map(m, int(d.tTeam))
+	madrid2017 = bool(d.get("madrid2017", false))
 	fixtures = []
 	for md in _ints(d.fixtures):
 		var day = []
