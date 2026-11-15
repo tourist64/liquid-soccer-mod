@@ -561,8 +561,9 @@ func _findThruPass(pos, lookD, _id):
 	var best = 1000
 	var dopass = false
 	var dl = 0
+	var runners = []
 	
-	# Nearest onside runner within ~57 degrees of the held direction; if nobody's there (a
+	# Onside runners within ~57 degrees of the held direction; if nobody's there (a
 	# touchline player like Marcelo), look again in a much wider angle.
 	for cone in [0.55, 0.15]:
 		for i in range(1, Global.squad):
@@ -573,20 +574,26 @@ func _findThruPass(pos, lookD, _id):
 		
 			if _isOffsidePosition(players[i]):
 				score = - 1000
-			if score > cone and (players[i].myID != _id):
-				dl = diff.length()
-				if (dl < best):
-					candidate = players[i]
-				
-					best = dl
+			if score > cone and (players[i].myID != _id) and players[i].carded < 2:
+				runners.append(players[i])
 	
-		if candidate:
+		if runners.size() > 0:
 			break
+	# Of the runners that way, pick the one whose best spot (see _thruSpot) is safest and gains
+	# the most; the nearer runner wins ties.
+	var bestScore = - 100000.0
+	var bestSpot = Vector3.ZERO
+	for r in runners:
+		var res = _thruSpot(r)
+		var sc = res[1] - (r.translation - Global.ballpos).length() * 0.05
+		if sc > bestScore:
+			bestScore = sc
+			bestSpot = res[0]
+			candidate = r
 	
 	if (candidate):
 		
-		var passPos = candidate.translation - goal
-		passPos = candidate.translation - passPos * 0.2
+		var passPos = bestSpot
 		if Global.elevenMode:
 			passPos = _safePassSpot(passPos, candidate)
 		passDir = passPos - Global.ballpos
@@ -608,6 +615,78 @@ func _findThruPass(pos, lookD, _id):
 			dopass = false
 	
 	return dopass
+# --- Smart through balls ---------------------------------------------------------------
+# Spots ahead of the runner (along his run, bent towards goal) are tried from far to near. A spot
+# is safe when no defender can get to the ball's path before the ball does and the runner gets
+# to the spot before any defender. Best: the safe spot gaining the most ground; if none is safe,
+# the least risky one (usually nearer his feet). Returns [spot, score].
+const THRU_LEADS = [18.0, 13.0, 8.0, 4.0, 0.0]
+const THRU_SIDES = [0.0, - 6.0, 6.0]
+const RUN_SPEED = 30.0       # a runner's sprint speed in units a second
+const DEF_SPEED = 30.0
+const DEF_REACH = 3.0        # a defender's legs reach this far
+const DEF_REACT = 0.2        # seconds before a defender moves for the ball
+func _thruSpot(r):
+	var ahead = r.velocity
+	ahead.y = 0.0
+	var toGoal = goal - r.translation
+	toGoal.y = 0.0
+	if ahead.length() < 3.0:
+		ahead = toGoal
+	ahead = (ahead.normalized() + toGoal.normalized() * 0.6).normalized()
+	var side = ahead.cross(Vector3.UP)
+	var best = r.translation
+	var bestScore = - 100000.0
+	for lead in THRU_LEADS:
+		for off in THRU_SIDES:
+			var spot = r.translation + ahead * lead + side * off
+			spot.y = 0.0
+			# Stay well inside the lines: the ball rolls on past the spot.
+			if abs(spot.z) > 70.0 * Global.ps or spot.x * playDir > 105.0 * Global.ps:
+				continue
+			var risk = _thruRisk(spot, r)
+			var gain = (spot.x - Global.ballpos.x) * playDir
+			var sc = gain * 0.3 + lead * 0.2 - abs(off) * 0.2 - risk * 40.0
+			if sc > bestScore:
+				bestScore = sc
+				best = spot
+	return [best, bestScore]
+
+# How badly defenders threaten a pass to this spot: 0 = clean; more is worse (seconds a defender
+# would be early, summed over the path and the spot itself).
+func _thruRisk(spot, r):
+	var from = Global.ballpos
+	from.y = 0.0
+	var path = spot - from
+	var D = path.length()
+	if D < 0.1:
+		return 0.0
+	# Average ball speed over the pass: the launch speed (as AI._thruPass hits it) and the pace it
+	# arrives with, losing about 0.55 a unit.
+	var v0 = clamp(D * 1.5, 80.0, 100.0)
+	if D * 0.55 + 45.0 > v0:
+		v0 = D * 0.55 + 45.0
+	var ballSpeed = (v0 + max(v0 - D * 0.55, 20.0)) * 0.5
+	var risk = 0.0
+	var runT = (spot - r.translation).length() / RUN_SPEED
+	for o in opponent.players:
+		if o.carded > 1:
+			continue
+		var op = o.translation
+		op.y = 0.0
+		# Along the ball's path.
+		var worst = 0.0
+		for k in range(1, 9):
+			var pt = from + path * (k / 8.0)
+			var tBall = (D * k / 8.0) / ballSpeed
+			var tDef = max(0.0, (op - pt).length() - DEF_REACH) / DEF_SPEED + DEF_REACT
+			worst = max(worst, tBall - tDef)
+		# At the spot: the runner must get there first.
+		var tDefSpot = max(0.0, (op - spot).length() - DEF_REACH) / DEF_SPEED + DEF_REACT
+		worst = max(worst, runT - tDefSpot)
+		risk += max(0.0, worst)
+	return risk
+
 func _checkPass( var pd, var fromP, var plength):
 	
 	

@@ -1039,6 +1039,8 @@ func _receivePass( var ppos, var dir, var ptype):
 	changeState(pstate.PCOLLECT)
 	
 const THRU_MAX_SPEED = 240.0
+const THRU_DECEL = 0.55
+const THRU_ARRIVE = 45.0
 func _thruPass( var D):
 	
 	if myTeam.zone == 3 and abs(Global.ballpos.z) > 30 * Global.ps:
@@ -1051,9 +1053,10 @@ func _thruPass( var D):
 		if myPlayer.lowshot:
 			myTeam.passDir *= 0.6
 			myTeam.passDir.y += 14
-		# No distance limit: the ball is hit as hard as it needs to be to reach the runner (it starts
-		# quick and brakes on the way, so it still arrives at about the normal spot).
-		var reach = min((myTeam.passDir * 1.5).length(), THRU_MAX_SPEED)
+		# No distance limit: a long ball is hit just hard enough to still arrive at a pace the runner
+		# can take (the ball loses about 0.55 speed per unit it rolls; measured in match runs).
+		var flat = Vector2(myTeam.passDir.x, myTeam.passDir.z).length()
+		var reach = min(flat * THRU_DECEL + THRU_ARRIVE, THRU_MAX_SPEED)
 		myPlayer.ball._passBall(myTeam.passDir * 1.5, myPlayer, reach)
 		myTeam._passTo(myTeam.passto)
 		myTeam.posession = false

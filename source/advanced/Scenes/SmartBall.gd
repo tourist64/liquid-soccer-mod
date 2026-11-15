@@ -26,13 +26,6 @@ const LOB_MAX_BRAKE = 60.0
 var trail = null
 var minPassSpeed = 80
 var maxPassSpeed = 100
-# Long through balls leave the foot 35% faster to get past the defence, then ease off over
-# THRU_BRAKE_TIME so they still stop about where they would have (tuned in a physics test:
-# ~15% quicker past the defensive line, stopping within a few percent of the normal spot).
-const THRU_KICK = 1.35
-const THRU_BRAKE_TIME = 0.6
-const THRU_BRAKE = 1.4
-var thruBrake = 0.0
 
 
 var doHit = false
@@ -147,15 +140,6 @@ func _physics_process(delta):
 			Game._shootoutMissed()
 	
 func _integrate_forces(pstate):
-	# Long through-ball brake. Done here on the physics state: setting linear_velocity from
-	# _physics_process threw away the kick impulse queued the same frame (the ball barely moved).
-	if thruBrake > 0.0 and (player != null or state != bstate.OPEN):
-		thruBrake = 0.0
-	if thruBrake > 0.0:
-		thruBrake -= pstate.step
-		var k = exp(- THRU_BRAKE * pstate.step)
-		var v = pstate.linear_velocity
-		pstate.linear_velocity = Vector3(v.x * k, v.y, v.z * k)
 	if state == bstate.TRAPPED:
 		var diff = translation - (player.myArea.get_global_transform().origin)
 		diff.y = 0
@@ -285,7 +269,8 @@ func _shootBall( var shootr, var direction, var curldirection):
 	
 	
 	
-# maxSpeed: a higher speed cap for long through balls by good passers (0 = the normal cap).
+# maxSpeed: through balls may be hit up to this hard to reach a far runner (0 = the normal cap).
+# The ball's own physics do the rest, so a harder ball simply rolls on further.
 func _passBall( var direction, var passer, var maxSpeed = 0.0):
 	# Keepers pass themselves as their AI node; the rest of the game expects the player.
 	if passer.get("myPlayer") != null:
@@ -306,10 +291,6 @@ func _passBall( var direction, var passer, var maxSpeed = 0.0):
 	var dl = direction.length()
 	var dr = direction
 	var ddl = max(minPassSpeed, min(dl, max(maxPassSpeed, maxSpeed)))
-	thruBrake = 0.0
-	if maxSpeed > 0.0 and dl > maxPassSpeed:
-		ddl *= THRU_KICK
-		thruBrake = THRU_BRAKE_TIME
 	
 	isShot = false
 	$BallPassed.play()
