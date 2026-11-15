@@ -562,20 +562,26 @@ func _findThruPass(pos, lookD, _id):
 	var dopass = false
 	var dl = 0
 	
-	for i in range(1, Global.squad):
-		diff = (players[i].translation) + ((players[i].velocity).normalized() * 1.0) - Global.ballpos
+	# Nearest onside runner within ~57 degrees of the held direction; if nobody's there (a
+	# touchline player like Marcelo), look again in a much wider angle.
+	for cone in [0.55, 0.15]:
+		for i in range(1, Global.squad):
+			diff = (players[i].translation) + ((players[i].velocity).normalized() * 1.0) - Global.ballpos
 		
 		
-		var score = diff.normalized().dot(lookD.normalized())
+			var score = diff.normalized().dot(lookD.normalized())
 		
-		if _isOffsidePosition(players[i]):
-			score = - 1000
-		if score > 0.55 and (players[i].myID != _id):
-			dl = diff.length()
-			if (dl < best):
-				candidate = players[i]
+			if _isOffsidePosition(players[i]):
+				score = - 1000
+			if score > cone and (players[i].myID != _id):
+				dl = diff.length()
+				if (dl < best):
+					candidate = players[i]
 				
-				best = dl
+					best = dl
+	
+		if candidate:
+			break
 	
 	if (candidate):
 		
