@@ -1037,6 +1037,8 @@ func _receivePass( var ppos, var dir, var ptype):
 	changeState(pstate.PCOLLECT)
 	
 const CLASSIC_THRU = []
+# These players may pick offside runners too (the flag goes up if the pass reaches them).
+const FREE_PASSERS = ["J Bellingham"]
 const THRU_MAX_SPEED = 220.0
 func _thruPass( var D):
 	
@@ -1046,7 +1048,7 @@ func _thruPass( var D):
 		return
 	# These players keep the game's original through ball.
 	var classic = myTeam._playerName(myPlayer.myID) in CLASSIC_THRU
-	var passTo = myTeam._findThruPass(pos, D, myPlayer.myID, - 2.0 if classic else clamp((myPlayer.pCurl * 10.0 - 6.0) / 4.0, 0.0, 1.0))
+	var passTo = myTeam._findThruPass(pos, D, myPlayer.myID, - 2.0 if classic else clamp((myPlayer.pCurl * 10.0 - 6.0) / 4.0, 0.0, 1.0), myTeam._playerName(myPlayer.myID) in FREE_PASSERS)
 	if (passTo):
 		myTeam.passDir.y += 1
 		if myPlayer.lowshot:

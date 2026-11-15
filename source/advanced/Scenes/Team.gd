@@ -552,7 +552,7 @@ func _findPass(pos, lookD, id):
 	return dopass
 	
 	
-func _findThruPass(pos, lookD, _id, vision = - 1.0):
+func _findThruPass(pos, lookD, _id, vision = - 1.0, freePass = false):
 	var diff
 	var candidate = null
 	
@@ -577,7 +577,7 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 		var bestGain = - 1000.0
 		for i in range(1, Global.squad):
 			var pl = players[i]
-			if pl.myID == _id or pl.carded > 1 or _isOffsidePosition(pl):
+			if pl.myID == _id or pl.carded > 1 or (not freePass and _isOffsidePosition(pl)):
 				continue
 			# Aim where the ball will actually go: ahead of his run and pulled towards goal, so
 			# wingers level with the ball (Bellingham is often the furthest man up) still count.
@@ -607,7 +607,7 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 			
 			var score = diff.normalized().dot(lookD.normalized())
 			
-			if _isOffsidePosition(players[i]) or players[i].carded > 1:
+			if (not freePass and _isOffsidePosition(players[i])) or players[i].carded > 1:
 				score = - 1000
 			if score > cone and (players[i].myID != _id):
 				dl = diff.length()
@@ -625,7 +625,7 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 		var bestRoom = - 1000.0
 		for i in range(1, Global.squad):
 			var pl = players[i]
-			if pl.myID == _id or pl.carded > 1 or _isOffsidePosition(pl):
+			if pl.myID == _id or pl.carded > 1 or (not freePass and _isOffsidePosition(pl)):
 				continue
 			if (pl.translation.x - Global.ballpos.x) * playDir < - LAST_RESORT_BEHIND:
 				continue
