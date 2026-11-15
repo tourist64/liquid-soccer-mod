@@ -580,11 +580,8 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 			# Aim where the ball will actually go: ahead of his run and pulled towards goal, so
 			# wingers level with the ball (Bellingham is often the furthest man up) still count.
 			var run = pl.translation + pl.velocity.normalized() * RUN_LEAD
-			# Runners getting level or ahead of the ball count as "forward". So do attackers a step
-			# behind it out wide or across the pitch: when the carrier is past the line, everyone
-			# else is held just behind him, and a ball into space ahead of them still beats the line.
-			var behind = (run.x - Global.ballpos.x) * playDir
-			if behind < 0.0 and (behind < - BEHIND_ALLOW or abs(pl.translation.z - Global.ballpos.z) < 12.0):
+			# Only runners getting level or ahead of the ball count as "forward".
+			if (run.x - Global.ballpos.x) * playDir < 0.0:
 				continue
 			var spot = run + (goal - run) * 0.2
 			var to = spot - Global.ballpos
@@ -771,7 +768,6 @@ func _closestPToP( var target):
 # onside team-mate who can get there in time goes for it instead.
 const OFFSIDE_YIELD = 10.0
 const RUN_LEAD = 8.0
-const BEHIND_ALLOW = 6.0
 func _offsideExtra(P):
 	return OFFSIDE_YIELD if ball.offsideFlags.has(P) else 0.0
 
@@ -1010,12 +1006,6 @@ func _looseBall():
 
 func _getPlayPos(pid):
 	var p = _holdLine(_keepOnside(_getPlayPosRaw(pid), pid), pid)
-	# Team-mate on the ball right at the touchline in the final third: the cross will swing out,
-	# so attackers near the box hold a step back from goal for it.
-	if posession and zone == 3 and players[pid] != pplayer and not (Global.elevenMode and _boxRunActive()):
-		var wide = smoothstep(TOUCHLINE_FROM * Global.ps, TOUCHLINE_AT * Global.ps, abs(Global.ballpos.z))
-		if wide > 0.0 and abs(p.x - goal.x) < 55.0 * Global.ps:
-			p.x -= playDir * TOUCHLINE_STEP_BACK * wide
 	# The anchor screens the middle without the ball instead of drifting wide.
 	if tdata.anchorId == pid and not _onTheBall():
 		p.z = clamp(p.z, - ANCHOR_HALF_WIDTH * Global.ps, ANCHOR_HALF_WIDTH * Global.ps)
@@ -2319,10 +2309,6 @@ func _elevenDefendCorner():
 # [distance from the goal line, distance toward the ball's side] for players attacking a cross.
 const BOX_RUN_SLOTS = [[14.0, 10.0], [18.0, - 2.0], [16.0, - 12.0], [34.0, 4.0], [40.0, - 12.0]]
 
-const TOUCHLINE_FROM = 76.0
-const TOUCHLINE_AT = 84.0
-const TOUCHLINE_STEP_BACK = 8.0
-
 var boxRunFrame = - 1
 var boxRunners = []
 
@@ -2350,9 +2336,7 @@ func _boxRun(pid):
 	if slot < 0:
 		return null
 	var inward = - sign(goal.x)
-	# Crosser right on the touchline: the ball will swing out, so the runners hold a step back.
-	var back = TOUCHLINE_STEP_BACK * smoothstep(TOUCHLINE_FROM * Global.ps, TOUCHLINE_AT * Global.ps, abs(Global.ballpos.z))
-	return Vector3(goal.x + inward * (BOX_RUN_SLOTS[slot][0] + back), 0.0, sign(Global.ballpos.z) * BOX_RUN_SLOTS[slot][1])
+	return Vector3(goal.x + inward * BOX_RUN_SLOTS[slot][0], 0.0, sign(Global.ballpos.z) * BOX_RUN_SLOTS[slot][1])
 
 # Picks the best header of the ball in the box; better teams find him more often.
 func _crossTarget(crosser, low = false):
