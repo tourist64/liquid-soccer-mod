@@ -589,7 +589,9 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 			var gain = to.x * playDir
 			if gain < 2.0 or to.length() > reach or to.normalized().dot(lookD.normalized()) < - 0.2:
 				continue
-			var s = gain * 0.5 + to.normalized().dot(lookD.normalized()) * 8.0 + (_spaceAt(spot) + _spaceAt(pl.translation)) * 0.5 - _laneBlock(to) * 20.0
+			# Pick the most open runner: room around him matters most, a clear lane next,
+			# ground gained and the held direction only break ties.
+			var s = _spaceAt(pl.translation) * 1.5 + _spaceAt(spot) * 0.5 - _laneBlock(to) * 30.0 + gain * 0.2 + to.normalized().dot(lookD.normalized()) * 3.0
 			if s > bestGain:
 				bestGain = s
 				candidate = pl
