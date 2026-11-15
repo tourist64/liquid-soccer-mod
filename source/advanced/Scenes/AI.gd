@@ -1036,19 +1036,22 @@ func _receivePass( var ppos, var dir, var ptype):
 		
 	changeState(pstate.PCOLLECT)
 	
+const CLASSIC_THRU = ["J Bellingham"]
 func _thruPass( var D):
 	
 	if myTeam.zone == 3 and abs(Global.ballpos.z) > 30 * Global.ps:
 		myPlayer.lowshot = true
 		myPlayer.chipPass(true)
 		return
-	var passTo = myTeam._findThruPass(pos, D, myPlayer.myID, clamp((myPlayer.pCurl * 10.0 - 6.0) / 4.0, 0.0, 1.0))
+	# These players keep the game's original through ball.
+	var classic = myTeam._playerName(myPlayer.myID) in CLASSIC_THRU
+	var passTo = myTeam._findThruPass(pos, D, myPlayer.myID, - 2.0 if classic else clamp((myPlayer.pCurl * 10.0 - 6.0) / 4.0, 0.0, 1.0))
 	if (passTo):
 		myTeam.passDir.y += 1
 		if myPlayer.lowshot:
 			myTeam.passDir *= 0.6
 			myTeam.passDir.y += 14
-		myPlayer.ball._passBall(myTeam.passDir * 1.5, myPlayer, _thruCap())
+		myPlayer.ball._passBall(myTeam.passDir * 1.5, myPlayer, 0.0 if classic else _thruCap())
 		myTeam._passTo(myTeam.passto)
 		myTeam.posession = false
 		myPlayer.lowshot = false

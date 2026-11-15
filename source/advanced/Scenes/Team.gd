@@ -560,8 +560,10 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 	var dopass = false
 	var dl = 0
 	
+	# vision -2: the game's original through ball (tight cone, nearest runner, nothing else).
+	var classic = vision <= - 2.0
 	# No direction held: aim at the goal we're attacking.
-	if lookD.length_squared() < 0.01:
+	if not classic and lookD.length_squared() < 0.01:
 		lookD = goal - Global.ballpos
 		lookD.y = 0.0
 	# First look in a tight cone around the chosen direction; if nobody onside is there, widen
@@ -596,7 +598,7 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 				bestGain = s
 				candidate = pl
 	# Nobody in range: fall back to the nearest onside team-mate roughly that way.
-	for cone in [0.55, 0.15]:
+	for cone in ([0.55] if classic else [0.55, 0.15]):
 		if candidate:
 			break
 		for i in range(1, Global.squad):
@@ -1178,6 +1180,10 @@ func _getSupportPos(pid):
 # where he is. Once the ball is crossed nobody holds the ball, so they attack it as normal.
 const CROSS_HOLD_DEPTH = 29.0
 const CROSS_HOLD_WIDE = 40.0
+func _playerName(pid):
+	var pp = tdata.get("player" + str(pid)) if tdata else null
+	return pp.get("name", "") if typeof(pp) == TYPE_DICTIONARY else ""
+
 func _crossHoldActive():
 	var c = ball.player
 	if c == null or c.get("myTeam") != self:
