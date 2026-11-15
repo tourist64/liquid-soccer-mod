@@ -1038,43 +1038,24 @@ func _receivePass( var ppos, var dir, var ptype):
 		
 	changeState(pstate.PCOLLECT)
 	
-const CLASSIC_THRU = []
-# These players may pick offside runners too (the flag goes up if the pass reaches them).
-const FREE_PASSERS = ["J Bellingham"]
-const THRU_MAX_SPEED = 220.0
 func _thruPass( var D):
 	
 	if myTeam.zone == 3 and abs(Global.ballpos.z) > 30 * Global.ps:
 		myPlayer.lowshot = true
 		myPlayer.chipPass(true)
 		return
-	# These players keep the game's original through ball.
-	var classic = myTeam._playerName(myPlayer.myID) in CLASSIC_THRU
-	var passTo = myTeam._findThruPass(pos, D, myPlayer.myID, - 2.0 if classic else clamp((myPlayer.pCurl * 10.0 - 6.0) / 4.0, 0.0, 1.0), myTeam._playerName(myPlayer.myID) in FREE_PASSERS)
+	var passTo = myTeam._findThruPass(pos, D, myPlayer.myID, clamp((myPlayer.pCurl * 10.0 - 6.0) / 4.0, 0.0, 1.0))
 	if (passTo):
 		myTeam.passDir.y += 1
 		if myPlayer.lowshot:
 			myTeam.passDir *= 0.6
 			myTeam.passDir.y += 14
-		# Hit it hard enough to reach the runner however far away he is (the normal pass cap
-		# left long through balls dying short in front of defenders).
-		var reachSpeed = min((myTeam.passDir * 1.5).length(), THRU_MAX_SPEED)
-		myPlayer.ball._passBall(myTeam.passDir * 1.5, myPlayer, max(reachSpeed, 0.0 if classic else _thruCap()))
+		myPlayer.ball._passBall(myTeam.passDir * 1.5, myPlayer)
 		myTeam._passTo(myTeam.passto)
 		myTeam.posession = false
 		myPlayer.lowshot = false
 		_losePosession()
 		
-# Through-ball speed cap from passing quality (curl): normal for curl 8 and below, up to +60
-# for the very best (Alexander-Arnold, Guler); Bellingham gets about +36. Longer through
-# balls still leave the foot like a normal one and slow down as they reach the runner.
-const THRU_EXTRA = 60.0
-func _thruCap():
-	var q = clamp((myPlayer.pCurl * 10.0 - 8.0) / 2.5, 0.0, 1.0)
-	if q <= 0.0:
-		return 0.0
-	return myPlayer.ball.maxPassSpeed + THRU_EXTRA * q
-
 func _thruPassAI( var _D, var candidate):
 	var passPos = candidate.translation - myGoal
 	passPos = candidate.translation - (passPos * 0.3)
@@ -1084,11 +1065,7 @@ func _thruPassAI( var _D, var candidate):
 	if rand_range(0, 1) > myPlayer.pAgility:
 		pd.y += 6
 		pd *= 0.5
-	# A far-away runner: good passers hit it at through-ball pace all the way to him.
-	if _thruCap() > 0.0 and pd.length() * 1.5 > myPlayer.ball.maxPassSpeed:
-		myPlayer.ball._passBall(pd * 1.5, myPlayer, _thruCap())
-	else:
-		myPlayer.ball._passBall(pd * 0.1, myPlayer)
+	myPlayer.ball._passBall(pd * 0.1, myPlayer)
 	myTeam._passTo(candidate)
 	myPlayer.lowshot = false
 	myTeam.posession = false

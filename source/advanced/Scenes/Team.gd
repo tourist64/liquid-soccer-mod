@@ -552,7 +552,7 @@ func _findPass(pos, lookD, id):
 	return dopass
 	
 	
-func _findThruPass(pos, lookD, _id, vision = - 1.0, freePass = false):
+func _findThruPass(pos, lookD, _id, vision = - 1.0):
 	var diff
 	var candidate = null
 	
@@ -560,10 +560,8 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0, freePass = false):
 	var dopass = false
 	var dl = 0
 	
-	# vision -2: the game's original through ball (tight cone, nearest runner, nothing else).
-	var classic = vision <= - 2.0
 	# No direction held: aim at the goal we're attacking.
-	if not classic and lookD.length_squared() < 0.01:
+	if lookD.length_squared() < 0.01:
 		lookD = goal - Global.ballpos
 		lookD.y = 0.0
 	# First look in a tight cone around the chosen direction; if nobody onside is there, widen
@@ -577,7 +575,7 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0, freePass = false):
 		var bestGain = - 1000.0
 		for i in range(1, Global.squad):
 			var pl = players[i]
-			if pl.myID == _id or pl.carded > 1 or (not freePass and _isOffsidePosition(pl)):
+			if pl.myID == _id or pl.carded > 1 or _isOffsidePosition(pl):
 				continue
 			# Aim where the ball will actually go: ahead of his run and pulled towards goal, so
 			# wingers level with the ball (Bellingham is often the furthest man up) still count.
@@ -591,14 +589,12 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0, freePass = false):
 			var gain = to.x * playDir
 			if gain < 2.0 or to.length() > reach or to.normalized().dot(lookD.normalized()) < - 0.2:
 				continue
-			# Pick the most open runner: room around him matters most, a clear lane next,
-			# ground gained and the held direction only break ties.
-			var s = _spaceAt(pl.translation) * 1.5 + _spaceAt(spot) * 0.5 - _laneBlock(to) * 30.0 + gain * 0.2 + to.normalized().dot(lookD.normalized()) * 3.0
+			var s = gain * 0.5 + to.normalized().dot(lookD.normalized()) * 8.0 + (_spaceAt(spot) + _spaceAt(pl.translation)) * 0.5 - _laneBlock(to) * 20.0
 			if s > bestGain:
 				bestGain = s
 				candidate = pl
 	# Nobody in range: fall back to the nearest onside team-mate roughly that way.
-	for cone in ([0.55] if classic else [0.55, 0.15]):
+	for cone in [0.55, 0.15]:
 		if candidate:
 			break
 		for i in range(1, Global.squad):
@@ -607,7 +603,7 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0, freePass = false):
 			
 			var score = diff.normalized().dot(lookD.normalized())
 			
-			if (not freePass and _isOffsidePosition(players[i])) or players[i].carded > 1:
+			if _isOffsidePosition(players[i]) or players[i].carded > 1:
 				score = - 1000
 			if score > cone and (players[i].myID != _id):
 				dl = diff.length()
@@ -618,21 +614,6 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0, freePass = false):
 		if candidate:
 			break
 	
-	# Last resort: the most open onside team-mate who is level with the ball or not far
-	# behind it, wherever he is across the pitch. Only with everyone well behind does the
-	# button find nobody.
-	if candidate == null and not classic:
-		var bestRoom = - 1000.0
-		for i in range(1, Global.squad):
-			var pl = players[i]
-			if pl.myID == _id or pl.carded > 1 or (not freePass and _isOffsidePosition(pl)):
-				continue
-			if (pl.translation.x - Global.ballpos.x) * playDir < - LAST_RESORT_BEHIND:
-				continue
-			var room = _spaceAt(pl.translation) - _laneBlock(pl.translation - Global.ballpos) * 10.0
-			if room > bestRoom:
-				bestRoom = room
-				candidate = pl
 	if (candidate):
 		
 		var passPos = candidate.translation - goal
@@ -785,7 +766,6 @@ func _closestPToP( var target):
 # onside team-mate who can get there in time goes for it instead.
 const OFFSIDE_YIELD = 10.0
 const RUN_LEAD = 8.0
-const LAST_RESORT_BEHIND = 8.0
 func _offsideExtra(P):
 	return OFFSIDE_YIELD if ball.offsideFlags.has(P) else 0.0
 
