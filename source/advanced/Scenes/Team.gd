@@ -2332,7 +2332,9 @@ func _crossTarget(crosser, low = false):
 # --- 11v11 offside --------------------------------------------------------------------
 # Supporting attackers stay level with the second-last opponent, or the ball if it is further
 # forward. Runs onto a pass use their own states, so through balls can still beat the line.
-const ONSIDE_MARGIN = 2.0
+const ONSIDE_MARGIN = 3.5
+const LINE_LOOKAHEAD = 0.6
+const OFFSIDE_RETREAT = 4.0
 
 var onsideFrame = - 1
 var onsideLine = 0.0
@@ -2341,9 +2343,14 @@ func _onsideLine():
 	var frame = Engine.get_idle_frames()
 	if frame != onsideFrame:
 		onsideFrame = frame
+		# Read the line where it is about to be: a high line stepping up drags it back, so
+		# runners pull back with it instead of being caught offside.
 		var depths = []
 		for o in opponent.players:
-			depths.append(o.translation.x * playDir)
+			if o.carded < 2:
+				var d = o.translation.x * playDir
+				var v = o.velocity.x * playDir if o.velocity is Vector3 else 0.0
+				depths.append(min(d, d + v * LINE_LOOKAHEAD))
 		depths.sort()
 		var secondLast = depths[depths.size() - 2]
 		onsideLine = max(max(secondLast, Global.ballpos.x * playDir), 0.0)
@@ -2353,6 +2360,9 @@ func _keepOnside(p, pid):
 	if not Global.gameOn or players[pid] == pplayer:
 		return p
 	var limit = _onsideLine() - ONSIDE_MARGIN
+	# Already caught beyond the line: drop back further so he is onside quickly.
+	if players[pid].translation.x * playDir > _onsideLine():
+		limit -= OFFSIDE_RETREAT
 	if p.x * playDir > limit:
 		p = Vector3(limit * playDir, p.y, p.z)
 	return p
