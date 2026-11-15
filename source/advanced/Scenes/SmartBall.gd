@@ -73,13 +73,6 @@ func _initialize():
 	
 	
 func _physics_process(delta):
-	if thruBrake > 0.0 and (player != null or state != bstate.OPEN):
-		thruBrake = 0.0
-	if thruBrake > 0.0:
-		thruBrake -= delta
-		var k = exp(- THRU_BRAKE * delta)
-		linear_velocity.x *= k
-		linear_velocity.z *= k
 	
 	
 	sa.global_transform.origin = global_transform.origin + linear_velocity * delta * 1.2
@@ -154,6 +147,15 @@ func _physics_process(delta):
 			Game._shootoutMissed()
 	
 func _integrate_forces(pstate):
+	# Long through-ball brake. Done here on the physics state: setting linear_velocity from
+	# _physics_process threw away the kick impulse queued the same frame (the ball barely moved).
+	if thruBrake > 0.0 and (player != null or state != bstate.OPEN):
+		thruBrake = 0.0
+	if thruBrake > 0.0:
+		thruBrake -= pstate.step
+		var k = exp(- THRU_BRAKE * pstate.step)
+		var v = pstate.linear_velocity
+		pstate.linear_velocity = Vector3(v.x * k, v.y, v.z * k)
 	if state == bstate.TRAPPED:
 		var diff = translation - (player.myArea.get_global_transform().origin)
 		diff.y = 0
