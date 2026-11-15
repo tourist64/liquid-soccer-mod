@@ -552,7 +552,7 @@ func _findPass(pos, lookD, id):
 	return dopass
 	
 	
-func _findThruPass(pos, lookD, _id):
+func _findThruPass(pos, lookD, _id, vision = 0.0):
 	var diff
 	var candidate = null
 	
@@ -567,7 +567,26 @@ func _findThruPass(pos, lookD, _id):
 	# First look in a tight cone around the chosen direction; if nobody onside is there, widen
 	# it so the pass still goes to the nearest onside runner roughly that way instead of the
 	# button doing nothing (which just lost the ball against high lines).
+	# Great passers scan the whole pitch ahead: they pick the runner who gains the most ground,
+	# far wingers included, as long as no opponent sits right in the passing lane.
+	if vision > 0.0:
+		var bestGain = - 1000.0
+		for i in range(1, Global.squad):
+			var pl = players[i]
+			if pl.myID == _id or pl.carded > 1 or _isOffsidePosition(pl):
+				continue
+			var to = pl.translation + pl.velocity.normalized() * 2.0 - Global.ballpos
+			to.y = 0.0
+			var gain = to.x * playDir
+			if gain < 4.0 or to.normalized().dot(lookD.normalized()) < - 0.2:
+				continue
+			var s = gain + to.normalized().dot(lookD.normalized()) * 10.0 - _laneBlock(to) * 25.0
+			if s > bestGain:
+				bestGain = s
+				candidate = pl
 	for cone in [0.55, 0.15]:
+		if candidate:
+			break
 		for i in range(1, Global.squad):
 			diff = (players[i].translation) + ((players[i].velocity).normalized() * 1.0) - Global.ballpos
 			
@@ -610,6 +629,18 @@ func _findThruPass(pos, lookD, _id):
 			dopass = false
 	
 	return dopass
+# How many opponents sit in the lane from the ball to a spot (no side effects).
+func _laneBlock(to):
+	var n = 0
+	var len2 = to.length_squared()
+	for o in opponent.players:
+		var d = o.translation - Global.ballpos
+		d.y = 0.0
+		var t = d.dot(to) / max(len2, 0.01)
+		if t > 0.05 and t < 0.95 and (d - to * t).length() < 3.0:
+			n += 1
+	return n
+
 func _checkPass( var pd, var fromP, var plength):
 	
 	

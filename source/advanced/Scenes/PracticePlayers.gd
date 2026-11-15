@@ -85,7 +85,7 @@ func _closestPToP( var crossto):
 	
 func _shot( var ID, var shotV, var shotcurl, var f):
 	pass
-func _findThruPass(pos, D, ID):
+func _findThruPass(pos, D, ID, _vision = 0.0):
 	var passto = $PlayerRoot2 / Player
 	p1p = Vector3(rand_range(80, 100), 0, rand_range( - 30, 30))
 	if ball.player == $PlayerRoot2 / Player:
