@@ -350,11 +350,11 @@ const LOOSE_BALL_CHASERS = 2
 
 # One of this team's two outfield players nearest the ball.
 func _closeToLooseBall():
-	var mine = myPlayer.translation.distance_squared_to(Global.ballpos)
+	var mine = myPlayer.translation.distance_to(Global.ballpos) + myTeam._offsideExtra(myPlayer)
 	var nearer = 0
 	for i in range(1, Global.squad):
 		var mate = myTeam.players[i]
-		if mate != myPlayer and mate.translation.distance_squared_to(Global.ballpos) < mine:
+		if mate != myPlayer and mate.translation.distance_to(Global.ballpos) + myTeam._offsideExtra(mate) < mine:
 			nearer += 1
 	return nearer < LOOSE_BALL_CHASERS
 

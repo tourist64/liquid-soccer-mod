@@ -743,12 +743,19 @@ func _closestPToP( var target):
 			dist = d
 	return CP
 
+# A player flagged offside by the last pass counts as this much further from the ball, so an
+# onside team-mate who can get there in time goes for it instead.
+const OFFSIDE_YIELD = 10.0
+func _offsideExtra(P):
+	return OFFSIDE_YIELD if ball.offsideFlags.has(P) else 0.0
+
 func _closestPToBall():
 	var dist = 300000
 	var CP = null
 	for i in range(1, Global.squad):
 		var P = players[i]
 		var d = (P.translation - (Global.ballpos + Global.ballvel * 0.3)).length_squared()
+		d = pow(sqrt(d) + _offsideExtra(P), 2)
 		if d < dist:
 			CP = P
 			dist = d
@@ -790,7 +797,7 @@ func _closestPToBallDir():
 	
 	
 	
-	if cplayer:
+	if cplayer and not ball.offsideFlags.has(cplayer):
 		
 		if jx == 0 and jy == 0 and d2p2b[cplayer.myID] < 1600:
 			return cplayer
@@ -821,6 +828,7 @@ func _closestPToBallDir():
 		var dl = d.length()
 		if dl < 70:
 			var dp = (d / dl).dot(dvec)
+			dl += _offsideExtra(P)
 		
 			dp = clamp(dp, 0.0, 1.0)
 			if dp > 0.3:
@@ -857,6 +865,7 @@ func _closestDPToBall():
 		var lookP = (Global.ballpos + Global.ballvel * 0.3)
 		lookP.y = 0.2
 		var d = (P.translation - lookP).length_squared()
+		d = pow(sqrt(d) + _offsideExtra(P), 2)
 		
 		if d < dist:
 			CP = P
