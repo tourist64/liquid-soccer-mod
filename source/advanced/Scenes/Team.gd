@@ -552,7 +552,7 @@ func _findPass(pos, lookD, id):
 	return dopass
 	
 	
-func _findThruPass(pos, lookD, _id, vision = 0.0):
+func _findThruPass(pos, lookD, _id, vision = - 1.0):
 	var diff
 	var candidate = null
 	
@@ -567,9 +567,11 @@ func _findThruPass(pos, lookD, _id, vision = 0.0):
 	# First look in a tight cone around the chosen direction; if nobody onside is there, widen
 	# it so the pass still goes to the nearest onside runner roughly that way instead of the
 	# button doing nothing (which just lost the ball against high lines).
-	# Great passers scan the whole pitch ahead: they pick the runner who gains the most ground,
-	# far wingers included, as long as no opponent sits right in the passing lane.
-	if vision > 0.0:
+	# Passers scan the pitch ahead for the runner who gains the most ground, far wingers
+	# included, avoiding lanes with a defender in them. Passing quality (vision 0-1) sets how
+	# far they can reach; with nobody forward the button finds no one, as before.
+	if vision >= 0.0:
+		var reach = lerp(28.0, 70.0, vision)
 		var bestGain = - 1000.0
 		for i in range(1, Global.squad):
 			var pl = players[i]
@@ -578,15 +580,13 @@ func _findThruPass(pos, lookD, _id, vision = 0.0):
 			var to = pl.translation + pl.velocity.normalized() * 2.0 - Global.ballpos
 			to.y = 0.0
 			var gain = to.x * playDir
-			if gain < 4.0 or to.normalized().dot(lookD.normalized()) < - 0.2:
+			if gain < 4.0 or to.length() > reach or to.normalized().dot(lookD.normalized()) < - 0.2:
 				continue
 			var s = gain + to.normalized().dot(lookD.normalized()) * 10.0 - _laneBlock(to) * 25.0
 			if s > bestGain:
 				bestGain = s
 				candidate = pl
-	for cone in [0.55, 0.15]:
-		if candidate:
-			break
+	for cone in ([] if vision >= 0.0 else [0.55, 0.15]):
 		for i in range(1, Global.squad):
 			diff = (players[i].translation) + ((players[i].velocity).normalized() * 1.0) - Global.ballpos
 			

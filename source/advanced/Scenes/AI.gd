@@ -1042,7 +1042,7 @@ func _thruPass( var D):
 		myPlayer.lowshot = true
 		myPlayer.chipPass(true)
 		return
-	var passTo = myTeam._findThruPass(pos, D, myPlayer.myID, clamp((myPlayer.pCurl * 10.0 - 8.0) / 2.0, 0.0, 1.0))
+	var passTo = myTeam._findThruPass(pos, D, myPlayer.myID, clamp((myPlayer.pCurl * 10.0 - 6.0) / 4.0, 0.0, 1.0))
 	if (passTo):
 		myTeam.passDir.y += 1
 		if myPlayer.lowshot:
