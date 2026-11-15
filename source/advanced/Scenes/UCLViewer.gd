@@ -376,7 +376,8 @@ func _madrid2017KO(td):
 			if pp.get("name", "") == "C Ronaldo":
 				plus += UCL.RONALDO_EXTRA.get(k, 0.0)
 			var v = float(boosted.get(k, 5.0))
-			boosted[k] = max(v, min(v + plus, UCL.MADRID_2017_CAP))
+			var cap = UCL.SHOOT_CAP if k == "shoot" else UCL.MADRID_2017_CAP
+			boosted[k] = max(v, min(v + plus, cap))
 		copy.set(key, boosted)
 	return copy
 

@@ -39,6 +39,8 @@ const BIG_GAME_PLAYERS = {"F Valverde": {"speed": 1.0, "aggression": 1.5, "agili
 const MADRID_2017_BOOST = {"speed": 1.5, "agility": 1.5, "curl": 1.5, "smart": 1.5, "shoot": 1.5}
 const RONALDO_EXTRA = {"speed": 1.0, "shoot": 1.5, "agility": 0.5}
 const MADRID_2017_CAP = 12.0
+# Shooting stops at 10: past that the shot maths runs off its scale and drives shots into the ground.
+const SHOOT_CAP = 10.0
 
 # The real 2026/27 league-phase draw: 8 matchdays of [home, away].
 const REAL_FIXTURES = [
