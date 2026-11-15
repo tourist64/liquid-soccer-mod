@@ -35,7 +35,7 @@ func _ready():
 	$referee._setRef(self)
 	card = $referee / QuickRigCharacter_Reference / BoneAttachment / Card
 	cardshad = card.get_active_material(0)
-	foulTolerance = floor(rand_range(1, 4))
+	foulTolerance = floor(rand_range(1, 3))  # a booking every 1-2 fouls
 	
 	
 func process( var _delta):
@@ -167,13 +167,8 @@ func _bookPlayer( var p, var lastMan = false):
 	
 	
 	p.foulCount += 1
-	if lastMan or p.foulCount > foulTolerance:
+	if lastMan or p.foulCount >= foulTolerance:
 		offender = p
-		# The computer's players are booked so rarely that their first card is a straight red.
-		if p.carded == 0 and p.myTeam.AIteam:
-			p.foulCount = 0
-			_sendOffPlayer(p)
-			return true
 		if p.carded == 0:
 			cardshad.set_shader_param("albedo_color", Color(1, 1, 0))
 			target = p.translation + Vector3(0, 0, - 5)
@@ -183,11 +178,13 @@ func _bookPlayer( var p, var lastMan = false):
 		
 			p.foulCount = 0
 			p.carded = 1
+			foulTolerance = floor(rand_range(1, 3))
 		
 		
 		
 			return true
 		elif p.carded == 1:
+			foulTolerance = floor(rand_range(1, 3))
 			_sendOffPlayer(p)
 		
 			return true
