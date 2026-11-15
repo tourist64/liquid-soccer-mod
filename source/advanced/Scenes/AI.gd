@@ -1037,6 +1037,7 @@ func _receivePass( var ppos, var dir, var ptype):
 	changeState(pstate.PCOLLECT)
 	
 const CLASSIC_THRU = ["J Bellingham"]
+const THRU_MAX_SPEED = 220.0
 func _thruPass( var D):
 	
 	if myTeam.zone == 3 and abs(Global.ballpos.z) > 30 * Global.ps:
@@ -1051,7 +1052,10 @@ func _thruPass( var D):
 		if myPlayer.lowshot:
 			myTeam.passDir *= 0.6
 			myTeam.passDir.y += 14
-		myPlayer.ball._passBall(myTeam.passDir * 1.5, myPlayer, 0.0 if classic else _thruCap())
+		# Hit it hard enough to reach the runner however far away he is (the normal pass cap
+		# left long through balls dying short in front of defenders).
+		var reachSpeed = min((myTeam.passDir * 1.5).length(), THRU_MAX_SPEED)
+		myPlayer.ball._passBall(myTeam.passDir * 1.5, myPlayer, max(reachSpeed, 0.0 if classic else _thruCap()))
 		myTeam._passTo(myTeam.passto)
 		myTeam.posession = false
 		myPlayer.lowshot = false
