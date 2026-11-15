@@ -326,6 +326,8 @@ func _play():
 				Global.t2 = Global.t2.duplicate()
 				Global.t2.level = 0.0
 	# Quarter-finals and later: big-game players step up (this match's copy of the team only).
+	if Global.has_meta("madrid2017Late"):
+		Global.remove_meta("madrid2017Late")
 	if ucl.knockoutStage and ucl.koRound >= 2:
 		Global.t1 = _bigGame(Global.t1)
 		Global.t2 = _bigGame(Global.t2)
@@ -345,8 +347,11 @@ func _save():
 		saveBtn.text = "saved!"
 
 func _bigGame(td):
+	# 2017 Real Madrid start the match as normal; their boosted side comes on for the last two
+	# minutes (Game swaps it in).
 	if td.teamname == "2017 Real Madrid":
-		return _madrid2017KO(td)
+		Global.set_meta("madrid2017Late", _madrid2017KO(td))
+		return td
 	var copy = null
 	for i in range(12):
 		var key = "player" + str(i)

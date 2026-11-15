@@ -156,6 +156,8 @@ func setupFormation():
 		
 
 func setPlayerParams( var p, var i):
+	# Remember which squad entry this player came from (subs reorder the players array).
+	p.set_meta("squadSlot", i)
 	
 	var pp = tdata.player0
 	match i:

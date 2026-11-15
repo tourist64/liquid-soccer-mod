@@ -1756,6 +1756,8 @@ func _updateRemontada():
 	# The late lockdown only applies while the opponent has the ball; loose balls and Madrid's own
 	# possession are for sprinting forward on the counter.
 	var lastMinute = half == 1 and gametimer.time_left < 120.0
+	if lastMinute and _inUCL():
+		_madrid2017Late()
 	var carrier = _ballCarrier()
 	var onBall = null
 	if carrier != null and is_instance_valid(carrier) and ball.state == ball.bstate.TRAPPED:
@@ -1764,6 +1766,19 @@ func _updateRemontada():
 		team1._setOutlet(int(score.x - score.y), lastMinute and onBall == team2)
 	if _isRealMadrid(team2.tdata):
 		team2._setOutlet(int(score.y - score.x), lastMinute and onBall == team1)
+
+# UCL quarter-finals on: 2017 Real Madrid's boosted ratings kick in for the last two minutes.
+func _madrid2017Late():
+	if not Global.has_meta("madrid2017Late"):
+		return
+	var boosted = Global.get_meta("madrid2017Late")
+	Global.remove_meta("madrid2017Late")
+	for t in [team1, team2]:
+		if t.tdata != null and t.tdata.teamname == boosted.teamname:
+			t.tdata = boosted
+			for p in t.players:
+				if p.has_meta("squadSlot"):
+					t.setPlayerParams(p, p.get_meta("squadSlot"))
 
 func _isRealMadrid(td):
 	if td == null:
