@@ -1005,7 +1005,7 @@ func _looseBall():
 	return not posession and passto == null and not opponent.posession and opponent.passto == null
 
 func _getPlayPos(pid):
-	var p = _holdLine(_keepOnside(_getPlayPosRaw(pid), pid), pid)
+	var p = _holdForCross(_holdLine(_keepOnside(_getPlayPosRaw(pid), pid), pid), pid)
 	# The anchor screens the middle without the ball instead of drifting wide.
 	if tdata.anchorId == pid and not _onTheBall():
 		p.z = clamp(p.z, - ANCHOR_HALF_WIDTH * Global.ps, ANCHOR_HALF_WIDTH * Global.ps)
@@ -1171,7 +1171,27 @@ func _getPlayPosRaw(pid):
 		return pp1
 
 func _getSupportPos(pid):
-	return _keepOnside(_getSupportPosRaw(pid), pid)
+	return _holdForCross(_keepOnside(_getSupportPosRaw(pid), pid), pid)
+
+# A wide team-mate carrying the ball inside the last two grass stripes (the final ~29 units
+# before the goal line) is about to cross: everyone else stops moving towards goal and holds
+# where he is. Once the ball is crossed nobody holds the ball, so they attack it as normal.
+const CROSS_HOLD_DEPTH = 29.0
+const CROSS_HOLD_WIDE = 40.0
+func _crossHoldActive():
+	var c = ball.player
+	if c == null or c.get("myTeam") != self:
+		return false
+	var toLine = 140.0 * Global.ps - c.translation.x * playDir
+	return toLine < CROSS_HOLD_DEPTH * Global.ps and abs(c.translation.z) > CROSS_HOLD_WIDE * Global.ps
+
+func _holdForCross(p, pid):
+	if pid == 0 or not _crossHoldActive() or players[pid] == ball.player:
+		return p
+	var now = players[pid].translation.x
+	if (p.x - now) * playDir > 0.0:
+		p.x = now
+	return p
 
 func _getSupportPosRaw(pid):
 	if Global.elevenMode:
