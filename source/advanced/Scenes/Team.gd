@@ -618,6 +618,21 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 		if candidate:
 			break
 	
+	# Last resort: the most open onside team-mate who is level with the ball or not far
+	# behind it, wherever he is across the pitch. Only with everyone well behind does the
+	# button find nobody.
+	if candidate == null and not classic:
+		var bestRoom = - 1000.0
+		for i in range(1, Global.squad):
+			var pl = players[i]
+			if pl.myID == _id or pl.carded > 1 or _isOffsidePosition(pl):
+				continue
+			if (pl.translation.x - Global.ballpos.x) * playDir < - LAST_RESORT_BEHIND:
+				continue
+			var room = _spaceAt(pl.translation) - _laneBlock(pl.translation - Global.ballpos) * 10.0
+			if room > bestRoom:
+				bestRoom = room
+				candidate = pl
 	if (candidate):
 		
 		var passPos = candidate.translation - goal
@@ -770,6 +785,7 @@ func _closestPToP( var target):
 # onside team-mate who can get there in time goes for it instead.
 const OFFSIDE_YIELD = 10.0
 const RUN_LEAD = 8.0
+const LAST_RESORT_BEHIND = 8.0
 func _offsideExtra(P):
 	return OFFSIDE_YIELD if ball.offsideFlags.has(P) else 0.0
 

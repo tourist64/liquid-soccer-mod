@@ -1036,7 +1036,7 @@ func _receivePass( var ppos, var dir, var ptype):
 		
 	changeState(pstate.PCOLLECT)
 	
-const CLASSIC_THRU = ["J Bellingham"]
+const CLASSIC_THRU = []
 const THRU_MAX_SPEED = 220.0
 func _thruPass( var D):
 	
