@@ -1048,12 +1048,22 @@ func _thruPass( var D):
 		if myPlayer.lowshot:
 			myTeam.passDir *= 0.6
 			myTeam.passDir.y += 14
-		myPlayer.ball._passBall(myTeam.passDir * 1.5, myPlayer)
+		myPlayer.ball._passBall(myTeam.passDir * 1.5, myPlayer, _thruCap())
 		myTeam._passTo(myTeam.passto)
 		myTeam.posession = false
 		myPlayer.lowshot = false
 		_losePosession()
 		
+# Through-ball speed cap from passing quality (curl): normal for curl 8 and below, up to +60
+# for the very best (Alexander-Arnold, Guler); Bellingham gets about +36. Longer through
+# balls still leave the foot like a normal one and slow down as they reach the runner.
+const THRU_EXTRA = 60.0
+func _thruCap():
+	var q = clamp((myPlayer.pCurl * 10.0 - 8.0) / 2.5, 0.0, 1.0)
+	if q <= 0.0:
+		return 0.0
+	return myPlayer.ball.maxPassSpeed + THRU_EXTRA * q
+
 func _thruPassAI( var _D, var candidate):
 	var passPos = candidate.translation - myGoal
 	passPos = candidate.translation - (passPos * 0.3)
@@ -1063,7 +1073,11 @@ func _thruPassAI( var _D, var candidate):
 	if rand_range(0, 1) > myPlayer.pAgility:
 		pd.y += 6
 		pd *= 0.5
-	myPlayer.ball._passBall(pd * 0.1, myPlayer)
+	# A far-away runner: good passers hit it at through-ball pace all the way to him.
+	if _thruCap() > 0.0 and pd.length() * 1.5 > myPlayer.ball.maxPassSpeed:
+		myPlayer.ball._passBall(pd * 1.5, myPlayer, _thruCap())
+	else:
+		myPlayer.ball._passBall(pd * 0.1, myPlayer)
 	myTeam._passTo(candidate)
 	myPlayer.lowshot = false
 	myTeam.posession = false
