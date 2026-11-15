@@ -34,6 +34,11 @@ const SHARP_AI_RATING = 84
 # Big-game players: in the quarter-finals and later they step up (rating -> new value, capped at 10).
 const BIG_GAME_PLAYERS = {"F Valverde": {"speed": 1.0, "aggression": 1.5, "agility": 1.0, "curl": 1.0, "smart": 0.5, "shoot": 1.0},
 	"J Bellingham": {"speed": 1.0, "aggression": 1.0, "agility": 1.0, "curl": 0.5, "smart": 0.5, "shoot": 1.0}}
+# 2017 Real Madrid from the quarter-finals on: every player steps up by this much (cap 12),
+# and Ronaldo gets extra on top.
+const MADRID_2017_BOOST = {"speed": 1.5, "agility": 1.5, "curl": 1.5, "smart": 1.5, "shoot": 1.5}
+const RONALDO_EXTRA = {"speed": 1.0, "shoot": 1.5, "agility": 0.5}
+const MADRID_2017_CAP = 12.0
 
 # The real 2026/27 league-phase draw: 8 matchdays of [home, away].
 const REAL_FIXTURES = [
@@ -251,8 +256,15 @@ func _record(h, a, s):
 		else:
 			row["l"] += 1
 
+# 2017 Real Madrid in the quarter-finals and later: Champions League mode, far stronger.
+const MADRID_2017_KO_RATING = 10.0
+func strength(i):
+	if madrid2017 and files[i] == "Real Madrid" and knockoutStage and koRound >= 2:
+		return ratings[i] + MADRID_2017_KO_RATING
+	return ratings[i]
+
 func _simScore(a, b, homeEdge):
-	var gap = ratings[a] - ratings[b] + (HOME_EDGE if homeEdge else 0.0)
+	var gap = strength(a) - strength(b) + (HOME_EDGE if homeEdge else 0.0)
 	return [_poisson(clamp(BASE_GOALS * exp(GAP_FACTOR * gap), 0.25, 4.5)),
 		_poisson(clamp(BASE_GOALS * exp(- GAP_FACTOR * gap), 0.25, 4.5))]
 
@@ -267,7 +279,7 @@ func _poisson(lam):
 
 # Chance the first club wins a shootout: slightly favours the stronger side.
 func _penEdge(a, b):
-	return clamp(0.5 + 0.01 * (ratings[a] - ratings[b]), 0.35, 0.65)
+	return clamp(0.5 + 0.01 * (strength(a) - strength(b)), 0.35, 0.65)
 
 # --- Table and knockouts --------------------------------------------------------------------
 

@@ -345,6 +345,8 @@ func _save():
 		saveBtn.text = "saved!"
 
 func _bigGame(td):
+	if td.teamname == "2017 Real Madrid":
+		return _madrid2017KO(td)
 	var copy = null
 	for i in range(12):
 		var key = "player" + str(i)
@@ -359,6 +361,24 @@ func _bigGame(td):
 			boosted[k] = min(float(boosted.get(k, 5.0)) + plus[k], 10.0)
 		copy.set(key, boosted)
 	return copy if copy != null else td
+
+func _madrid2017KO(td):
+	var copy = td.duplicate()
+	copy.level = 0.0
+	for i in range(12):
+		var key = "player" + str(i)
+		var pp = td.get(key)
+		if typeof(pp) != TYPE_DICTIONARY:
+			continue
+		var boosted = pp.duplicate()
+		for k in UCL.MADRID_2017_BOOST:
+			var plus = UCL.MADRID_2017_BOOST[k]
+			if pp.get("name", "") == "C Ronaldo":
+				plus += UCL.RONALDO_EXTRA.get(k, 0.0)
+			var v = float(boosted.get(k, 5.0))
+			boosted[k] = max(v, min(v + plus, UCL.MADRID_2017_CAP))
+		copy.set(key, boosted)
+	return copy
 
 func _simRound():
 	ucl.simulateRound()
