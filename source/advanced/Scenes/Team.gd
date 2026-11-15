@@ -2380,11 +2380,27 @@ func _isOffsidePosition(p):
 	depths.sort()
 	return depths.size() >= 2 and depth > depths[depths.size() - 2]
 
+# The offside line at the instant the ball is played: the second-last defender (keeper
+# counted), but never behind the ball or the halfway line. Being level counts as onside.
+const OFFSIDE_LEVEL = 0.4
+var kickLine = 0.0
+
+func _kickOffsideLine():
+	var depths = []
+	for o in opponent.players:
+		if o.carded < 2:
+			depths.append(o.translation.x * playDir)
+	depths.sort()
+	var line = depths[depths.size() - 2] if depths.size() >= 2 else 1000.0
+	return max(max(line, ball.translation.x * playDir), 0.0)
+
 func _offsidePlayers(kicker):
 	var flagged = {}
+	kickLine = _kickOffsideLine()
 	for i in range(1, Global.squad):
-		if players[i] != kicker and _isOffsidePosition(players[i]):
-			flagged[players[i]] = true
+		var p = players[i]
+		if p != kicker and p.carded < 2 and p.translation.x * playDir > kickLine + OFFSIDE_LEVEL:
+			flagged[p] = true
 	return flagged
 
 func _offsideCalled(offender):
