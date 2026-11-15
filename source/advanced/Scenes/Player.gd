@@ -1025,7 +1025,7 @@ func _on_TrapArea_body_entered(body):
 						continue
 					if b.get_parent().myTeam.teamID != myTeam.teamID and not ball._isShooting() and randf() >= pBallWin * 0.7:
 						fouled = true
-						hardFoul = _isHardTackle(b.get_parent())
+						hardFoul = false
 						b.get_parent().AI._fouled()
 			
 				
