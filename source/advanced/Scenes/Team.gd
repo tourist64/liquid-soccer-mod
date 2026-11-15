@@ -1341,8 +1341,15 @@ func _getDefendFKPos(pid):
 func _getPenPosition(pid):
 	# The taker is always the last player (Team._penalty sets kickTaker that way): stand behind
 	# the ball. In 8v8 that's player 7, so player 6 joins the others on the edge of the box.
-	if pid == Global.squad - 1:
+	# The taker stands behind the ball; if that's a designated taker, the last player takes his
+	# usual spot instead.
+	var taker = Global.squad - 1
+	if Game.kickTaker != null and is_instance_valid(Game.kickTaker) and Game.kickTaker.get("myTeam") == self:
+		taker = Game.kickTaker.myID
+	if pid == taker:
 		return Vector3(Game.penend * - 91 * Global.ps, 0, 0)
+	if pid == Global.squad - 1:
+		pid = taker
 	if pid == 6:
 		return Vector3(Game.penend * - 70 * Global.ps, 0, 14)
 	match pid:
@@ -1835,13 +1842,19 @@ func _penalty():
 	ball.translation = Vector3(Game.penend * - 100 * Global.ps, 1.0, 0.0)
 	
 	
+	# Taker: a designated one on the pitch (Ronaldo), else the last player not sent off. Chosen
+	# before anyone moves, so everyone's spot (_getPenPosition) knows who it is.
+	for i in range(0, Global.squad):
+		if players[i].carded < 2:
+			Game.kickTaker = players[i]
+	var star = _penStar()
+	if star != null:
+		Game.kickTaker = star
 	for i in range(0, Global.squad):
 		players[i].AI._penalty()
 		players[i].isAI = true
 		
 		players[i]._loseControl()
-		if players[i].carded < 2:
-			Game.kickTaker = players[i]
 	pplayer = Game.kickTaker
 	# Whoever takes it (the last player not sent off) stands just behind the spot.
 	if pplayer != null:
@@ -2010,12 +2023,28 @@ func _shootout():
 		
 		players[i]._loseControl()
 	
+# Players who always take this team's penalties (first in a shootout).
+const PEN_STARS = ["C Ronaldo"]
+func _penStar():
+	for i in range(1, Global.squad):
+		var p = players[i]
+		if p.carded < 2 and p.has_meta("squadSlot") and _playerName(p.get_meta("squadSlot")) in PEN_STARS:
+			return p
+	return null
+
 func _shootoutKick( var kn):
 	
 	players[0].AI._shootout()
-	
-	players[6 - kn].AI._penaltyTaker()
-	return players[6 - kn]
+	var k = players[6 - kn]
+	# A designated taker goes first; whoever normally kicks first takes his turn instead.
+	var star = _penStar()
+	if star != null:
+		if kn == 0:
+			k = star
+		elif k == star:
+			k = players[6]
+	k.AI._penaltyTaker()
+	return k
 func _shootoutDefend():
 	
 	players[0].AI._defendPen(AIteam)
