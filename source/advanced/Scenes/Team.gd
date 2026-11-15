@@ -580,8 +580,11 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 			# Aim where the ball will actually go: ahead of his run and pulled towards goal, so
 			# wingers level with the ball (Bellingham is often the furthest man up) still count.
 			var run = pl.translation + pl.velocity.normalized() * RUN_LEAD
-			# Only runners getting level or ahead of the ball count as "forward".
-			if (run.x - Global.ballpos.x) * playDir < 0.0:
+			# Runners getting level or ahead of the ball count as "forward". So do attackers a step
+			# behind it out wide or across the pitch: when the carrier is past the line, everyone
+			# else is held just behind him, and a ball into space ahead of them still beats the line.
+			var behind = (run.x - Global.ballpos.x) * playDir
+			if behind < 0.0 and (behind < - BEHIND_ALLOW or abs(pl.translation.z - Global.ballpos.z) < 12.0):
 				continue
 			var spot = run + (goal - run) * 0.2
 			var to = spot - Global.ballpos
@@ -768,6 +771,7 @@ func _closestPToP( var target):
 # onside team-mate who can get there in time goes for it instead.
 const OFFSIDE_YIELD = 10.0
 const RUN_LEAD = 8.0
+const BEHIND_ALLOW = 6.0
 func _offsideExtra(P):
 	return OFFSIDE_YIELD if ball.offsideFlags.has(P) else 0.0
 
