@@ -577,12 +577,19 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 			var pl = players[i]
 			if pl.myID == _id or pl.carded > 1 or _isOffsidePosition(pl):
 				continue
-			var to = pl.translation + pl.velocity.normalized() * 2.0 - Global.ballpos
+			# Aim where the ball will actually go: ahead of his run and pulled towards goal, so
+			# wingers level with the ball (Bellingham is often the furthest man up) still count.
+			var run = pl.translation + pl.velocity.normalized() * RUN_LEAD
+			# Only runners getting level or ahead of the ball count as "forward".
+			if (run.x - Global.ballpos.x) * playDir < 0.0:
+				continue
+			var spot = run + (goal - run) * 0.2
+			var to = spot - Global.ballpos
 			to.y = 0.0
 			var gain = to.x * playDir
-			if gain < 4.0 or to.length() > reach or to.normalized().dot(lookD.normalized()) < - 0.2:
+			if gain < 2.0 or to.length() > reach or to.normalized().dot(lookD.normalized()) < - 0.2:
 				continue
-			var s = gain + to.normalized().dot(lookD.normalized()) * 10.0 - _laneBlock(to) * 25.0
+			var s = gain * 0.5 + to.normalized().dot(lookD.normalized()) * 8.0 + (_spaceAt(spot) + _spaceAt(pl.translation)) * 0.5 - _laneBlock(to) * 20.0
 			if s > bestGain:
 				bestGain = s
 				candidate = pl
@@ -632,6 +639,15 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 			dopass = false
 	
 	return dopass
+# Free room around a spot: distance to the nearest opponent, capped.
+func _spaceAt(spot):
+	var room = 20.0
+	for o in opponent.players:
+		var d = o.translation - spot
+		d.y = 0.0
+		room = min(room, d.length())
+	return room
+
 # How many opponents sit in the lane from the ball to a spot (no side effects).
 func _laneBlock(to):
 	var n = 0
@@ -749,6 +765,7 @@ func _closestPToP( var target):
 # A player flagged offside by the last pass counts as this much further from the ball, so an
 # onside team-mate who can get there in time goes for it instead.
 const OFFSIDE_YIELD = 10.0
+const RUN_LEAD = 8.0
 func _offsideExtra(P):
 	return OFFSIDE_YIELD if ball.offsideFlags.has(P) else 0.0
 
