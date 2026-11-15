@@ -571,7 +571,7 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 	# included, avoiding lanes with a defender in them. Passing quality (vision 0-1) sets how
 	# far they can reach; with nobody forward the button finds no one, as before.
 	if vision >= 0.0:
-		var reach = lerp(28.0, 70.0, vision)
+		var reach = lerp(55.0, 95.0, vision)
 		var bestGain = - 1000.0
 		for i in range(1, Global.squad):
 			var pl = players[i]
@@ -586,7 +586,10 @@ func _findThruPass(pos, lookD, _id, vision = - 1.0):
 			if s > bestGain:
 				bestGain = s
 				candidate = pl
-	for cone in ([] if vision >= 0.0 else [0.55, 0.15]):
+	# Nobody in range: fall back to the nearest onside team-mate roughly that way.
+	for cone in [0.55, 0.15]:
+		if candidate:
+			break
 		for i in range(1, Global.squad):
 			diff = (players[i].translation) + ((players[i].velocity).normalized() * 1.0) - Global.ballpos
 			
