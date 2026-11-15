@@ -123,10 +123,12 @@ func _quadratic_bezier(p0: Vector3, p1: Vector3, p2: Vector3, t: float):
 	
 
 
+const BALL_STATES = [pstate.POSESSION, pstate.PCOLLECT, pstate.PRESS, pstate.INTERCEPT, pstate.HEAD, pstate.PICKUP, pstate.KICKER, pstate.SHOOT, pstate.SLIDE, pstate.BIKE, pstate.PCONTROL, pstate.PENALTY, pstate.THROWIN, pstate.HOLDING]
 func seek( var t):
 	
-	# Players holding position stay onside; runs onto a pass use other states.
-	if state == pstate.PLAYING or state == pstate.SUPPORT:
+	# Off the ball everyone stays strictly onside (and drops back if caught offside). Only
+	# going for the ball itself - receiving a pass, pressing, intercepting, heading - may cross it.
+	if not (state in BALL_STATES or myTeam.passto == myPlayer):
 		t = myTeam._keepOnside(t, myPlayer.myID)
 	var diff = (t - pos)
 
