@@ -30,16 +30,16 @@ crossing = 0.55
 setPieces = 0.60
 player0 = {
 "aggression": 8.0,
-"agility": 8.0,
-"curl": 6.0,
+"agility": 10.5,
+"curl": 9.5,
 "facehair": 0,
 "hair": Color( 0.850, 0.700, 0.400, 1 ),
 "hairtype": 4,
 "name": "M Neuer",
 "shoot": 6.0,
 "skin": Color( 0.960, 0.800, 0.690, 1 ),
-"smart": 10.0,
-"speed": 5.0
+"smart": 10.5,
+"speed": 7.0
 }
 player1 = {
 "aggression": 8.0,
