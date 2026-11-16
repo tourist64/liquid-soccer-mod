@@ -26,7 +26,7 @@ approach = 9.0
 League = 7
 player0 = {
 "aggression": 8.0,
-"agility": 11.5,
+"agility": 12.0,
 "curl": 9.5,
 "facehair": 0,
 "hair": Color( 0.850, 0.700, 0.400, 1 ),
@@ -34,7 +34,7 @@ player0 = {
 "name": "M Neuer",
 "shoot": 4.0,
 "skin": Color( 0.960, 0.800, 0.690, 1 ),
-"smart": 11.5,
+"smart": 12.0,
 "speed": 7.0
 }
 player1 = {
