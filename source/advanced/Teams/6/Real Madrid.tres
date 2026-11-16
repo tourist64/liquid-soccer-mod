@@ -45,11 +45,11 @@ player0 = {
 "speed": 5.0
 }
 player1 = {
-"aerial": 11.5,
-"hitbox": 1.35,
-"block": 0.9,
-"aggression": 9.5,
-"agility": 8.0,
+"aerial": 10.0,
+"hitbox": 1.1,
+"block": 0.6,
+"aggression": 9.0,
+"agility": 7.5,
 "curl": 4.0,
 "facehair": 1,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
@@ -57,12 +57,13 @@ player1 = {
 "name": "E Militao",
 "shoot": 5.0,
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
-"smart": 10.0,
-"speed": 9.5
+"smart": 8.5,
+"speed": 9.0
 }
 player2 = {
-"aggression": 8.5,
-"agility": 8.5,
+"longShot": 1.0,
+"aggression": 8.0,
+"agility": 8.0,
 "curl": 8.5,
 "facehair": 2,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
@@ -70,17 +71,17 @@ player2 = {
 "name": "F Valverde",
 "shoot": 10.0,
 "skin": Color( 0.780, 0.570, 0.450, 1 ),
-"smart": 9.5,
-"speed": 9.0
+"smart": 9.0,
+"speed": 8.5
 }
 player3 = {
-"strength": 9.5,
-"ballWin": 1.0,
-"pressRes": 0.8,
-"block": 0.8,
-"aerial": 11.5,
-"hitbox": 1.35,
-"aggression": 10.0,
+"strength": 8.5,
+"ballWin": 0.6,
+"pressRes": 0.6,
+"block": 0.5,
+"aerial": 10.0,
+"hitbox": 1.1,
+"aggression": 9.0,
 "agility": 8.0,
 "curl": 7.0,
 "facehair": 0,
@@ -89,7 +90,7 @@ player3 = {
 "name": "A Tchouameni",
 "shoot": 8.0,
 "skin": Color( 0.330, 0.210, 0.140, 1 ),
-"smart": 10.0,
+"smart": 9.0,
 "speed": 8.0
 }
 player4 = {
@@ -110,7 +111,7 @@ player4 = {
 }
 player5 = {
 "aggression": 6.0,
-"agility": 10.0,
+"agility": 9.5,
 "curl": 8.5,
 "facehair": 0,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
@@ -123,7 +124,7 @@ player5 = {
 }
 player6 = {
 "aggression": 5.0,
-"agility": 9.5,
+"agility": 9.0,
 "curl": 8.5,
 "facehair": 0,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
