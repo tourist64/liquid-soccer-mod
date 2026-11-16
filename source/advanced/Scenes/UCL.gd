@@ -222,7 +222,7 @@ func _advance(playerScore):
 		else:
 			if _twoLegged():
 				# Aggregate over both legs: first at the lower seed's ground (t[1]), then at t[0].
-				var l1 = firstLeg if (mine and koLeg == 2 and firstLeg.size() == 2) else _simScore(t[1], t[0], true)
+				var l1 = firstLeg if (mine and koLeg == 2 and firstLeg.size() == 2) else _firstLegScore(t[1], t[0])
 				var l2 = _simScore(t[0], t[1], true)
 				s = [l1[1] + l2[0], l1[0] + l2[1]]
 				legs = [[l1[1], l1[0]], [l2[0], l2[1]]]
@@ -264,6 +264,15 @@ func strength(i):
 	if madrid2017 and files[i] == "Real Madrid" and knockoutStage and koRound >= 2:
 		return ratings[i] + MADRID_2017_KO_RATING
 	return ratings[i]
+
+# Quarter- and semi-final first legs: now and then Madrid get battered away from home (0-3,
+# 0-4, rarely 0-5) and have to pull off a comeback at the Bernabeu.
+const COLLAPSE_CHANCE = 0.3
+func _firstLegScore(home, away):
+	if files[away] == "Real Madrid" and koRound in [2, 3] and randf() < COLLAPSE_CHANCE:
+		var r = randf()
+		return [3 if r < 0.6 else (4 if r < 0.9 else 5), 0]
+	return _simScore(home, away, true)
 
 func _simScore(a, b, homeEdge):
 	var gap = strength(a) - strength(b) + (HOME_EDGE if homeEdge else 0.0)
@@ -349,7 +358,7 @@ func simulateRound():
 func simulateMatch():
 	var f = nextMatch()
 	if f.size() == 2 and _twoLegged() and koLeg == 1:
-		firstLeg = _simScore(f[0], f[1], true)
+		firstLeg = _firstLegScore(f[0], f[1])
 		koLeg = 2
 		_syncLeg()
 		saveState()

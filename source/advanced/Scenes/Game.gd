@@ -1071,6 +1071,19 @@ func _renderVid():
 func _renderFinish():
 	$VPC / VP.size = Vector2(1920, 1080)
 	
+# Celebration length: normally 6 seconds; a Madrid goal that levels a Champions League tie on
+# aggregate in the second leg (the comeback) gets a very long one.
+const COMEBACK_CELEBRATION = 20.0
+func _celebrationTime():
+	if _inUCL() and Global.tournament.get("leg") == 2:
+		var agg = Global.tournament.aggscore
+		var a1 = score.x + agg.y
+		var a2 = score.y + agg.x
+		var madrid = _isRealMadrid(team1.tdata) if team1Scored else _isRealMadrid(team2.tdata)
+		if madrid and a1 == a2:
+			return COMEBACK_CELEBRATION
+	return 6.0
+
 func Goal():
 	
 	ball._ballFree()
@@ -1092,7 +1105,7 @@ func Goal():
 	else:
 		t2scorer.append(goalscorer.myID)
 	
-	$Timers / Timer.wait_time = 6
+	$Timers / Timer.wait_time = _celebrationTime()
 	$Timers / Timer.start()
 	ref._kickOff()
 
