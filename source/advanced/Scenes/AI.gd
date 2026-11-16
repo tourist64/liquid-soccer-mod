@@ -1851,6 +1851,10 @@ func _update():
 	atarget = target
 	if Global.elevenMode and myPlayer.pBallWin > 0.0:
 		_readPassingLane()
+	# Tap-ins are checked every frame while a low ball comes across, not only when it first
+	# enters his danger zone.
+	if Global.gameOn and myPlayer.canControl and _moving() and myPlayer.ball._canHead() and not myTeam.posession and _tapInChance():
+		_tapIn()
 	stateFunc[state].call_func()
 	vel += aavoid
 	_setData()
@@ -1888,10 +1892,48 @@ func _on_ThreatArea_body_entered(_body):
 		target = Global.ballpos + Global.ballvel * 0.1
 
 
+# --- Tap-ins -----------------------------------------------------------------------------
+# A low ball played across the box by a team-mate, passing right by an attacker in the box who
+# isn't offside: he sweeps it first time, low, to the side away from the keeper.
+const TAPIN_REACH = 3.5
+func _tapInChance():
+	var b = myPlayer.ball
+	if Global.ballpos.y > 2.5 or Global.ballvel.length() < 30.0:
+		return false
+	var sh = b.shooter
+	if sh == null or sh == myPlayer or sh.get("myTeam") != myTeam or b.offsideFlags.has(myPlayer):
+		return false
+	if not (b.state == b.bstate.CROSSING or abs(Global.ballvel.z) > abs(Global.ballvel.x) * 0.6):
+		return false
+	var g = myTeam.goal
+	if sign(pos.x) != sign(g.x) or abs(pos.x) < 91.0 * Global.ps or abs(pos.z - g.z) > 40.0 * Global.ps:
+		return false
+	var clp = Helper.pointToLine(Global.ballpos, Global.ballpos + Global.ballvel * 0.3, pos, 1.0)
+	return Vector2(clp.x - pos.x, clp.z - pos.z).length() < TAPIN_REACH
+
+func _tapIn():
+	var g = myTeam.goal
+	var k = myTeam.opponent.players[0].translation
+	var side = - sign(k.z - g.z)
+	if abs(k.z - g.z) < 1.0:
+		side = 1.0 if randf() < 0.5 else - 1.0
+	var half = abs(myGoalL.z - myGoalR.z) * 0.5 * myPlayer.HEADER_AIM_WIDTH
+	var t = Vector3(g.x, 0.6, g.z + side * half * rand_range(0.55, 1.0))
+	var shotV = (t - Global.ballpos).normalized() * lerp(110.0, 140.0, myPlayer.pShoot)
+	shotV.y = 2.0
+	myPlayer.myAState.travel("shot")
+	myPlayer.ball._shootBall(myPlayer, shotV, Vector3.ZERO)
+	myTeam._shot(myPlayer.myID, shotV, Vector3.ZERO, 0)
+	myTeam.posession = false
+
 func _on_DangerZone_body_entered(body):
 	# Every AI-run player goes for headers, including your own team-mates (only the player you
 	# control is left to you).
 	if ( not _moving()) or (body != myPlayer.ball) or not (Global.gameOn) or not myPlayer.ball._canHead() or not myPlayer.canControl:
+		return
+	# A low cross across the box to a man in a good spot is tapped in first time (yours too).
+	if _tapInChance():
+		_tapIn()
 		return
 	if not myTeam.AIteam and myPlayer == myTeam.cplayer:
 		return

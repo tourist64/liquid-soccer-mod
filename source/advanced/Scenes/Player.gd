@@ -1089,10 +1089,14 @@ func _on_HeadArea_body_entered(_body):
 					var mov = Global.touchPad.get_force()
 					aim += mov.y * jflip * - 1.0
 				aim *= myTeam.playDir
-			else:
-				aim = rand_range( - 1.0, 1.0)
-				if aerialRated:
-					aim = sign(aim) * lerp(abs(aim), 1.0, pAerial * 0.55)
+			if isAI or abs(aim) < 0.2:
+				# Head it towards the side the keeper isn't covering; better headers of the ball
+				# get closer to that spot, weaker ones stray towards the middle.
+				var k = myTeam.opponent.players[0].translation
+				var gmid = (myGoalL + myGoalR) * 0.5
+				var awayL = (myGoalL - gmid).dot(k - gmid) < 0.0
+				var skill = pAerial if aerialRated else 0.6
+				aim = (- 1.0 if awayL else 1.0) * clamp(lerp(0.35, 0.9, skill) + rand_range( - 0.25, 0.25) * (1.2 - skill), 0.1, 1.0)
 			
 			
 			shotV = lerp(myGoalL, myGoalR, smoothstep( - 1, 1, aim))
