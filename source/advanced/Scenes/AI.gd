@@ -1893,12 +1893,14 @@ func _on_ThreatArea_body_entered(_body):
 
 
 # --- Tap-ins -----------------------------------------------------------------------------
-# A low ball played across the box by a team-mate, passing right by an attacker in the box who
+# A low or volleyable ball played across the box by a team-mate, passing right by an attacker in the box who
 # isn't offside: he sweeps it first time, low, to the side away from the keeper.
 const TAPIN_REACH = 3.5
+const TAPIN_MAX_HEIGHT = 3.8
 func _tapInChance():
 	var b = myPlayer.ball
-	if Global.ballpos.y > 2.5 or Global.ballvel.length() < 30.0:
+	# Up to about waist height: low balls are side-footed, bouncing or dropping ones volleyed.
+	if Global.ballpos.y > TAPIN_MAX_HEIGHT or Global.ballvel.length() < 30.0:
 		return false
 	var sh = b.shooter
 	if sh == null or sh == myPlayer or sh.get("myTeam") != myTeam or b.offsideFlags.has(myPlayer):
@@ -1921,7 +1923,7 @@ func _tapIn():
 	var t = Vector3(g.x, 0.6, g.z + side * half * rand_range(0.55, 1.0))
 	var shotV = (t - Global.ballpos).normalized() * lerp(110.0, 140.0, myPlayer.pShoot)
 	shotV.y = 2.0
-	myPlayer.myAState.travel("shot")
+	myPlayer.myAState.travel("scissor" if Global.ballpos.y > 2.0 else "shot")
 	myPlayer.ball._shootBall(myPlayer, shotV, Vector3.ZERO)
 	myTeam._shot(myPlayer.myID, shotV, Vector3.ZERO, 0)
 	myTeam.posession = false
