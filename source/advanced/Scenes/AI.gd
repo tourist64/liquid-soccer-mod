@@ -542,9 +542,26 @@ func pressState():
 func pcollectState():
 	
 	if myTeam.posession:
-		
+		thruSpot = null
 		changeState(pstate.PLAYING)
 		return
+	# Through ball: run to where it's going. Once the ball is close, has nearly stopped or has gone
+	# past him, attack the ball itself as usual.
+	if thruSpot != null:
+		var toBall = Vector2(Global.ballpos.x - pos.x, Global.ballpos.z - pos.z).length()
+		var bv = Vector2(Global.ballvel.x, Global.ballvel.z)
+		var ballToSpot = Vector2(thruSpot.x - Global.ballpos.x, thruSpot.z - Global.ballpos.z)
+		if toBall < 14.0 or bv.length() < 15.0 or bv.dot(ballToSpot) < 0.0 or myTeam.passto != myPlayer:
+			thruSpot = null
+		else:
+			target = thruSpot
+			var _c = seek(target)
+			atarget = target
+			view = Global.ballpos
+			if myPlayer.pSpeed <= myPlayer.pOSpeed:
+				myPlayer._burst()
+				myPlayer.myfx.emitting = Global.doParticles
+			return
 	if longpass:
 		var lookahead = 0.15
 		if Global.ballpos.y > 4:
@@ -1027,7 +1044,12 @@ func tryFKLongPass():
 	myTeam.opponent.setDefend()
 	
 
+# Where a through ball is aimed: the receiver runs straight there instead of chasing the ball.
+var thruSpot = null
 func _receivePass( var ppos, var dir, var ptype):
+	thruSpot = null
+	if ptype == 2:
+		thruSpot = Vector3(Global.ballpos.x + dir.x, 0.0, Global.ballpos.z + dir.z)
 	longpass = ptype == 1
 	if longpass:
 		target = ppos + dir * 2.0

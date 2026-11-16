@@ -604,9 +604,8 @@ func _findThruPass(pos, lookD, _id):
 			pplayer = candidate
 			dopass = true
 		
-			if AIteam:
-			
-			
+			# The receiver is told where the ball is going (unless he is the one you control).
+			if AIteam or candidate != cplayer:
 				candidate.AI._receivePass(pos, passDir, 2)
 			opponent.pressTarget(candidate, false)
 			passto = candidate
@@ -620,12 +619,16 @@ func _findThruPass(pos, lookD, _id):
 # is safe when no defender can get to the ball's path before the ball does and the runner gets
 # to the spot before any defender. Best: the safe spot gaining the most ground; if none is safe,
 # the least risky one (usually nearer his feet). Returns [spot, score].
-const THRU_LEADS = [18.0, 13.0, 8.0, 4.0, 0.0]
+# Up to 24 ahead: with open space the ball is played deeper (and harder) so he runs onto it in a
+# more dangerous place, as long as he still gets there before every defender and the keeper.
+const THRU_LEADS = [24.0, 18.0, 13.0, 8.0, 4.0, 0.0]
 const THRU_SIDES = [0.0, - 6.0, 6.0]
 const RUN_SPEED = 30.0       # a runner's sprint speed in units a second
-const DEF_SPEED = 30.0
+const DEF_SPEED = 34.0
 const DEF_REACH = 3.0        # a defender's legs reach this far
-const DEF_REACT = 0.2        # seconds before a defender moves for the ball
+const DEF_REACT = 0.1        # seconds before a defender moves for the ball
+const RUN_MARGIN = 0.25      # the runner must win the race to the spot by this much
+const DEEP_MARGIN = 0.4      # and by this much more for the deepest balls
 func _thruSpot(r):
 	var ahead = r.velocity
 	ahead.y = 0.0
@@ -644,9 +647,9 @@ func _thruSpot(r):
 			# Stay well inside the lines: the ball rolls on past the spot.
 			if abs(spot.z) > 70.0 * Global.ps or spot.x * playDir > 105.0 * Global.ps:
 				continue
-			var risk = _thruRisk(spot, r)
+			var risk = _thruRisk(spot, r, DEEP_MARGIN if lead > 18.0 else 0.0)
 			var gain = (spot.x - Global.ballpos.x) * playDir
-			var sc = gain * 0.3 + lead * 0.2 - abs(off) * 0.2 - risk * 40.0
+			var sc = gain * 0.5 + lead * 0.3 - abs(off) * 0.2 - risk * 40.0
 			if sc > bestScore:
 				bestScore = sc
 				best = spot
@@ -654,7 +657,7 @@ func _thruSpot(r):
 
 # How badly defenders threaten a pass to this spot: 0 = clean; more is worse (seconds a defender
 # would be early, summed over the path and the spot itself).
-func _thruRisk(spot, r):
+func _thruRisk(spot, r, extra = 0.0):
 	var from = Global.ballpos
 	from.y = 0.0
 	var path = spot - from
@@ -683,7 +686,7 @@ func _thruRisk(spot, r):
 			worst = max(worst, tBall - tDef)
 		# At the spot: the runner must get there first.
 		var tDefSpot = max(0.0, (op - spot).length() - DEF_REACH) / DEF_SPEED + DEF_REACT
-		worst = max(worst, runT - tDefSpot)
+		worst = max(worst, runT + RUN_MARGIN + extra - tDefSpot)
 		risk += max(0.0, worst)
 	return risk
 
