@@ -303,7 +303,9 @@ func _process( var delta):
 		
 		else:
 			velocity = AI.divevel
-			AI.divevel *= pow(0.98, (delta / 0.01666667))
+			# Faster divers slow down in step (see Team: diveFast), so a dive lands where it
+			# always would, just sooner.
+			AI.divevel *= pow(1.0 - 0.02 * (get_meta("diveFast") if has_meta("diveFast") else 1.0), (delta / 0.01666667))
 			
 			
 			

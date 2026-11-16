@@ -223,11 +223,12 @@ func setPlayerParams( var p, var i):
 	
 	if i == 0:
 		p.pAgg = p.pAggression * 0.6
-		# Keeper class from agility and smart (8.5 and below = 0, 10 = 0.75, 11 = 1.25 for Neuer): top keepers come
+		# Keeper class from agility and smart (8.5 and below = 0, 10 = 0.75, Raya 10.5 = 1, Neuer 11.5 = 1.5): top keepers come
 		# out further and quicker to narrow the angle (AIKeeper.moveKeeper).
-		p.set_meta("rushClass", clamp((float(pp["agility"]) + float(pp["smart"])) * 0.5 - 8.5, 0.0, 2.5) * 0.5)
+		p.set_meta("rushClass", clamp((float(pp["agility"]) + float(pp["smart"])) * 0.5 - 8.5, 0.0, 3.0) * 0.5)
 		# Top keepers dive faster too (Keeper.gd caps a dive at pDiveSpeed).
-		p.pDiveSpeed = 30.0 * (1.0 + 0.25 * p.get_meta("rushClass"))
+		p.set_meta("diveFast", 1.0 + 0.25 * p.get_meta("rushClass"))
+		p.pDiveSpeed = 30.0 * p.get_meta("diveFast")
 		# Save reach: the keeper's save box (AreaTest on his spine) a little bigger for everyone,
 		# more for top keepers (Neuer about +23%, Courtois/Raya +17%).
 		var saveBox = p.find_node("AreaTest", true, false)

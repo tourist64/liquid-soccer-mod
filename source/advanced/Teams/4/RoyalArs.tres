@@ -19,7 +19,7 @@ numberColor = Color( 0.905882, 0.807843, 0.807843, 1 )
 sponsor = "pvc"
 shirtType = 6
 shirt2Type = 0
-level = 0
+level = 0.0
 tictacs = 5.0
 aggression = 4.0
 approach = 5.0
@@ -30,7 +30,7 @@ crossing = 0.85
 setPieces = 1.30
 player0 = {
 "aggression": 7.0,
-"agility": 10.0,
+"agility": 10.5,
 "curl": 6.0,
 "facehair": 2,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
@@ -38,10 +38,11 @@ player0 = {
 "name": "D Raya",
 "shoot": 5.0,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
-"smart": 10.0,
+"smart": 10.5,
 "speed": 5.0
 }
 player1 = {
+"ballWin": 0.8,
 "aggression": 10.0,
 "agility": 9.0,
 "curl": 5.0,
@@ -50,7 +51,7 @@ player1 = {
 "hairtype": 2,
 "strength": 10.0,
 "aerial": 10.0,
-"block": 1.0,
+"block": 0.8,
 "name": "J Timber",
 "shoot": 5.0,
 "skin": Color( 0.450, 0.290, 0.200, 1 ),
@@ -58,6 +59,7 @@ player1 = {
 "speed": 9.0
 }
 player2 = {
+"ballWin": 0.7,
 "aggression": 10.0,
 "agility": 9.0,
 "curl": 6.0,
@@ -66,7 +68,7 @@ player2 = {
 "hairtype": 4,
 "strength": 10.0,
 "aerial": 10.0,
-"block": 1.0,
+"block": 0.8,
 "name": "R Calafiori",
 "shoot": 6.0,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
@@ -74,6 +76,7 @@ player2 = {
 "speed": 8.0
 }
 player3 = {
+"ballWin": 0.9,
 "aggression": 10.0,
 "agility": 9.0,
 "curl": 4.0,
@@ -90,6 +93,7 @@ player3 = {
 "speed": 9.0
 }
 player4 = {
+"ballWin": 0.8,
 "aggression": 10.0,
 "agility": 8.0,
 "curl": 4.0,
@@ -151,6 +155,7 @@ player7 = {
 "speed": 5.0
 }
 player8 = {
+"ballWin": 0.8,
 "aggression": 8.0,
 "agility": 7.0,
 "curl": 8.0,

@@ -193,6 +193,14 @@ func longShotState():
 	
 	
 	
+	# Keep reading the shot as it flies (it may be curling), allowing for the swing like the
+	# close-range dive does.
+	if ball._isShooting():
+		var lt = intersectShot(Global.ballvel)
+		lt += ball.curl.z * myPlayer.transform.basis.x * - 1.85 * flip
+		lt.y = 0
+		lt.x = clamp(lt.x, - 135.0 * Global.ps, 135.0 * Global.ps)
+		longTarget = lt
 	target = longTarget
 	var _close = seek()
 	# Get across to a long shot quickly: 20% faster for every keeper, up to 80% for the best.
@@ -468,7 +476,7 @@ func intersectShot(shdir):
 func incomingState():
 	
 	
-	var velval = myPlayer.pDiveAgile * 0.6 * (1.0 + 0.25 * _rushClass())
+	var velval = myPlayer.pDiveAgile * 0.6 * (myPlayer.get_meta("diveFast") if myPlayer.has_meta("diveFast") else 1.0)
 	
 	isUp = false
 	dview = Global.ballpos
