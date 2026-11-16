@@ -228,6 +228,11 @@ func setPlayerParams( var p, var i):
 		p.set_meta("rushClass", clamp((float(pp["agility"]) + float(pp["smart"])) * 0.5 - 8.5, 0.0, 2.5) * 0.5)
 		# Top keepers dive faster too (Keeper.gd caps a dive at pDiveSpeed).
 		p.pDiveSpeed = 30.0 * (1.0 + 0.25 * p.get_meta("rushClass"))
+		# Save reach: the keeper's save box (AreaTest on his spine) a little bigger for everyone,
+		# more for top keepers (Neuer about +23%, Courtois/Raya +17%).
+		var saveBox = p.find_node("AreaTest", true, false)
+		if saveBox != null:
+			saveBox.scale = Vector3.ONE * (1.08 + 0.12 * p.get_meta("rushClass"))
 		var klev = Global.config.get_value("game", "skillLevel")
 		p.pDiveAgile = lerp(1.25, 3, klev)
 		
