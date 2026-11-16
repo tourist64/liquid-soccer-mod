@@ -155,7 +155,7 @@ func setupFormation():
 		cformation.append(Vector3(range_lerp(tdata.cor[i].y, 0, 1, - 150 * Global.ps, 150 * Global.ps), 0, range_lerp(tdata.cor[i].x, 0, 1, 100 * Global.ps, - 100 * Global.ps)))
 		
 
-const HUMAN_COURTOIS_NERF = 0.5
+const HUMAN_COURTOIS_NERF = 0.75
 func setPlayerParams( var p, var i):
 	# Remember which squad entry this player came from (subs reorder the players array).
 	p.set_meta("squadSlot", i)
