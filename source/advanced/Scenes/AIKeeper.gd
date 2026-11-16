@@ -195,6 +195,8 @@ func longShotState():
 	
 	target = longTarget
 	var _close = seek()
+	# Get across to a long shot quickly: 20% faster for every keeper, up to 80% for the best.
+	vel *= 1.2 + 0.6 * _rushClass()
 	
 	view = Global.ballpos
 	debugtarget.translation = longTarget
@@ -466,7 +468,7 @@ func intersectShot(shdir):
 func incomingState():
 	
 	
-	var velval = myPlayer.pDiveAgile * 0.6
+	var velval = myPlayer.pDiveAgile * 0.6 * (1.0 + 0.25 * _rushClass())
 	
 	isUp = false
 	dview = Global.ballpos
@@ -821,8 +823,12 @@ func _shotIncoming( var A, var shotV, var _curl, var stype):
 	else:
 		call_deferred("longshotCalcTarget")
 
+func _rushClass():
+	return myPlayer.get_meta("rushClass") if myPlayer.has_meta("rushClass") else 0.0
+
 func longshotCalcTarget():
-		yield(get_tree().create_timer(0.1), "timeout")
+		# Top keepers read a long shot almost at once.
+		yield(get_tree().create_timer(lerp(0.1, 0.03, _rushClass())), "timeout")
 		longTarget = intersectShot(Global.ballvel)
 		
 		

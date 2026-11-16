@@ -223,9 +223,11 @@ func setPlayerParams( var p, var i):
 	
 	if i == 0:
 		p.pAgg = p.pAggression * 0.6
-		# Keeper class 0-1 from agility and smart (8.5 and below = 0, 10.5 = 1): top keepers come
+		# Keeper class from agility and smart (8.5 and below = 0, 10 = 0.75, 11 = 1.25 for Neuer): top keepers come
 		# out further and quicker to narrow the angle (AIKeeper.moveKeeper).
-		p.set_meta("rushClass", clamp((float(pp["agility"]) + float(pp["smart"])) * 0.5 - 8.5, 0.0, 2.0) * 0.5)
+		p.set_meta("rushClass", clamp((float(pp["agility"]) + float(pp["smart"])) * 0.5 - 8.5, 0.0, 2.5) * 0.5)
+		# Top keepers dive faster too (Keeper.gd caps a dive at pDiveSpeed).
+		p.pDiveSpeed = 30.0 * (1.0 + 0.25 * p.get_meta("rushClass"))
 		var klev = Global.config.get_value("game", "skillLevel")
 		p.pDiveAgile = lerp(1.25, 3, klev)
 		
