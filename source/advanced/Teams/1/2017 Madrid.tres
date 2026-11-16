@@ -112,10 +112,11 @@ player5 = {
 "speed": 11.0
 }
 player6 = {
-"aggression": 6.0,
-"agility": 10.0,
+"strength": 10.0,
+"aggression": 8.0,
+"agility": 12.0,
 "aerial": 12.0,
-"curl": 9.5,
+"curl": 11.5,
 "facehair": 0,
 "hair": Color( 0.250, 0.150, 0.080, 1 ),
 "hairtype": 6,
@@ -124,8 +125,8 @@ player6 = {
 "name": "C Ronaldo",
 "shoot": 10.0,
 "skin": Color( 0.780, 0.570, 0.450, 1 ),
-"smart": 10.0,
-"speed": 10.0
+"smart": 12.0,
+"speed": 12.0
 }
 player7 = {
 "aggression": 10.0,

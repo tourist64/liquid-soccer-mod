@@ -30,7 +30,7 @@ unitShape = 1.0
 midBlock = 0.6
 setPieces = 1.2
 cornerLockdown = 1.0
-anchorId = 3
+anchorId = -1
 player0 = {
 "aggression": 6.0,
 "agility": 10.0,
@@ -75,23 +75,17 @@ player2 = {
 "speed": 8.5
 }
 player3 = {
-"strength": 8.5,
-"ballWin": 0.6,
-"pressRes": 0.6,
-"block": 0.5,
-"aerial": 10.0,
-"hitbox": 1.1,
-"aggression": 9.0,
-"agility": 8.0,
-"curl": 7.0,
+"aggression": 7.0,
+"agility": 10.5,
+"curl": 11.5,
 "facehair": 0,
-"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hair": Color( 0.550, 0.380, 0.200, 1 ),
 "hairtype": 0,
-"name": "A Tchouameni",
-"shoot": 8.0,
-"skin": Color( 0.330, 0.210, 0.140, 1 ),
-"smart": 9.0,
-"speed": 8.0
+"name": "A Guler",
+"shoot": 8.5,
+"skin": Color( 0.960, 0.800, 0.690, 1 ),
+"smart": 10.0,
+"speed": 8.5
 }
 player4 = {
 "hitbox": 1.25,
@@ -149,17 +143,23 @@ player7 = {
 "speed": 10.5
 }
 player8 = {
-"aggression": 5.0,
-"agility": 10.5,
-"curl": 11.5,
+"strength": 8.5,
+"ballWin": 0.6,
+"pressRes": 0.6,
+"block": 0.5,
+"aerial": 10.0,
+"hitbox": 1.1,
+"aggression": 9.0,
+"agility": 8.0,
+"curl": 7.0,
 "facehair": 0,
-"hair": Color( 0.550, 0.380, 0.200, 1 ),
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 0,
-"name": "A Guler",
-"shoot": 8.5,
-"skin": Color( 0.960, 0.800, 0.690, 1 ),
-"smart": 10.0,
-"speed": 8.5
+"name": "A Tchouameni",
+"shoot": 8.0,
+"skin": Color( 0.330, 0.210, 0.140, 1 ),
+"smart": 9.0,
+"speed": 8.0
 }
 player9 = {
 "aggression": 8.5,

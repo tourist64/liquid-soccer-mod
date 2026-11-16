@@ -1103,11 +1103,13 @@ func _on_HeadArea_body_entered(_body):
 			# Aim inside the posts (the middle 75% of the goal), not right at them.
 			var mid = (myGoalL + myGoalR) * 0.5
 			shotV = mid + (shotV - mid) * HEADER_AIM_WIDTH
-			shotV = shotV - translation
+			# Aim from the ball (it's struck at head height) at a point low in the goal. Measuring
+			# from his feet tilted every header up and over the bar.
+			shotV.y = rand_range(1.5, 4.5)
+			shotV = shotV - ball.translation
 			
 			var headPower = lerp(82.0, 105.0, pAerial) if aerialRated else 92.0
-			# Down, but not so steeply that it bounces up and over from range.
-			var headdir = (shotV.normalized() + Vector3(0, lerp( - 0.05, - 0.2, pShoot), 0)) * headPower
+			var headdir = shotV.normalized() * headPower
 			if sign(transform.basis.z.x) == sign(myTeam.playDir):
 				headdir = (myGoal - translation).normalized()
 				ball._tapBall(headdir * 60.0 + Vector3(0, rand_range(20, 25), 0), self)

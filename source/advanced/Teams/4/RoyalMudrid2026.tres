@@ -163,7 +163,7 @@ player8 = {
 "speed": 9.5
 }
 player9 = {
-"aggression": 5.0,
+"aggression": 7.0,
 "agility": 9.0,
 "curl": 10.0,
 "facehair": 0,
