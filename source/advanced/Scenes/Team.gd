@@ -1849,7 +1849,7 @@ func _throwin( var side, var position):
 	ball._initialize()
 	for i in range(0, Global.squad):
 		
-		players[i].AI.target = _getPlayPos(i)
+		players[i].AI.target = _throwSpot(i)
 		players[i].isAI = true
 		players[i].AI._kickoff()
 		if i > 0:
@@ -1870,6 +1870,16 @@ func _throwin( var side, var position):
 	state = teamState.LINEUP
 	
 
+# Where a player lines up for a throw-in. The keeper stays in his goal (a few units off his line
+# towards the ball); outfield players use their normal spot. Before, the keeper was given an
+# outfield spot and could wander out of his goal.
+func _throwSpot(pid):
+	if pid == 0:
+		var toBall = Global.ballpos - dGoal
+		toBall.y = 0.0
+		return dGoal + toBall.normalized() * 6.0
+	return _getPlayPos(pid)
+
 func _defendThrowin():
 	momentum = false
 	
@@ -1878,7 +1888,7 @@ func _defendThrowin():
 	ball._ballFree()
 	for i in range(0, Global.squad):
 		players[i].AI._kickoff()
-		players[i].AI.target = _getPlayPos(players[i].myID)
+		players[i].AI.target = _throwSpot(players[i].myID)
 		if i < 0:
 			players[i].indicator.visible = false
 
