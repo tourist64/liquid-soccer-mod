@@ -629,6 +629,8 @@ const DEF_REACH = 3.0        # a defender's legs reach this far
 const DEF_REACT = 0.1        # seconds before a defender moves for the ball
 const RUN_MARGIN = 0.25      # the runner must win the race to the spot by this much
 const DEEP_MARGIN = 0.4      # and by this much more for the deepest balls
+const CROWD_RADIUS = 18.0
+const CROWD_COUNT = 2
 func _thruSpot(r):
 	var ahead = r.velocity
 	ahead.y = 0.0
@@ -636,11 +638,18 @@ func _thruSpot(r):
 	toGoal.y = 0.0
 	if ahead.length() < 3.0:
 		ahead = toGoal
-	ahead = (ahead.normalized() + toGoal.normalized() * 0.6).normalized()
+	# Mostly towards goal, only partly along his run, so he runs forward onto it, not out wide.
+	ahead = (ahead.normalized() * 0.5 + toGoal.normalized()).normalized()
 	var side = ahead.cross(Vector3.UP)
 	var best = r.translation
 	var bestScore = - 100000.0
-	for lead in THRU_LEADS:
+	# Crowded around him (2+ defenders close by): no ball into space, just a normal pass to him.
+	var crowd = 0
+	for o in opponent.players:
+		if o.carded < 2 and Vector2(o.translation.x - r.translation.x, o.translation.z - r.translation.z).length() < CROWD_RADIUS * Global.ps:
+			crowd += 1
+	var leads = [0.0] if crowd >= CROWD_COUNT else THRU_LEADS
+	for lead in leads:
 		for off in THRU_SIDES:
 			var spot = r.translation + ahead * lead + side * off
 			spot.y = 0.0
@@ -649,7 +658,9 @@ func _thruSpot(r):
 				continue
 			var risk = _thruRisk(spot, r, DEEP_MARGIN if lead > 18.0 else 0.0)
 			var gain = (spot.x - Global.ballpos.x) * playDir
-			var sc = gain * 0.5 + lead * 0.3 - abs(off) * 0.2 - risk * 40.0
+			# Drawing him out towards the touchline counts against a spot.
+			var outward = max(0.0, abs(spot.z) - abs(r.translation.z)) + max(0.0, abs(spot.z) - 50.0 * Global.ps)
+			var sc = gain * 0.5 + lead * 0.3 - abs(off) * 0.2 - outward * 0.6 - risk * 40.0
 			if sc > bestScore:
 				bestScore = sc
 				best = spot
