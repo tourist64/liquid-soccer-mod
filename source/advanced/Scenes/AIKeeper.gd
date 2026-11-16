@@ -128,6 +128,9 @@ func moveKeeperIntersect():
 # shooter down to 65% of the way instead of halfway, leaving a smaller angle.
 const RUSH_EXTRA = 0.4
 const RUSH_CLOSE = 0.65
+const NEAR_POST_SHADE = 0.12
+const NEAR_POST_MAX = 5.0
+const LONG_DIVE_DIST = 45.0
 func moveKeeper():
 	
 	if (AIKeeper == false) and Input.is_action_pressed(myPlayer.cthru) and not myTeam.posession:
@@ -170,6 +173,10 @@ func moveKeeper():
 	if (Global.elevenMode or myTeam.tdata.sweeperKeeper > 0.0) and _shouldSweep():
 		target = Global.ballpos + Global.ballvel * 0.3
 	
+	# Shade towards the near post when the ball is wide, more for top keepers, so a shot
+	# squeezed in at the near post has less room.
+	var side = Global.ballpos.z - dGoal.z
+	target.z += sign(side) * min(abs(side) * NEAR_POST_SHADE, NEAR_POST_MAX) * (0.4 + 0.6 * min(_rushClass(), 1.0))
 	target.y = 0
 	target.x = sign(target.x) * min(135.0 * Global.ps, abs(target.x))
 	
@@ -196,11 +203,15 @@ func longShotState():
 	# Keep reading the shot as it flies (it may be curling), allowing for the swing like the
 	# close-range dive does.
 	if ball._isShooting():
-		var lt = intersectShot(Global.ballvel)
-		lt += ball.curl.z * myPlayer.transform.basis.x * - 1.85 * flip
+		var lt = _predictShot(pos.x)
 		lt.y = 0
 		lt.x = clamp(lt.x, - 135.0 * Global.ps, 135.0 * Global.ps)
 		longTarget = lt
+	# Top keepers go into a full dive once a long shot is close enough, not just a run.
+	if ball._isShooting() and _rushClass() >= 0.5 and (Global.ballpos - pos).length() < LONG_DIVE_DIST and not _diving():
+		dcount = 1
+		changeState(pstate.INCOMING)
+		return
 	target = longTarget
 	var _close = seek()
 	# Get across to a long shot quickly: 20% faster for every keeper, up to 80% for the best.
@@ -451,6 +462,36 @@ func kickerState():
 		
 		
 	
+# Where a shot will actually cross the plane x = planeX, simulating the ball's own flight: the
+# curl push SmartBall applies every frame (curl.z sideways, fading 2% a frame; curl.y up/down),
+# gravity (20 x gravity_scale 2), air damping 0.2 and a soft bounce. Curl that bends a shot back
+# inside the post is read correctly, not just offset.
+func _predictShot(planeX):
+	var p = ball.translation
+	var v = ball.linear_velocity
+	var cz = ball.curl.z
+	var cy = ball.curl.y
+	var dt = 1.0 / 60.0
+	if abs(v.x) < 1.0:
+		return p
+	for _i in range(240):
+		var left = v.normalized().cross(Vector3.UP)
+		if v.x < 0.0:
+			left = - left
+		v += (cz * left + cy * Vector3.UP) * dt * 50.0
+		cz *= 0.98
+		v.y -= 40.0 * dt
+		v *= 1.0 - 0.2 * dt
+		var np = p + v * dt
+		if np.y < 0.1:
+			np.y = 0.1
+			v.y = abs(v.y) * 0.5
+		if sign(np.x - planeX) != sign(p.x - planeX):
+			var k = (planeX - p.x) / (np.x - p.x)
+			return p + (np - p) * k
+		p = np
+	return p
+
 func intersectShot(shdir):
 	var nvel = shdir.normalized()
 	
@@ -500,11 +541,15 @@ func incomingState():
 	var intP = intersectShot(R)
 	var left = myPlayer.transform.basis.x
 	
-	if dcount > 0:
-		intP += ball.curl.z * left * - 1.75 * flip
-		intP += ball.curl.y * Vector3.UP
+	if pen:
+		if dcount > 0:
+			intP += ball.curl.z * left * - 1.75 * flip
+			intP += ball.curl.y * Vector3.UP
+		else:
+			intP += ball.curl.z * left * - 1.85 * flip
 	else:
-		intP += ball.curl.z * left * - 1.85 * flip
+		# Read the real flight, curl and dip included.
+		intP = _predictShot(pos.x)
 	intP.y = max(intP.y, 0.1)
 	
 	divedir = 0
@@ -513,7 +558,8 @@ func incomingState():
 		if rand_range(0.0, 18.0) > myPlayer.pAgility:
 			intP.z *= rand_range( - 1, 1)
 	
-	intP.y *= 0.5 + 0.5 * smoothstep(90, 180, shotDir.length())
+	if pen:
+		intP.y *= 0.5 + 0.5 * smoothstep(90, 180, shotDir.length())
 	
 	intP.x = clamp(intP.x, - 135.0 * Global.ps, 135.0 * Global.ps)
 	intP.z = clamp(intP.z, - 20.0, 20.0)
