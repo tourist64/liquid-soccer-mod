@@ -155,6 +155,7 @@ func setupFormation():
 		cformation.append(Vector3(range_lerp(tdata.cor[i].y, 0, 1, - 150 * Global.ps, 150 * Global.ps), 0, range_lerp(tdata.cor[i].x, 0, 1, 100 * Global.ps, - 100 * Global.ps)))
 		
 
+const HUMAN_COURTOIS_NERF = 0.5
 func setPlayerParams( var p, var i):
 	# Remember which squad entry this player came from (subs reorder the players array).
 	p.set_meta("squadSlot", i)
@@ -184,6 +185,11 @@ func setPlayerParams( var p, var i):
 		11:
 			pp = tdata.player11
 	
+	# Your own Courtois is a touch more human (still excellent); against you he's at full strength.
+	if i == 0 and not AIteam and typeof(pp) == TYPE_DICTIONARY and pp.get("name", "") == "T Courtois":
+		pp = pp.duplicate()
+		pp["agility"] = float(pp["agility"]) - HUMAN_COURTOIS_NERF
+		pp["smart"] = float(pp["smart"]) - HUMAN_COURTOIS_NERF
 	var lev = Global.config.get_value("game", "skillLevel")
 	lev = floor(lerp(30, 4, lev))
 	
