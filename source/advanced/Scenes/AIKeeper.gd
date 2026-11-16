@@ -124,15 +124,20 @@ func moveKeeperIntersect():
 		view = Global.ballpos
 	else:
 		moveKeeper()
+# Top keepers (rushClass, set in Team.setPlayerParams) come out up to 40% further and close the
+# shooter down to 65% of the way instead of halfway, leaving a smaller angle.
+const RUSH_EXTRA = 0.4
+const RUSH_CLOSE = 0.65
 func moveKeeper():
 	
 	if (AIKeeper == false) and Input.is_action_pressed(myPlayer.cthru) and not myTeam.posession:
 		myPlayer.pAggression = min(abs(Global.ballpos.x + 5), myPlayer.pAggression + 0.5)
 		myPlayer.pAggression = min(abs(dGoal.x - Global.ballpos.x), min(48, myPlayer.pAggression))
 	elif DZ:
-		myPlayer.pAggression += myPlayer.pAgg * 0.6
+		var rush = myPlayer.get_meta("rushClass") if myPlayer.has_meta("rushClass") else 0.0
+		myPlayer.pAggression += myPlayer.pAgg * 0.6 * (1.0 + rush)
 		var toball = dGoal - (Global.ballpos + Global.ballvel * 0.02)
-		myPlayer.pAggression = min(toball.length(), min(lerp(36.0, 20.0, abs(toball.normalized().z)), myPlayer.pAggression))
+		myPlayer.pAggression = min(toball.length(), min(lerp(36.0, 20.0, abs(toball.normalized().z)) * (1.0 + RUSH_EXTRA * rush), myPlayer.pAggression))
 		if sign(Global.ballvel.x) == sign(myTeam.playDir):
 			myPlayer.pAggression -= 0.25
 	elif (myPlayer.pAggression > myPlayer.pDAggression):
@@ -156,7 +161,9 @@ func moveKeeper():
 	var bpos = Global.ballpos + Global.ballvel * look
 	
 	if (bpos - dGoal).length_squared() < (myPlayer.pAggression * myPlayer.pAggression):
-		myPlayer.pAggression = max((bpos - dGoal).length() * 0.5, 1.0)
+		# Close in on the ball: halfway for an ordinary keeper, closer for a top one.
+		var rushIn = myPlayer.get_meta("rushClass") if myPlayer.has_meta("rushClass") else 0.0
+		myPlayer.pAggression = max((bpos - dGoal).length() * lerp(0.5, RUSH_CLOSE, rushIn), 1.0)
 	myPlayer.pAggression = max(1.0, myPlayer.pAggression)
 	
 	target = dGoal + (bpos - dGoal).normalized() * myPlayer.pAggression
