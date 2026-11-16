@@ -131,6 +131,7 @@ const RUSH_CLOSE = 0.65
 const NEAR_POST_SHADE = 0.12
 const NEAR_POST_MAX = 5.0
 const LONG_DIVE_DIST = 45.0
+const HEADER_DIVE = 0.85
 func moveKeeper():
 	
 	if (AIKeeper == false) and Input.is_action_pressed(myPlayer.cthru) and not myTeam.posession:
@@ -523,6 +524,10 @@ func incomingState():
 	
 	
 	var velval = myPlayer.pDiveAgile * 0.6 * (myPlayer.get_meta("diveFast") if myPlayer.has_meta("diveFast") else 1.0)
+	# Headers (shot types 3 and 4) are close and sudden: every keeper is a step slower to them,
+	# so a good corner header is a real chance even against Neuer.
+	if shottype == 3 or shottype == 4:
+		velval *= HEADER_DIVE
 	
 	isUp = false
 	dview = Global.ballpos

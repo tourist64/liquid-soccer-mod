@@ -1909,9 +1909,14 @@ func _tapInChance():
 	# A real cross or square ball, not a ball played straight up the pitch.
 	if not (b.state == b.bstate.CROSSING or abs(Global.ballvel.z) > abs(Global.ballvel.x) * 0.35):
 		return false
-	# In the box or just in front of it.
+	# Only at the end we attack: in the box or just in front of it, with the ball in our
+	# attacking third, and never off an opponent's last touch.
 	var g = myTeam.goal
-	if sign(pos.x) != sign(g.x) or abs(pos.x) < TAPIN_FROM_LINE * Global.ps or abs(pos.z - g.z) > 45.0 * Global.ps:
+	if myTeam.zone != 3 or sign(pos.x) != sign(g.x) or abs(pos.x) < TAPIN_FROM_LINE * Global.ps or abs(pos.z - g.z) > 45.0 * Global.ps:
+		return false
+	if abs(pos.x - g.x) > (140.0 - TAPIN_FROM_LINE) * Global.ps:
+		return false
+	if b.lastPlayer != null and b.lastPlayer.get("myTeam") != null and b.lastPlayer.myTeam != myTeam:
 		return false
 	# Within reach of where the ball is going, or of the ball itself if it has just run past
 	# him (still close enough to reach without turning right round).
@@ -1928,6 +1933,9 @@ func _tapIn():
 		side = 1.0 if randf() < 0.5 else - 1.0
 	var half = abs(myGoalL.z - myGoalR.z) * 0.5 * myPlayer.HEADER_AIM_WIDTH
 	var t = Vector3(g.x, 0.6, g.z + side * half * rand_range(0.55, 1.0))
+	# Safety: only ever towards the goal we attack.
+	if sign(t.x - Global.ballpos.x) != sign(g.x) and abs(Global.ballpos.x) < abs(g.x):
+		return
 	var shotV = (t - Global.ballpos).normalized() * lerp(110.0, 140.0, myPlayer.pShoot)
 	shotV.y = 2.0
 	myPlayer.myAState.travel("scissor" if Global.ballpos.y > 2.0 else "shot")

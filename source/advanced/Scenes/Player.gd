@@ -1105,7 +1105,7 @@ func _on_HeadArea_body_entered(_body):
 			shotV = mid + (shotV - mid) * HEADER_AIM_WIDTH
 			shotV = shotV - translation
 			
-			var headPower = lerp(72.0, 98.0, pAerial) if aerialRated else 83.5
+			var headPower = lerp(82.0, 105.0, pAerial) if aerialRated else 92.0
 			# Down, but not so steeply that it bounces up and over from range.
 			var headdir = (shotV.normalized() + Vector3(0, lerp( - 0.05, - 0.2, pShoot), 0)) * headPower
 			if sign(transform.basis.z.x) == sign(myTeam.playDir):

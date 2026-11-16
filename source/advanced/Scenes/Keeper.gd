@@ -424,8 +424,23 @@ func _physics_process(delta):
 
 
 
+# A ball already going wide or over is left alone (it goes out for a goal kick) rather than
+# touched round the post for a corner. Before, the bigger save reach turned wide headers into
+# corner after corner.
+func _goingWide():
+	if Global.penOn or not Global.gameOn or ball._isCaught():
+		return false
+	var lineX = sign(AI.dGoal.x) * 140.0 * Global.ps
+	if sign(Global.ballvel.x) != sign(lineX) or abs(Global.ballvel.x) < 5.0:
+		return false
+	var cross = AI._predictShot(lineX)
+	var half = abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5
+	return abs(cross.z) > half + 1.5 or cross.y > 10.5
+
 func doSave():
 	var saved = false
+	if _goingWide():
+		return saved
 	
 	var dc = (Global.ballpos - cp.global_transform.origin)
 	if (dc.length() < 4.5) and Global.ballvel.length_squared() < catchDistance and ( not Global.penOn) and AI._diving():
