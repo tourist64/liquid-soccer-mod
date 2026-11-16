@@ -1895,23 +1895,30 @@ func _on_ThreatArea_body_entered(_body):
 # --- Tap-ins -----------------------------------------------------------------------------
 # A low or volleyable ball played across the box by a team-mate, passing right by an attacker in the box who
 # isn't offside: he sweeps it first time, low, to the side away from the keeper.
-const TAPIN_REACH = 3.5
+const TAPIN_REACH = 6.0
+const TAPIN_FROM_LINE = 80.0      # |x| beyond this: the box (edge at 91) or just in front of it
 const TAPIN_MAX_HEIGHT = 3.8
 func _tapInChance():
 	var b = myPlayer.ball
 	# Up to about waist height: low balls are side-footed, bouncing or dropping ones volleyed.
-	if Global.ballpos.y > TAPIN_MAX_HEIGHT or Global.ballvel.length() < 30.0:
+	if Global.ballpos.y > TAPIN_MAX_HEIGHT or Global.ballvel.length() < 20.0:
 		return false
 	var sh = b.shooter
 	if sh == null or sh == myPlayer or sh.get("myTeam") != myTeam or b.offsideFlags.has(myPlayer):
 		return false
-	if not (b.state == b.bstate.CROSSING or abs(Global.ballvel.z) > abs(Global.ballvel.x) * 0.6):
+	# A real cross or square ball, not a ball played straight up the pitch.
+	if not (b.state == b.bstate.CROSSING or abs(Global.ballvel.z) > abs(Global.ballvel.x) * 0.35):
 		return false
+	# In the box or just in front of it.
 	var g = myTeam.goal
-	if sign(pos.x) != sign(g.x) or abs(pos.x) < 91.0 * Global.ps or abs(pos.z - g.z) > 40.0 * Global.ps:
+	if sign(pos.x) != sign(g.x) or abs(pos.x) < TAPIN_FROM_LINE * Global.ps or abs(pos.z - g.z) > 45.0 * Global.ps:
 		return false
+	# Within reach of where the ball is going, or of the ball itself if it has just run past
+	# him (still close enough to reach without turning right round).
 	var clp = Helper.pointToLine(Global.ballpos, Global.ballpos + Global.ballvel * 0.3, pos, 1.0)
-	return Vector2(clp.x - pos.x, clp.z - pos.z).length() < TAPIN_REACH
+	if Vector2(clp.x - pos.x, clp.z - pos.z).length() < TAPIN_REACH:
+		return true
+	return Vector2(Global.ballpos.x - pos.x, Global.ballpos.z - pos.z).length() < TAPIN_REACH
 
 func _tapIn():
 	var g = myTeam.goal

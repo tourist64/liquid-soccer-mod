@@ -1226,10 +1226,11 @@ func _getSupportPos(pid):
 	return _holdForCross(_keepOnside(_getSupportPosRaw(pid), pid), pid)
 
 # A wide team-mate carrying the ball inside the last two grass stripes (the final ~29 units
-# before the goal line) is about to cross: everyone else stops moving towards goal and holds
-# where he is. Once the ball is crossed nobody holds the ball, so they attack it as normal.
+# before the goal line) is about to cross: everyone else may run in, but only up to 12 units
+# from the goal line. Once the ball is crossed nobody holds the ball, so they attack it as normal.
 const CROSS_HOLD_DEPTH = 29.0
 const CROSS_HOLD_WIDE = 40.0
+const CROSS_HOLD_LINE = 12.0
 func _playerName(pid):
 	var pp = tdata.get("player" + str(pid)) if tdata else null
 	return pp.get("name", "") if typeof(pp) == TYPE_DICTIONARY else ""
@@ -1244,9 +1245,11 @@ func _crossHoldActive():
 func _holdForCross(p, pid):
 	if pid == 0 or not _crossHoldActive() or players[pid] == ball.player:
 		return p
-	var now = players[pid].translation.x
-	if (p.x - now) * playDir > 0.0:
-		p.x = now
+	# Attackers may keep going in, but no closer than CROSS_HOLD_LINE to the goal line: right
+	# in front of the keeper for a low ball across, without running past it.
+	var limit = 140.0 * Global.ps - CROSS_HOLD_LINE * Global.ps
+	if p.x * playDir > limit:
+		p.x = limit * playDir
 	return p
 
 func _getSupportPosRaw(pid):
