@@ -1163,6 +1163,8 @@ func _tryHeader():
 				aim = rand_range(0.0, 1.0)
 			
 			shotV = lerp(myGoalL, myGoalR, aim)
+			var mid = (myGoalL + myGoalR) * 0.5
+			shotV = mid + (shotV - mid) * myPlayer.HEADER_AIM_WIDTH
 			shotV = shotV - translation
 			
 			var headdir = (shotV.normalized() + Vector3(0, - 0.125, 0)) * 83.5
@@ -1887,7 +1889,11 @@ func _on_ThreatArea_body_entered(_body):
 
 
 func _on_DangerZone_body_entered(body):
-	if ( not _moving()) or (body != myPlayer.ball) or not (Global.gameOn) or not myPlayer.ball._canHead() or not myTeam.AIteam or not myPlayer.canControl:
+	# Every AI-run player goes for headers, including your own team-mates (only the player you
+	# control is left to you).
+	if ( not _moving()) or (body != myPlayer.ball) or not (Global.gameOn) or not myPlayer.ball._canHead() or not myPlayer.canControl:
+		return
+	if not myTeam.AIteam and myPlayer == myTeam.cplayer:
 		return
 	
 	var p = Global.ballpos + Global.ballvel * 0.1
@@ -1914,7 +1920,7 @@ func _on_DangerZone_body_entered(body):
 	var headReach = lerp(7.4, 5.0, myPlayer.pAerial) if myPlayer.aerialRated else 6.0
 	if clp.y > headReach and bdot < 0.7:
 		
-		if (myTeam.AIteam) and (state != pstate.PCOLLECT) and state != pstate.INTERCEPT:
+		if (state != pstate.PCOLLECT) and state != pstate.INTERCEPT:
 			_header(false)
 	elif myTeam.zone == 3:
 		if clp.y > 4 and clp.y < 5 and pd < 500 and bdot < 0.7:

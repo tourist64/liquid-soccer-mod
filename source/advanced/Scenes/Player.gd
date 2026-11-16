@@ -281,6 +281,11 @@ func chipPass( var human):
 				picked = myTeam._crossTarget(self, true)
 				if picked != null:
 					crossto = Vector3(picked.x, crossto.y, picked.z)
+			# Corners and set-piece crosses are aimed at the best header in the box.
+			if picked == null and AI.isSP:
+				picked = myTeam._crossTarget(self, false, true)
+				if picked != null:
+					crossto = Vector3(picked.x, crossto.y, picked.z)
 			var curl = Vector3( - myTeam.playDir * swing, - 0.2, 0) * pCurl
 			if picked != null:
 				# Half the swing, so the ball still arrives where the man is.
@@ -1069,6 +1074,7 @@ func _holdScore(holder):
 	var chance = lerp(0.25, 0.12, res)
 	return min(hold, TACKLE_ROLL * (1.0 - chance)) - pBallWin * BALL_WIN_BONUS
 
+const HEADER_AIM_WIDTH = 0.75
 func _on_HeadArea_body_entered(_body):
 	if (_body != ball) or ( not Global.gameOn) or not ball._isFree() or not canHead:
 		return
@@ -1090,10 +1096,14 @@ func _on_HeadArea_body_entered(_body):
 			
 			
 			shotV = lerp(myGoalL, myGoalR, smoothstep( - 1, 1, aim))
+			# Aim inside the posts (the middle 75% of the goal), not right at them.
+			var mid = (myGoalL + myGoalR) * 0.5
+			shotV = mid + (shotV - mid) * HEADER_AIM_WIDTH
 			shotV = shotV - translation
 			
 			var headPower = lerp(72.0, 98.0, pAerial) if aerialRated else 83.5
-			var headdir = (shotV.normalized() + Vector3(0, lerp( - 0.1, - 0.425, pShoot), 0)) * headPower
+			# Down, but not so steeply that it bounces up and over from range.
+			var headdir = (shotV.normalized() + Vector3(0, lerp( - 0.05, - 0.2, pShoot), 0)) * headPower
 			if sign(transform.basis.z.x) == sign(myTeam.playDir):
 				headdir = (myGoal - translation).normalized()
 				ball._tapBall(headdir * 60.0 + Vector3(0, rand_range(20, 25), 0), self)

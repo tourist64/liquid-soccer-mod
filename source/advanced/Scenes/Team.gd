@@ -2444,8 +2444,11 @@ func _boxRun(pid):
 	return Vector3(goal.x + inward * BOX_RUN_SLOTS[slot][0], 0.0, sign(Global.ballpos.z) * BOX_RUN_SLOTS[slot][1])
 
 # Picks the best header of the ball in the box; better teams find him more often.
-func _crossTarget(crosser, low = false):
+func _crossTarget(crosser, low = false, setPiece = false):
 	var quality = lerp(0.25, 0.95, max(tdata.crossing, tdata.setPieces))
+	# Set pieces are rehearsed: even ordinary sides find their man most of the time.
+	if setPiece:
+		quality = max(quality, lerp(0.65, 0.95, tdata.setPieces))
 	if randf() > quality:
 		return null
 	var best = null
