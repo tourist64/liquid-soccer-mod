@@ -1851,11 +1851,34 @@ func _update():
 	atarget = target
 	if Global.elevenMode and myPlayer.pBallWin > 0.0:
 		_readPassingLane()
+	stateFunc[state].call_func()
 	# Tap-ins are checked every frame while a low ball comes across, not only when it first
 	# enters his danger zone.
-	if Global.gameOn and myPlayer.canControl and _moving() and myPlayer.ball._canHead() and not myTeam.posession and _tapInChance():
+	# A low ball coming across within reach: he lunges to meet it, and only strikes once it
+	# actually reaches him.
+	if state != pstate.SLIDE:
+		slideTap = false
+	if slideTap and Global.gameOn and myPlayer.ball._canHead() and _tapInContact():
+		# Sliding finish: the stretch reaches it.
+		slideTap = false
 		_tapIn()
-	stateFunc[state].call_func()
+	elif Global.gameOn and myPlayer.canControl and _moving() and myPlayer.ball._canHead() and not myTeam.posession and _tapInChance():
+		if _tapInContact():
+			_tapIn()
+		elif myPlayer.isAI:
+			var meet = _tapInMeet()
+			var toMeet = Vector2(meet.x - pos.x, meet.z - pos.z)
+			var ballT = Vector2(meet.x - Global.ballpos.x, meet.z - Global.ballpos.z).length() / max(Global.ballvel.length(), 1.0)
+			# Can't get there on his feet in time: slide in to stretch for it.
+			if toMeet.length() > SLIDE_TAP_MIN and ballT < SLIDE_TAP_TIME and toMeet.length() / max(myPlayer.pSpeed, 1.0) > ballT:
+				slideTap = true
+				_slide(false, toMeet.normalized())
+			else:
+				target = meet
+				atarget = target
+				var _c = seek(target)
+				if myPlayer.pSpeed <= myPlayer.pOSpeed:
+					myPlayer._burst()
 	vel += aavoid
 	_setData()
 	
@@ -1896,6 +1919,10 @@ func _on_ThreatArea_body_entered(_body):
 # A low or volleyable ball played across the box by a team-mate, passing right by an attacker in the box who
 # isn't offside: he sweeps it first time, low, to the side away from the keeper.
 const TAPIN_REACH = 6.0
+const TAPIN_CONTACT = 2.8
+const SLIDE_TAP_MIN = 2.5      # further than this from where he meets it ...
+const SLIDE_TAP_TIME = 0.35    # ... with the ball this close in time: slide for it
+var slideTap = false
 const TAPIN_FROM_LINE = 80.0      # |x| beyond this: the box (edge at 91) or just in front of it
 const TAPIN_MAX_HEIGHT = 3.8
 func _tapInChance():
@@ -1925,6 +1952,16 @@ func _tapInChance():
 		return true
 	return Vector2(Global.ballpos.x - pos.x, Global.ballpos.z - pos.z).length() < TAPIN_REACH
 
+# Where he meets the ball: the closest point of its path (or the ball, if it's past him).
+func _tapInMeet():
+	var clp = Helper.pointToLine(Global.ballpos, Global.ballpos + Global.ballvel * 0.3, pos, 1.0)
+	clp.y = 0.0
+	return clp
+
+# The ball has actually reached him: at his feet, not just passing in the distance.
+func _tapInContact():
+	return Vector2(Global.ballpos.x - pos.x, Global.ballpos.z - pos.z).length() < TAPIN_CONTACT
+
 func _tapIn():
 	var g = myTeam.goal
 	var k = myTeam.opponent.players[0].translation
@@ -1949,7 +1986,7 @@ func _on_DangerZone_body_entered(body):
 	if ( not _moving()) or (body != myPlayer.ball) or not (Global.gameOn) or not myPlayer.ball._canHead() or not myPlayer.canControl:
 		return
 	# A low cross across the box to a man in a good spot is tapped in first time (yours too).
-	if _tapInChance():
+	if _tapInChance() and _tapInContact():
 		_tapIn()
 		return
 	if not myTeam.AIteam and myPlayer == myTeam.cplayer:
