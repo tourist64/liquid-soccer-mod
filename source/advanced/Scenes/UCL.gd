@@ -223,7 +223,9 @@ func _advance(playerScore):
 			if _twoLegged():
 				# Aggregate over both legs: first at the lower seed's ground (t[1]), then at t[0].
 				var l1 = firstLeg if (mine and koLeg == 2 and firstLeg.size() == 2) else _firstLegScore(t[1], t[0])
+				secondLegSim = true
 				var l2 = _simScore(t[0], t[1], true)
+				secondLegSim = false
 				s = [l1[1] + l2[0], l1[0] + l2[1]]
 				legs = [[l1[1], l1[0]], [l2[0], l2[1]]]
 			else:
@@ -261,13 +263,19 @@ func _record(h, a, s):
 # 2017 Real Madrid in the quarter-finals and later: Champions League mode, far stronger.
 const MADRID_2017_KO_RATING = 10.0
 func strength(i):
+	var r = ratings[i]
 	if madrid2017 and files[i] == "Real Madrid" and knockoutStage and koRound >= 2:
-		return ratings[i] + MADRID_2017_KO_RATING
-	return ratings[i]
+		r += MADRID_2017_KO_RATING
+	# Second legs: Real Madrid become the greatest side ever (the comeback kings).
+	if secondLegSim and files[i] == "Real Madrid":
+		r += MADRID_SECOND_LEG
+	return r
 
 # Quarter- and semi-final first legs: now and then Madrid get battered away from home (0-3,
 # 0-4, rarely 0-5) and have to pull off a comeback at the Bernabeu.
 const COLLAPSE_CHANCE = 0.3
+const MADRID_SECOND_LEG = 25.0
+var secondLegSim = false
 func _firstLegScore(home, away):
 	if files[away] == "Real Madrid" and koRound in [2, 3] and randf() < COLLAPSE_CHANCE:
 		var r = randf()
@@ -276,8 +284,9 @@ func _firstLegScore(home, away):
 
 func _simScore(a, b, homeEdge):
 	var gap = strength(a) - strength(b) + (HOME_EDGE if homeEdge else 0.0)
-	return [_poisson(clamp(BASE_GOALS * exp(GAP_FACTOR * gap), 0.25, 4.5)),
-		_poisson(clamp(BASE_GOALS * exp(- GAP_FACTOR * gap), 0.25, 4.5))]
+	var top = 6.0 if secondLegSim and (files[a] == "Real Madrid" or files[b] == "Real Madrid") else 4.5
+	return [_poisson(clamp(BASE_GOALS * exp(GAP_FACTOR * gap), 0.25, top)),
+		_poisson(clamp(BASE_GOALS * exp(- GAP_FACTOR * gap), 0.25, top))]
 
 func _poisson(lam):
 	var l = exp(- lam)
