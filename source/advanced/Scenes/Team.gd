@@ -2283,12 +2283,11 @@ func _counterBonus():
 	return counter * 2.5
 
 # --- Outlet winger -------------------------------------------------------------------------
-# Diomande's defensive job follows the score: losing or two goals up he stays high on the right like
-# Vini and Mbappe (still behind the last defender) as a counter outlet; one goal up he tracks back
-# deep to protect the lead; otherwise he uses his normal spot from the team file.
+# Diomande is Madrid's counter outlet: he stays high on the right (still behind the last defender)
+# whatever the score, and only drops back in the last-two-minutes lockdown when winning.
 const OUTLET_PLAYER = "Y Diomande"
-const OUTLET_DEF = Vector2(0.8, 0.4)
-const OUTLET_MID = Vector2(0.82, 0.3)
+const OUTLET_DEF = Vector2(0.82, 0.3)
+const OUTLET_MID = Vector2(0.84, 0.2)
 const PROTECT_DEF = Vector2(0.72, 0.74)
 const PROTECT_MID = Vector2(0.8, 0.5)
 
@@ -2321,15 +2320,14 @@ func _setOutlet(margin, lastMinute = false):
 		elif nm == OUTLET_PLAYER:
 			var d = tdata.def[pid - 1]
 			var m = tdata.mid[pid - 1]
+			# Pure counter-attacking outlet: he stays high on the right whatever the score; only
+			# the last-two-minutes lockdown (when winning) brings him back.
 			if lockdown:
 				d = Vector2(d.x, LOCKDOWN_DEF_DEPTH)
 				m = Vector2(m.x, LOCKDOWN_MID_DEPTH)
-			elif margin < 0 or margin >= 2:
+			else:
 				d = OUTLET_DEF
 				m = OUTLET_MID
-			elif margin == 1:
-				d = PROTECT_DEF
-				m = PROTECT_MID
 			formation[pid] = _shapeToPitch(d)
 			formation[Global.squad + pid] = _shapeToPitch(m)
 
