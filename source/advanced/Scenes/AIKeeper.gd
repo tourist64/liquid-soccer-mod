@@ -469,11 +469,16 @@ func kickerState():
 func _predictShot(planeX):
 	var p = ball.translation
 	var v = ball.linear_velocity
+	# Right as a shot is struck the kick hasn't reached the ball's velocity yet (it lands next
+	# physics step), so read the shot from the kick itself; otherwise the keeper "predicted" the
+	# ball where it stood and dived towards the shooter.
+	if shotDir != null and typeof(shotDir) == TYPE_VECTOR3 and v.length() < shotDir.length() * 0.5:
+		v = shotDir
 	var cz = ball.curl.z
 	var cy = ball.curl.y
 	var dt = 1.0 / 60.0
 	if abs(v.x) < 1.0:
-		return p
+		return intersectShot(Global.ballvel)
 	for _i in range(240):
 		var left = v.normalized().cross(Vector3.UP)
 		if v.x < 0.0:
