@@ -131,6 +131,7 @@ const RUSH_CLOSE = 0.65
 const NEAR_POST_SHADE = 0.12
 const NEAR_POST_MAX = 5.0
 const LONG_DIVE_DIST = 45.0
+const LONG_DIVE_MIN = 30.0
 const HEADER_DIVE = 0.85
 func moveKeeper():
 	
@@ -208,8 +209,9 @@ func longShotState():
 		lt.y = 0
 		lt.x = clamp(lt.x, - 135.0 * Global.ps, 135.0 * Global.ps)
 		longTarget = lt
-	# Top keepers go into a full dive once a long shot is close enough, not just a run.
-	if ball._isShooting() and _rushClass() >= 0.5 and (Global.ballpos - pos).length() < LONG_DIVE_DIST and not _diving():
+	# Every keeper goes into a full dive at a long shot once it's close enough (reading the curl
+	# like any dive), not just a run: from 30 units for an ordinary keeper to 45 for the best.
+	if ball._isShooting() and (Global.ballpos - pos).length() < lerp(LONG_DIVE_MIN, LONG_DIVE_DIST, min(_rushClass(), 1.0)) and not _diving():
 		dcount = 1
 		changeState(pstate.INCOMING)
 		return
