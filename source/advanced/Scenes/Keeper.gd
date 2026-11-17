@@ -20,6 +20,7 @@ var pDiveAgile = 1.5
 var pAcc
 var pDiveSpeed = 30
 const DIVE_STOP_PAST = 1.2
+const DIVE_STOP_PAST_SHARP = 0.6
 var pBurst = 12
 var dBurst = 12
 var carded = 0
@@ -309,9 +310,10 @@ func _process( var delta):
 			AI.divevel *= pow(1.0 - 0.02 * (get_meta("diveFast") if has_meta("diveFast") else 1.0), (delta / 0.01666667))
 			# A dive carries the keeper to the ball's line and a body-width past it, no further:
 			# without this, quick divers flew by long and curling shots and let them in behind.
-			if AI.diveStopOn and abs(AI.divevel.z) > 0.5 and (translation.z - AI.diveStopZ) * sign(AI.divevel.z) > DIVE_STOP_PAST:
-				AI.divevel.z *= 0.15
-				velocity.z *= 0.15
+			var stopPast = DIVE_STOP_PAST_SHARP if (get_meta("sharpKeeper") if has_meta("sharpKeeper") else false) else DIVE_STOP_PAST
+			if AI.diveStopOn and abs(AI.divevel.z) > 0.5 and (translation.z - AI.diveStopZ) * sign(AI.divevel.z) > stopPast:
+				AI.divevel.z = 0.0
+				velocity.z = 0.0
 				AI.diveStopOn = false
 			
 			

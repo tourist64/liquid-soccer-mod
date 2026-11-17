@@ -105,10 +105,14 @@ func seek():
 
 	var dl = diff.length()
 	var speed = smoothstep(0, 4, dl * 1.0)
-	
-	
+	var quick = 1.0
+	# Sharp keepers (rated above 8.5) keep level with the ball: quicker feet, and they only
+	# ease off right on their spot.
+	if myPlayer.get_meta("sharpKeeper") if myPlayer.has_meta("sharpKeeper") else false:
+		speed = smoothstep(0, 1.5, dl)
+		quick = SHARP_FOOTWORK
 	if dl > 0.1:
-		vel = (diff / dl) * myPlayer.pAgility * speed
+		vel = (diff / dl) * myPlayer.pAgility * speed * quick
 	
 	view = Global.ballpos
 	return dl
@@ -136,6 +140,7 @@ const NEAR_POST_MAX = 5.0
 const LONG_DIVE_DIST = 45.0
 const LONG_DIVE_MIN = 30.0
 const HEADER_DIVE = 0.85
+const SHARP_FOOTWORK = 1.35
 func moveKeeper():
 	
 	if (AIKeeper == false) and Input.is_action_pressed(myPlayer.cthru) and not myTeam.posession:
@@ -709,6 +714,9 @@ func _quickDive(intP):
 	var n = max(t * 60.0, 1.0)
 	var covered = (1.0 - pow(1.0 - k, n)) / k / 60.0
 	var need = (intP.z - pos.z) / covered
+	# Never ask for more than the keeper's dive speed: Keeper.gd caps the speed each frame but
+	# not the push itself, so an oversized push kept him sliding flat out past the ball.
+	need = clamp(need, - myPlayer.pDiveSpeed, myPlayer.pDiveSpeed)
 	if abs(need) > abs(vel.z):
 		vel.z = need
 
