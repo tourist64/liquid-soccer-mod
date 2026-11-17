@@ -157,7 +157,7 @@ player8 = {
 "strength": 8.0,
 "aerial": 9.0,
 "name": "J Bellingham",
-"shoot": 10.0,
+"shoot": 8.5,
 "skin": Color( 0.620, 0.420, 0.300, 1 ),
 "smart": 10.0,
 "speed": 9.5
