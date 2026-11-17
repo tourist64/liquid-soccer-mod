@@ -640,6 +640,8 @@ func incomingState():
 		
 		
 			
+		if not pen:
+			_quickDive(intP)
 		# Stop the slide just past where the ball will cross (Keeper.gd) instead of flying by.
 		diveStopOn = not pen
 		diveStopZ = intP.z
@@ -650,6 +652,8 @@ func incomingState():
 		if (fk):
 			vel *= rand_range(0.9, 1.0)
 			fk = false
+		if not pen:
+			_quickDive(intP)
 		# Stop the slide just past where the ball will cross (Keeper.gd) instead of flying by.
 		diveStopOn = not pen
 		diveStopZ = intP.z
@@ -693,6 +697,21 @@ func incomingState():
 	shotview = view
 	
 	
+# A dive's push was set in proportion to the gap, so a short dive to the near post was slow
+# exactly when the ball arrives soonest, and long shots squeezed in there. Each dive is now at
+# least quick enough to reach the ball's line as it gets there (Keeper.gd still caps it at the
+# keeper's dive speed, so lesser keepers can be beaten, and stops it just past the line).
+const DIVE_DECAY = 0.02
+func _quickDive(intP):
+	var fast = myPlayer.get_meta("diveFast") if myPlayer.has_meta("diveFast") else 1.0
+	var k = DIVE_DECAY * fast
+	var t = abs(pos.x - Global.ballpos.x) / max(abs(Global.ballvel.x), 20.0)
+	var n = max(t * 60.0, 1.0)
+	var covered = (1.0 - pow(1.0 - k, n)) / k / 60.0
+	var need = (intP.z - pos.z) / covered
+	if abs(need) > abs(vel.z):
+		vel.z = need
+
 func _penaltyDive( var ddir):
 	
 	var velval = myPlayer.pDiveAgile * 0.6
