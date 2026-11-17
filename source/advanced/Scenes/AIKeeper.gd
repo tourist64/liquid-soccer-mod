@@ -42,6 +42,8 @@ enum pstate{IDLE, PCONTROL, DEFEND, SUPPORT, PRESS, POSESSION, CELEBRATE, REPLAY
 # Where the current dive should stop sliding sideways (see Keeper.gd); off for penalties.
 var diveStopOn = false
 var diveStopZ = 0.0
+var diveStopPoint = Vector3.ZERO
+var diveStopDir = Vector3.ZERO
 var stateFunc = {}
 var state
 var tostate
@@ -287,6 +289,7 @@ func activeState():
 				
 		
 			divevel = (target - pos).normalized() * myPlayer.pDiveSpeed * 0.9
+			_setDiveStop(target)
 			shotview = pos + divevel
 			view = shotview
 			
@@ -297,6 +300,7 @@ func activeState():
 			divevel = ((Global.ballpos + Global.ballvel * 0.25) - pos).normalized() * myPlayer.pDiveSpeed * 0.95
 			divevel.y *= 2.0
 			divevel.x *= 3.0
+			_setDiveStop(Global.ballpos + Global.ballvel * 0.25)
 			diving = true
 			myPlayer.canControl = true
 			myPlayer.myAState.travel("diveUp")
@@ -648,8 +652,9 @@ func incomingState():
 		if not pen:
 			_quickDive(intP)
 		# Stop the slide just past where the ball will cross (Keeper.gd) instead of flying by.
-		diveStopOn = not pen
-		diveStopZ = intP.z
+		diveStopOn = false
+		if not pen:
+			_setDiveStop(intP)
 		divevel = vel
 	else:
 		vel = (intP - pos) * Vector3(1.5, 4.5, 4.5)
@@ -660,8 +665,9 @@ func incomingState():
 		if not pen:
 			_quickDive(intP)
 		# Stop the slide just past where the ball will cross (Keeper.gd) instead of flying by.
-		diveStopOn = not pen
-		diveStopZ = intP.z
+		diveStopOn = false
+		if not pen:
+			_setDiveStop(intP)
 		divevel = vel
 		if (intP.y > 5.0):
 			divedir = 0.0
@@ -707,6 +713,16 @@ func incomingState():
 # least quick enough to reach the ball's line as it gets there (Keeper.gd still caps it at the
 # keeper's dive speed, so lesser keepers can be beaten, and stops it just past the line).
 const DIVE_DECAY = 0.02
+# Every dive (shots, smothering a loose ball, claiming a cross) stops once the keeper is
+# just past the point he dived for (Keeper.gd), so nobody flies by the ball.
+func _setDiveStop(pt):
+	var d = pt - pos
+	d.y = 0.0
+	diveStopOn = d.length() > 0.3
+	diveStopPoint = pt
+	diveStopZ = pt.z
+	diveStopDir = d.normalized() if diveStopOn else Vector3.ZERO
+
 func _quickDive(intP):
 	var fast = myPlayer.get_meta("diveFast") if myPlayer.has_meta("diveFast") else 1.0
 	var k = DIVE_DECAY * fast
@@ -721,6 +737,7 @@ func _quickDive(intP):
 		vel.z = need
 
 func _penaltyDive( var ddir):
+	diveStopOn = false
 	
 	var velval = myPlayer.pDiveAgile * 0.6
 	
