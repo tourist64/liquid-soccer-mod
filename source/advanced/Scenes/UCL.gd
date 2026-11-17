@@ -274,13 +274,13 @@ func strength(i):
 		r += MADRID_SECOND_LEG
 	return r
 
-# Quarter- and semi-final first legs: now and then Madrid get battered away from home (0-3,
+# Semi-final first legs only: now and then Madrid get battered away from home (0-3,
 # 0-4, rarely 0-5) and have to pull off a comeback at the Bernabeu.
 const COLLAPSE_CHANCE = 0.3
 const MADRID_SECOND_LEG = 25.0
 var secondLegSim = false
 func _firstLegScore(home, away):
-	if files[away] == "Real Madrid" and koRound in [2, 3] and randf() < COLLAPSE_CHANCE:
+	if files[away] == "Real Madrid" and koRound == SEMI_ROUND and randf() < COLLAPSE_CHANCE:
 		var r = randf()
 		return [3 if r < 0.6 else (4 if r < 0.9 else 5), 0]
 	return _simScore(home, away, true)
