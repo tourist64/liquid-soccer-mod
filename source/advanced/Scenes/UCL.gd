@@ -33,7 +33,10 @@ const HOME_EDGE = 1.5
 const SHARP_AI_RATING = 84
 # Big-game players: in the quarter-finals and later they step up (rating -> new value, capped at 10).
 const BIG_GAME_PLAYERS = {"F Valverde": {"speed": 1.0, "aggression": 1.5, "agility": 1.0, "curl": 1.0, "smart": 0.5, "shoot": 1.0},
-	"J Bellingham": {"speed": 1.0, "aggression": 1.0, "agility": 1.0, "curl": 0.5, "smart": 0.5, "shoot": 1.5}}
+	"J Bellingham": {"speed": 1.0, "aggression": 1.0, "agility": 1.0, "curl": 0.5, "smart": 0.5}}
+# Semi-finals and later only: extra shooting on top of the big-game boost.
+const SEMI_SHOOT_PLAYERS = {"J Bellingham": 1.5}
+const SEMI_ROUND = 3
 # 2017 Real Madrid from the quarter-finals on: every player steps up by this much (cap 12),
 # and Ronaldo gets extra on top.
 const MADRID_2017_BOOST = {"speed": 1.5, "agility": 1.5, "curl": 1.5, "smart": 1.5, "shoot": 1.5}

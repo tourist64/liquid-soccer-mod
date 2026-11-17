@@ -364,6 +364,8 @@ func _bigGame(td):
 		var plus = UCL.BIG_GAME_PLAYERS[pp["name"]]
 		for k in plus:
 			boosted[k] = min(float(boosted.get(k, 5.0)) + plus[k], 10.0)
+		if ucl.koRound >= UCL.SEMI_ROUND and UCL.SEMI_SHOOT_PLAYERS.has(pp["name"]):
+			boosted["shoot"] = min(float(boosted.get("shoot", 5.0)) + UCL.SEMI_SHOOT_PLAYERS[pp["name"]], UCL.SHOOT_CAP)
 		copy.set(key, boosted)
 	return copy if copy != null else td
 
