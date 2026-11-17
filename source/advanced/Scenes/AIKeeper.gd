@@ -638,7 +638,9 @@ func incomingState():
 		
 		tostate = pstate.ACTIVE
 		
-		vel = (intP - pos) * Vector3(velval, velval * 3.0, velval)
+		var aimF = intP if pen else _handAim(intP, DIVE_HAND_REACH)
+		vel = (aimF - pos) * Vector3(velval, velval * 3.0, velval)
+		vel.y = (intP - pos).y * velval * 3.0
 		
 		
 		
@@ -650,25 +652,47 @@ func incomingState():
 		
 			
 		if not pen:
-			_quickDive(intP)
-		# Stop the slide just past where the ball will cross (Keeper.gd) instead of flying by.
+			_quickDive(aimF)
+		# Stop the slide once his head and hands are on the ball's line (Keeper.gd), not his feet.
 		diveStopOn = false
 		if not pen:
-			_setDiveStop(intP)
+			_setDiveStop(aimF)
 		divevel = vel
 	else:
-		vel = (intP - pos) * Vector3(1.5, 4.5, 4.5)
+		var aimC = intP if pen else _handAim(intP, CLOSE_HAND_REACH)
+		vel = (aimC - pos) * Vector3(1.5, 4.5, 4.5)
+		vel.y = (intP - pos).y * 4.5
 		divedir = 0
 		if (fk):
 			vel *= rand_range(0.9, 1.0)
 			fk = false
 		if not pen:
-			_quickDive(intP)
-		# Stop the slide just past where the ball will cross (Keeper.gd) instead of flying by.
+			_quickDive(aimC)
+		# Stop the slide once his head and hands are on the ball's line (Keeper.gd), not his feet.
 		diveStopOn = false
 		if not pen:
-			_setDiveStop(intP)
+			_setDiveStop(aimC)
 		divevel = vel
+		# A shot straight at him: stand his ground and take it (jumping only for one over his
+		# head) rather than lean off to one side and let it in where he was standing.
+		if not pen and dz < BLOCK_GAP and intP.y <= 5.0:
+			vel = Vector3.ZERO
+			divevel = vel
+			diveStopOn = false
+			divedir = 0.0
+			diving = true
+			isUp = intP.y > 3.0
+			if isUp:
+				myPlayer.myAState.travel("diveUp")
+			elif sign(Global.ballvel.z) == sign(myTeam.playDir):
+				myPlayer.myAState.travel("collectR")
+			else:
+				myPlayer.myAState.travel("collectL")
+			state = pstate.DIVE
+			tostate = pstate.ACTIVE
+			view = dview
+			shotview = view
+			return
 		if (intP.y > 5.0):
 			divedir = 0.0
 			diving = true
@@ -713,6 +737,23 @@ func incomingState():
 # least quick enough to reach the ball's line as it gets there (Keeper.gd still caps it at the
 # keeper's dive speed, so lesser keepers can be beaten, and stops it just past the line).
 const DIVE_DECAY = 0.02
+# In a full dive his hands end up about 8.5 ahead of his feet (his neck, where saves are
+# judged, about 6.5), so the feet are aimed short of the ball's line by this much and his
+# head and hands arrive on it. A short sideways lean reaches less.
+const DIVE_HAND_REACH = 6.0
+const CLOSE_HAND_REACH = 3.0
+const BLOCK_GAP = 2.0
+func _handAim(intP, reach):
+	var d = intP - pos
+	d.y = 0.0
+	var l = d.length()
+	if l < 0.01:
+		return Vector3(pos.x, intP.y, pos.z)
+	var go = max(l - reach, 0.0)
+	var aim = pos + d / l * go
+	aim.y = intP.y
+	return aim
+
 # Every dive (shots, smothering a loose ball, claiming a cross) stops once the keeper is
 # just past the point he dived for (Keeper.gd), so nobody flies by the ball.
 func _setDiveStop(pt):
