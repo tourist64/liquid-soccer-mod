@@ -2562,8 +2562,7 @@ func goShootoutT1():
 	if kickTaker:
 		kickTaker.AI._shootout()
 	var kp = shootoutCount / 2
-	if kp > 5:
-		kp = 0
+	# Team._shootoutOrder wraps round once everyone fit to kick has had a go.
 	kickTaker = kickTeam._shootoutKick(kp)
 	saveTeam._shootoutDefend()
 	if Global.teamsReady[0] and Global.teamsReady[1]:
@@ -2589,8 +2588,7 @@ func goShootoutT2():
 
 	
 	var kp = shootoutCount / 2
-	if kp > 5:
-		kp = 0
+	# Team._shootoutOrder wraps round once everyone fit to kick has had a go.
 	kickTaker = team2._shootoutKick(kp)
 	
 	hud._setCPlayer(2, kickTaker.myID)

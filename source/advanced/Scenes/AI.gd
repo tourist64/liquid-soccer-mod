@@ -2035,8 +2035,9 @@ func _on_DangerZone_body_entered(body):
 		changeState(pstate.PRESS)
 
 func _shootout():
-	
-	
+	# Sent-off players stay off the pitch.
+	if myPlayer.carded > 1:
+		return
 	marking = null
 	state = pstate.IDLE
 	myPlayer.myATree["parameters/BlendCelebrate/blend_amount"] = 0

@@ -2071,8 +2071,14 @@ func _cross( var _id):
 	
 	
 func shootoutState():
+	# Only the players on the pitch line up; anyone sent off is gone and counts as ready (he
+	# can't walk to the halfway line, which used to stall the shootout after a red card).
 	var pready = 0
-	for p in players:
+	for i in range(0, Global.squad):
+		var p = players[i]
+		if p.carded > 1:
+			pready += 1
+			continue
 		if (p.translation - p.target).length() < 6:
 			pready += 1
 		if not p.isAI:
@@ -2106,16 +2112,31 @@ func _penStar():
 func _shootoutKick( var kn):
 	
 	players[0].AI._shootout()
-	var k = players[6 - kn]
-	# A designated taker goes first; whoever normally kicks first takes his turn instead.
-	var star = _penStar()
-	if star != null:
-		if kn == 0:
-			k = star
-		elif k == star:
-			k = players[6]
+	var order = _shootoutOrder()
+	var k = order[kn % order.size()]
 	k.AI._penaltyTaker()
 	return k
+
+# Kick order: a designated taker (Ronaldo) first, then the usual order (6, 5 ... 1, then the
+# rest), skipping anyone sent off so the next man up fills the gap. The keeper kicks only if
+# nobody else is left.
+func _shootoutOrder():
+	var order = []
+	var star = _penStar()
+	if star != null:
+		order.append(star)
+	var ids = []
+	for i in range(min(6, Global.squad - 1), 0, -1):
+		ids.append(i)
+	for i in range(7, Global.squad):
+		ids.append(i)
+	for i in ids:
+		var p = players[i]
+		if p.carded < 2 and p != star:
+			order.append(p)
+	if order.empty():
+		order.append(players[0])
+	return order
 func _shootoutDefend():
 	
 	players[0].AI._defendPen(AIteam)
