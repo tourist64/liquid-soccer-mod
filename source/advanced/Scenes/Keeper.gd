@@ -19,6 +19,7 @@ var pCurl = 0
 var pDiveAgile = 1.5
 var pAcc
 var pDiveSpeed = 30
+const DIVE_STOP_PAST = 1.2
 var pBurst = 12
 var dBurst = 12
 var carded = 0
@@ -306,6 +307,12 @@ func _process( var delta):
 			# Faster divers slow down in step (see Team: diveFast), so a dive lands where it
 			# always would, just sooner.
 			AI.divevel *= pow(1.0 - 0.02 * (get_meta("diveFast") if has_meta("diveFast") else 1.0), (delta / 0.01666667))
+			# A dive carries the keeper to the ball's line and a body-width past it, no further:
+			# without this, quick divers flew by long and curling shots and let them in behind.
+			if AI.diveStopOn and abs(AI.divevel.z) > 0.5 and (translation.z - AI.diveStopZ) * sign(AI.divevel.z) > DIVE_STOP_PAST:
+				AI.divevel.z *= 0.15
+				velocity.z *= 0.15
+				AI.diveStopOn = false
 			
 			
 			

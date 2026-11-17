@@ -39,6 +39,9 @@ var lineupcount = 0
 var longTarget = Vector3.ZERO
 
 enum pstate{IDLE, PCONTROL, DEFEND, SUPPORT, PRESS, POSESSION, CELEBRATE, REPLAY, INCOMING, LONGSHOT, DIVE, CONCEDE, PENALTY, ACTIVE, CAUGHT, CLEARING, INCROSS, KICKER, SHOOTACTIVE, SHOOTOUT, LAP}
+# Where the current dive should stop sliding sideways (see Keeper.gd); off for penalties.
+var diveStopOn = false
+var diveStopZ = 0.0
 var stateFunc = {}
 var state
 var tostate
@@ -637,6 +640,9 @@ func incomingState():
 		
 		
 			
+		# Stop the slide just past where the ball will cross (Keeper.gd) instead of flying by.
+		diveStopOn = not pen
+		diveStopZ = intP.z
 		divevel = vel
 	else:
 		vel = (intP - pos) * Vector3(1.5, 4.5, 4.5)
@@ -644,6 +650,9 @@ func incomingState():
 		if (fk):
 			vel *= rand_range(0.9, 1.0)
 			fk = false
+		# Stop the slide just past where the ball will cross (Keeper.gd) instead of flying by.
+		diveStopOn = not pen
+		diveStopZ = intP.z
 		divevel = vel
 		if (intP.y > 5.0):
 			divedir = 0.0
