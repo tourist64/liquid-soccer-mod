@@ -116,8 +116,8 @@ player6 = {
 "speed": 9.5
 }
 player7 = {
-"aggression": 9.5,
-"agility": 7.5,
+"aggression": 10.5,
+"agility": 9.0,
 "curl": 5.0,
 "facehair": 1,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
@@ -125,8 +125,8 @@ player7 = {
 "name": "W Pacho",
 "shoot": 4.0,
 "skin": Color( 0.330, 0.210, 0.140, 1 ),
-"smart": 9.5,
-"speed": 9.0
+"smart": 10.5,
+"speed": 9.5
 }
 player8 = {
 "aggression": 8.5,

@@ -44,6 +44,9 @@ var diveStopOn = false
 var diveStopZ = 0.0
 var diveStopPoint = Vector3.ZERO
 var diveStopDir = Vector3.ZERO
+# Shot dives keep reading the ball and steer onto it (Keeper.gd); how far short his feet aim.
+var diveTrack = false
+var diveReach = 0.0
 var stateFunc = {}
 var state
 var tostate
@@ -295,6 +298,7 @@ func activeState():
 				
 		
 			divevel = (target - pos).normalized() * myPlayer.pDiveSpeed * 0.9
+			diveTrack = false
 			_setDiveStop(target)
 			shotview = pos + divevel
 			view = shotview
@@ -306,6 +310,7 @@ func activeState():
 			divevel = ((Global.ballpos + Global.ballvel * 0.25) - pos).normalized() * myPlayer.pDiveSpeed * 0.95
 			divevel.y *= 2.0
 			divevel.x *= 3.0
+			diveTrack = false
 			_setDiveStop(Global.ballpos + Global.ballvel * 0.25)
 			diving = true
 			myPlayer.canControl = true
@@ -616,7 +621,9 @@ func incomingState():
 	
 	
 	
-	if dz > 5.0:
+	# A low ball a couple of steps away gets a proper low dive: the short "close" lean barely
+	# moves his body and keeps it at waist height, so low shots into the corner slipped by.
+	if dz > 5.0 or (not pen and dz > BLOCK_GAP and intP.y < LOW_DIVE_HEIGHT):
 		divedir = sign(dp)
 		
 		if (divedir > 0):
@@ -644,7 +651,12 @@ func incomingState():
 		
 		tostate = pstate.ACTIVE
 		
-		var aimF = intP if pen else _handAim(intP, DIVE_HAND_REACH)
+		# His dive to the left (diveLF*) stretches out later than the one to the right, so his
+		# body has to slide nearly all the way to the ball's line on that side.
+		var reachF = LEFT_DIVE_REACH if divedir > 0 else DIVE_HAND_REACH
+		var aimF = intP if pen else _handAim(intP, reachF)
+		diveTrack = not pen
+		diveReach = reachF
 		vel = (aimF - pos) * Vector3(velval, velval * 3.0, velval)
 		vel.y = (intP - pos).y * velval * 3.0
 		
@@ -666,6 +678,8 @@ func incomingState():
 		divevel = vel
 	else:
 		var aimC = intP if pen else _handAim(intP, CLOSE_HAND_REACH)
+		diveTrack = not pen
+		diveReach = CLOSE_HAND_REACH
 		vel = (aimC - pos) * Vector3(1.5, 4.5, 4.5)
 		vel.y = (intP - pos).y * 4.5
 		divedir = 0
@@ -748,8 +762,10 @@ const DIVE_DECAY = 0.02
 # of the ball's line and the middle of his body (with his arms beyond it) arrives on it.
 const DIVE_HAND_REACH = 3.5
 const CLOSE_HAND_REACH = 1.5
+const LEFT_DIVE_REACH = 0.8
 # Shots coming within this of his body are stood up to and taken, never dived away from.
-const BLOCK_GAP = 3.5
+const BLOCK_GAP = 2.0
+const LOW_DIVE_HEIGHT = 2.5
 const BOX_CLAIM_PACE = 50.0
 const BOX_CLAIM_DIST = 18.0
 func _handAim(intP, reach):
@@ -788,6 +804,7 @@ func _quickDive(intP):
 
 func _penaltyDive( var ddir):
 	diveStopOn = false
+	diveTrack = false
 	
 	var velval = myPlayer.pDiveAgile * 0.6
 	

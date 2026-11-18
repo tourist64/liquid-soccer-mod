@@ -266,6 +266,7 @@ func _process( var delta):
 		
 		if ( not AI._diving()):
 			AI.diveStopOn = false
+			AI.diveTrack = false
 			velocity += acc * 60.0 * delta
 			velocity.x = clamp(velocity.x, - pSpeed, pSpeed)
 			velocity.z = clamp(velocity.z, - pSpeed, pSpeed)
@@ -310,7 +311,24 @@ func _process( var delta):
 			AI.divevel *= pow(1.0 - 0.02 * (get_meta("diveFast") if has_meta("diveFast") else 1.0), (delta / 0.01666667))
 			# A dive carries the keeper to where he dived for and half a body-width past it, no further:
 			# without this, quick divers flew by long and curling shots and let them in behind.
-			if AI.diveStopOn:
+			if AI.diveTrack and ball._isShooting():
+				# Shot dives keep reading the ball (curl, late deflections, his slower left-side
+				# dive) and steer his slide onto it, as fast as he can dive, stopping once there.
+				var pr = AI._predictShot(translation.x)
+				var gap = pr.z - translation.z
+				var want = 0.0
+				if abs(gap) > AI.diveReach + DIVE_STOP_PAST:
+					want = gap - sign(gap) * AI.diveReach
+				var tLeft = abs(translation.x - Global.ballpos.x) / max(abs(Global.ballvel.x), 20.0)
+				var need = clamp(want / max(tLeft, 0.05), - pDiveSpeed, pDiveSpeed)
+				if want == 0.0:
+					AI.divevel.z = 0.0
+					velocity.z = 0.0
+				elif sign(need) != sign(AI.divevel.z) or abs(need) > abs(AI.divevel.z):
+					AI.divevel.z = need
+					velocity.z = need
+				AI.diveStopOn = false
+			elif AI.diveStopOn:
 				var flat = translation - AI.diveStopPoint
 				flat.y = 0.0
 				if flat.dot(AI.diveStopDir) > DIVE_STOP_PAST:
