@@ -607,12 +607,14 @@ func _findThruPass(pos, lookD, _id):
 	# the most; the nearer runner wins ties.
 	var bestScore = - 100000.0
 	var bestSpot = Vector3.ZERO
+	thruDeep = false
 	for r in runners:
 		var res = _thruSpot(r)
 		var sc = res[1] - (r.translation - Global.ballpos).length() * 0.05
 		if sc > bestScore:
 			bestScore = sc
 			bestSpot = res[0]
+			thruDeep = res[2]
 			candidate = r
 	
 	if (candidate):
@@ -646,6 +648,10 @@ func _findThruPass(pos, lookD, _id):
 # Up to 24 ahead: with open space the ball is played deeper (and harder) so he runs onto it in a
 # more dangerous place, as long as he still gets there before every defender and the keeper.
 const THRU_LEADS = [24.0, 18.0, 13.0, 8.0, 4.0, 0.0]
+# Into open space behind the line: a forward (vertical) ball can be hit much further ahead, so the
+# runner sprints onto it, but only if no defender or the keeper can get there first.
+const THRU_LEADS_DEEP = [48.0, 40.0, 32.0]
+const VERTICAL_DOT = 0.8     # how straight towards the goal end the pass must go (1 = dead straight)
 const THRU_SIDES = [0.0, - 6.0, 6.0]
 const RUN_SPEED = 30.0       # a runner's sprint speed in units a second
 const DEF_SPEED = 34.0
@@ -667,12 +673,15 @@ func _thruSpot(r):
 	var side = ahead.cross(Vector3.UP)
 	var best = r.translation
 	var bestScore = - 100000.0
+	var bestDeep = false
 	# Crowded around him (2+ defenders close by): no ball into space, just a normal pass to him.
 	var crowd = 0
 	for o in opponent.players:
 		if o.carded < 2 and Vector2(o.translation.x - r.translation.x, o.translation.z - r.translation.z).length() < CROWD_RADIUS * Global.ps:
 			crowd += 1
-	var leads = [0.0] if crowd >= CROWD_COUNT else THRU_LEADS
+	# Defenders merely level with him still have to turn and chase, so a ball in behind stays
+	# on (the deep leads have their own, stricter check); only the short leads give way.
+	var leads = THRU_LEADS_DEEP + ([0.0] if crowd >= CROWD_COUNT else THRU_LEADS)
 	for lead in leads:
 		for off in THRU_SIDES:
 			var spot = r.translation + ahead * lead + side * off
@@ -680,7 +689,23 @@ func _thruSpot(r):
 			# Stay well inside the lines: the ball rolls on past the spot.
 			if abs(spot.z) > 70.0 * Global.ps or spot.x * playDir > 105.0 * Global.ps:
 				continue
-			var risk = _thruRisk(spot, r, DEEP_MARGIN if lead > 18.0 else 0.0)
+			var deep = lead > THRU_LEADS[0]
+			if deep:
+				# Only straight-ish forward balls go this far, never a long ball out wide.
+				var fwd = spot - Global.ballpos
+				fwd.y = 0.0
+				if fwd.length() < 1.0 or fwd.normalized().x * playDir < VERTICAL_DOT:
+					continue
+			var risk = 0.0
+			if deep:
+				# ...and only into wide-open space behind the line, with a clear lane to it.
+				if not _openBehind(spot, r):
+					continue
+				risk = _thruRisk(spot, r, 0.0, true)
+				if risk > 0.0:
+					continue
+			else:
+				risk = _thruRisk(spot, r, DEEP_MARGIN if lead > 18.0 else 0.0)
 			var gain = (spot.x - Global.ballpos.x) * playDir
 			# Drawing him out towards the touchline counts against a spot.
 			var outward = max(0.0, abs(spot.z) - abs(r.translation.z)) + max(0.0, abs(spot.z) - 50.0 * Global.ps)
@@ -688,11 +713,48 @@ func _thruSpot(r):
 			if sc > bestScore:
 				bestScore = sc
 				best = spot
-	return [best, bestScore]
+				bestDeep = deep
+	return [best, bestScore, bestDeep]
+
+# A deep ball (THRU_LEADS_DEEP) needs: plenty of grass behind the line, no outfield defender
+# already level with or behind the spot (nobody goal-side of the runner), and the runner beating
+# the keeper to it. Defenders level with the runner may chase; he has to outrun them.
+const DEEP_SPACE = 70.0       # the deepest outfield defender at least this far from the goal line
+const DEEP_GOAL_SIDE = 2.0    # an outfield defender this much deeper than the runner blocks it
+const DEEP_TURN = 0.3        # seconds a defender loses turning to chase
+const DEEP_RACE_MARGIN = 0.1
+const KEEPER_SPEED = 30.0
+const KEEPER_REACH = 4.0
+const KEEPER_MARGIN = 0.35
+var thruDeep = false
+func _openBehind(spot, r):
+	var rDepth = r.translation.x * playDir
+	var lineDepth = - 1000.0
+	# The runner is already flying; a defender level with him has to turn first. Both at their
+	# real sprint speed (pace stat), so a quick forward can leave a slower defender behind.
+	var runT = (spot - r.translation).length() / max(r.pBurst, 1.0)
+	for i in range(1, opponent.players.size()):
+		var o = opponent.players[i]
+		if o.carded > 1 or not o.visible:
+			continue
+		var dep = o.translation.x * playDir
+		if dep > rDepth + DEEP_GOAL_SIDE:
+			return false
+		lineDepth = max(lineDepth, dep)
+		var defT = max(0.0, (o.translation - spot).length() - DEF_REACH) / max(o.pBurst, 1.0) + DEEP_TURN
+		if runT + DEEP_RACE_MARGIN > defT:
+			return false
+	if 140.0 * Global.ps - lineDepth < DEEP_SPACE * Global.ps:
+		return false
+	var k = opponent.players[0].translation
+	k.y = 0.0
+	var keepT = max(0.0, (k - spot).length() - KEEPER_REACH) / KEEPER_SPEED
+	return runT + KEEPER_MARGIN < keepT
 
 # How badly defenders threaten a pass to this spot: 0 = clean; more is worse (seconds a defender
 # would be early, summed over the path and the spot itself).
-func _thruRisk(spot, r, extra = 0.0):
+# laneOnly: just the ball's path (deep balls judge the spot by _openBehind instead).
+func _thruRisk(spot, r, extra = 0.0, laneOnly = false):
 	var from = Global.ballpos
 	from.y = 0.0
 	var path = spot - from
@@ -719,6 +781,9 @@ func _thruRisk(spot, r, extra = 0.0):
 			var tBall = (D * k / 8.0) / ballSpeed
 			var tDef = max(0.0, (op - pt).length() - DEF_REACH) / DEF_SPEED + DEF_REACT
 			worst = max(worst, tBall - tDef)
+		if laneOnly:
+			risk += max(0.0, worst)
+			continue
 		# At the spot: the runner must get there first.
 		var tDefSpot = max(0.0, (op - spot).length() - DEF_REACH) / DEF_SPEED + DEF_REACT
 		worst = max(worst, runT + RUN_MARGIN + extra - tDefSpot)

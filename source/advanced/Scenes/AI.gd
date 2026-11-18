@@ -1063,6 +1063,7 @@ func _receivePass( var ppos, var dir, var ptype):
 const THRU_MAX_SPEED = 240.0
 const THRU_DECEL = 0.55
 const THRU_ARRIVE = 45.0
+const THRU_ARRIVE_DEEP = 30.0
 func _thruPass( var D):
 	
 	if myTeam.zone == 3 and abs(Global.ballpos.z) > 30 * Global.ps:
@@ -1078,7 +1079,9 @@ func _thruPass( var D):
 		# No distance limit: a long ball is hit just hard enough to still arrive at a pace the runner
 		# can take (the ball loses about 0.55 speed per unit it rolls; measured in match runs).
 		var flat = Vector2(myTeam.passDir.x, myTeam.passDir.z).length()
-		var reach = min(flat * THRU_DECEL + THRU_ARRIVE, THRU_MAX_SPEED)
+		# A deep ball into open space arrives softer so it sits up for the runner, not the keeper.
+		var reach = min(flat * THRU_DECEL + (THRU_ARRIVE_DEEP if myTeam.thruDeep else THRU_ARRIVE), THRU_MAX_SPEED)
+		myTeam.thruDeep = false
 		myPlayer.ball._passBall(myTeam.passDir * 1.5, myPlayer, reach)
 		myTeam._passTo(myTeam.passto)
 		myTeam.posession = false
