@@ -1230,6 +1230,8 @@ func _lineIds():
 func _deeperInShape(a, b):
 	return tdata.def[a - 1].y > tdata.def[b - 1].y
 
+# Distance from their own goal a team's back line never drops below without the ball (halfway = 140).
+const HIGH_LINE_TEAMS = {"Barcelona": 105.0}
 const TRAP_REACH = 14.0
 const TRAP_STEP = 3.0
 
@@ -1263,6 +1265,9 @@ func _holdLine(p, pid):
 			line = _springTrap(line)
 		if tdata.pepLine > 0.0:
 			line = _pepLine(line, ids)
+		# Barca keep their high line when they lose the ball: it only gives way to stay goal-side
+		# of the ball, while the rest of the team drops in front of it (see their def shape).
+		line = max(line, HIGH_LINE_TEAMS.get(str(tdata.teamname), 0.0) * Global.ps)
 		line = max(min(line, ballDepth - LINE_BALL_GAP), LINE_MIN_DEPTH)
 		lineX = dGoal.x - sign(dGoal.x) * line
 	return Vector3(lineX, p.y, p.z)
