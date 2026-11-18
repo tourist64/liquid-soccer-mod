@@ -7,6 +7,8 @@ extends Spatial
 
 const SEGMENTS = 120
 const CORNER_POWER = 6.0
+# Shape of the bowl: higher is boxier (Old Trafford), lower rounder (Allianz Arena).
+var cornerPower = CORNER_POWER
 const NEAR_CUT_Z = 130.0
 const NEAR_CUT_X = 190.0
 
@@ -38,6 +40,17 @@ var haltonIndex = 0
 var arcTables = {}
 const ARC_SAMPLES = 1024
 var fascia = FASCIA
+var seatCols = [SEAT_A, SEAT_B]
+var riser = RISER
+var concourse = CONCOURSE
+var text = TEXT
+var textHalf = TEXT_HALF
+var textCol = SEAT_TEXT
+# Bernabeu: fans sit on the lettering in a tifo. Elsewhere the letters are coloured seats left
+# empty so the mosaic shows, as at Camp Nou and Old Trafford.
+var tifoCrowd = true
+var screen = null
+var roofReach = false
 var roof = ROOF
 var roofEdge = ROOF_EDGE
 const BERNABEU_FASCIA = Color(0.97, 0.97, 0.98)
@@ -61,12 +74,53 @@ const FONT = {
 	"M": ["#...#", "##.##", "#.#.#", "#.#.#", "#...#", "#...#", "#...#"],
 	"D": ["####.", "#...#", "#...#", "#...#", "#...#", "#...#", "####."],
 	"I": ["#####", "..#..", "..#..", "..#..", "..#..", "..#..", "#####"],
+	"S": [".####", "#....", "#....", ".###.", "....#", "....#", "####."],
+	"Q": [".###.", "#...#", "#...#", "#...#", "#.#.#", "#..#.", ".##.#"],
+	"U": ["#...#", "#...#", "#...#", "#...#", "#...#", "#...#", ".###."],
+	"N": ["#...#", "##..#", "#.#.#", "#..##", "#...#", "#...#", "#...#"],
+	"C": [".####", "#....", "#....", "#....", "#....", "#....", ".####"],
+	"B": ["####.", "#...#", "#...#", "####.", "#...#", "#...#", "####."],
+	"H": ["#...#", "#...#", "#...#", "#####", "#...#", "#...#", "#...#"],
+	"T": ["#####", "..#..", "..#..", "..#..", "..#..", "..#..", "..#.."],
 	" ": [".....", ".....", ".....", ".....", ".....", ".....", "....."]}
 var paintText = false
 var tifoBg = TIFO_BG
 # Per fan from the last seats() call: 0 = ordinary, 1 = tifo background (navy), 2 = on a letter.
 var lastTifo = []
 const BERNABEU_SCREEN = [Color(0.95, 0.96, 1.0), Color(0.83, 0.68, 0.24), Color(0.95, 0.96, 1.0), Color(0.36, 0.20, 0.62)]
+
+# The big clubs' home grounds, after the real stadiums. seats: the seat colours, alternating in
+# blocks around the bowl; shape: cornerPower; text: lettering picked out in seats (empty of fans).
+const GROUNDS = {
+	# Spotify Camp Nou: a huge, rounded open bowl in blaugrana blocks, MES QUE UN CLUB in yellow.
+	"campnou": {"seats": [Color(0.06, 0.20, 0.52), Color(0.50, 0.07, 0.20)], "riser": Color(0.05, 0.09, 0.22),
+		"fascia": Color(0.92, 0.92, 0.90), "roof": Color(0.82, 0.83, 0.84), "roofEdge": Color(0.95, 0.95, 0.95),
+		"shape": 4.0, "crowd": 2.5, "text": "MES QUE UN CLUB", "textHalf": 165.0, "textCol": Color(0.98, 0.78, 0.10)},
+	# Allianz Arena: a steep, closed, round bowl of grey seats, red tier fronts, a white ETFE roof.
+	"allianz": {"seats": [Color(0.50, 0.52, 0.55), Color(0.43, 0.45, 0.48)], "riser": Color(0.20, 0.21, 0.23),
+		"fascia": Color(0.80, 0.08, 0.14), "roof": Color(0.92, 0.93, 0.95), "roofEdge": Color(0.85, 0.10, 0.16),
+		"shape": 3.2, "crowd": 2.3},
+	# Emirates: red seats all round, white tier fronts, a light roof on a rounded bowl.
+	"emirates": {"seats": [Color(0.74, 0.07, 0.10), Color(0.64, 0.05, 0.08)], "riser": Color(0.24, 0.04, 0.05),
+		"fascia": Color(0.95, 0.95, 0.95), "roof": Color(0.86, 0.88, 0.90), "roofEdge": Color(0.97, 0.97, 0.97),
+		"shape": 4.5, "crowd": 2.0},
+	# Etihad: sky-blue seats in a squared-off bowl, grey roof with a dark rim.
+	"etihad": {"seats": [Color(0.50, 0.76, 0.96), Color(0.43, 0.69, 0.92)], "riser": Color(0.30, 0.50, 0.70),
+		"fascia": Color(0.93, 0.94, 0.95), "roof": Color(0.66, 0.69, 0.72), "roofEdge": Color(0.20, 0.22, 0.26),
+		"shape": 7.0, "crowd": 2.0},
+	# Old Trafford: boxy stands of red seats, MANCHESTER UNITED in white, a dark cantilever roof.
+	"oldtrafford": {"seats": [Color(0.70, 0.06, 0.08), Color(0.60, 0.04, 0.06)], "riser": Color(0.16, 0.04, 0.05),
+		"fascia": Color(0.20, 0.20, 0.22), "roof": Color(0.30, 0.31, 0.33), "roofEdge": Color(0.88, 0.88, 0.88),
+		"shape": 12.0, "crowd": 2.3, "text": "MANCHESTER UNITED", "textHalf": 185.0, "textCol": Color(0.96, 0.96, 0.96)},
+	# Parc des Princes: a tight, square-cornered ring of red and blue blocks under a concrete roof.
+	"parc": {"seats": [Color(0.08, 0.16, 0.42), Color(0.74, 0.08, 0.14)], "riser": Color(0.08, 0.10, 0.18),
+		"fascia": Color(0.62, 0.62, 0.60), "roof": Color(0.46, 0.46, 0.45), "roofEdge": Color(0.70, 0.70, 0.68),
+		"shape": 9.0, "crowd": 1.9},
+	# Metropolitano: red seats in a rounded bowl under its sweeping white roof.
+	"metropolitano": {"seats": [Color(0.78, 0.09, 0.12), Color(0.68, 0.06, 0.10)], "riser": Color(0.20, 0.05, 0.07),
+		"fascia": Color(0.96, 0.96, 0.96), "roof": Color(0.95, 0.95, 0.96), "roofEdge": Color(0.80, 0.82, 0.86),
+		"shape": 4.2, "crowd": 2.1},
+}
 var st
 var stMain
 var stNear
@@ -87,6 +141,23 @@ func _ready():
 		evenSpread = true
 		tierWeights = [0.25, 0.29, 0.46]
 		paintText = true
+	elif GROUNDS.has(style):
+		var g = GROUNDS[style]
+		seatCols = g["seats"]
+		riser = g["riser"]
+		fascia = g["fascia"]
+		roof = g["roof"]
+		roofEdge = g["roofEdge"]
+		cornerPower = g["shape"]
+		crowdScale = g["crowd"]
+		evenSpread = true
+		tierWeights = [0.25, 0.29, 0.46]
+		if g.has("text"):
+			paintText = true
+			tifoCrowd = false
+			text = g["text"]
+			textHalf = g["textHalf"]
+			textCol = g["textCol"]
 	elif style == "away":
 		# Other clubs' grounds in New UCL: the standard bowl (blue seats, normal roof, no screen or
 		# lettering) with a smaller crowd, about 11,000.
@@ -139,7 +210,7 @@ func _ring(hx, hz, i):
 	var t = TAU * float(i) / SEGMENTS
 	var c = cos(t)
 	var s = sin(t)
-	return Vector2(hx * sign(c) * pow(abs(c), 2.0 / CORNER_POWER), hz * sign(s) * pow(abs(s), 2.0 / CORNER_POWER))
+	return Vector2(hx * sign(c) * pow(abs(c), 2.0 / cornerPower), hz * sign(s) * pow(abs(s), 2.0 / cornerPower))
 
 func _blocksView(p):
 	return p.y > NEAR_CUT_Z * ratio and abs(p.x) < NEAR_CUT_X * ratio
@@ -175,7 +246,7 @@ func _buildTier(t):
 	var near = d["near"]
 	var rows = d["rows"]
 	_band([a[0], a[1], a[2] - 6.0], [a[0], a[1], a[2]], fascia, near)
-	var seats = [SEAT_A, SEAT_B]
+	var seats = seatCols
 	for r in range(rows):
 		var f0 = float(r) / rows
 		var f1 = float(r + 1) / rows
@@ -186,7 +257,7 @@ func _buildTier(t):
 		var hz1 = lerp(a[1], b[1], f1)
 		var y1 = lerp(a[2], b[2], f1)
 		_band([hx0, hz0, y0], [hx1, hz1, y0], seats, near)
-		_band([hx1, hz1, y0], [hx1, hz1, y1], RISER, near)
+		_band([hx1, hz1, y0], [hx1, hz1, y1], riser, near)
 	# Concourse wall up to the next tier (or a short cap on the open near side).
 	var top = b[2] + 12.0
 	if t + 1 < tiers.size():
@@ -202,8 +273,8 @@ func _textOverlay():
 	var a = d["a"]
 	var b = d["b"]
 	var rows = d["rows"]
-	var cols = TEXT.length() * 6 - 1
-	var half = TEXT_HALF * ratio
+	var cols = text.length() * 6 - 1
+	var half = textHalf * ratio
 	var colW = 2.0 * half / cols
 	st = stMain
 	for r in range(rows):
@@ -229,21 +300,21 @@ func _textOverlay():
 				var t0b = Vector3(xb, y0 + 0.15, side * _sideZ(hx0, hz0, xb))
 				var t1a = Vector3(xa, y0 + 0.15, side * _sideZ(hx1, hz1, xa) * 0.998)
 				var t1b = Vector3(xb, y0 + 0.15, side * _sideZ(hx1, hz1, xb) * 0.998)
-				_tri(t0a, t0b, t1b, SEAT_TEXT)
-				_tri(t0a, t1b, t1a, SEAT_TEXT)
+				_tri(t0a, t0b, t1b, textCol)
+				_tri(t0a, t1b, t1a, textCol)
 				var r1a = Vector3(xa, y1, t1a.z)
 				var r1b = Vector3(xb, y1, t1b.z)
-				_tri(t1a, t1b, r1b, SEAT_TEXT)
-				_tri(t1a, r1b, r1a, SEAT_TEXT)
+				_tri(t1a, t1b, r1b, textCol)
+				_tri(t1a, r1b, r1a, textCol)
 
 # The long side of a ring: z for a given x (the ring is |x/hx|^6 + |z/hz|^6 = 1).
 func _sideZ(hx, hz, x):
-	return hz * pow(max(0.0, 1.0 - pow(abs(x) / hx, CORNER_POWER)), 1.0 / CORNER_POWER)
+	return hz * pow(max(0.0, 1.0 - pow(abs(x) / hx, cornerPower)), 1.0 / cornerPower)
 
 func _pixel(col, row):
 	if col % 6 == 5:
 		return 1
-	var glyph = FONT.get(TEXT[col / 6], FONT[" "])
+	var glyph = FONT.get(text[col / 6], FONT[" "])
 	return 2 if glyph[row][col % 6] == "#" else 1
 
 # 0 = away from the lettering, 1 = in its band but between letters, 2 = on a letter.
@@ -251,9 +322,9 @@ func _pixel(col, row):
 func _textAt(p, hz, f):
 	if abs(p.y) < hz * 0.82:
 		return 0
-	var cols = TEXT.length() * 6 - 1
+	var cols = text.length() * 6 - 1
 	var x = p.x if p.y < 0.0 else - p.x
-	var col = int(floor((x + TEXT_HALF * ratio) / (2.0 * TEXT_HALF * ratio / cols)))
+	var col = int(floor((x + textHalf * ratio) / (2.0 * textHalf * ratio / cols)))
 	var row = int(floor((TEXT_TOP - f) / ((TEXT_TOP - TEXT_BOTTOM) / 7.0)))
 	if col < 0 or col >= cols or row < 0 or row > 6:
 		return 0
@@ -313,8 +384,14 @@ func seats(count, away, nearUpper = false):
 		var inAway = (p.x < - hx * 0.82)
 		if inAway != away:
 			continue
+		var tf = _textAt(p, hz, f) if paintText and t == TEXT_TIER else 0
+		if not tifoCrowd:
+			# Mosaic grounds: nobody sits on the letters, so the coloured seats spell them out.
+			if tf == 2:
+				continue
+			tf = 0
 		out.append(Vector3(p.x, lerp(a[2], b[2], f) + 0.5, p.y))
-		lastTifo.append(_textAt(p, hz, f) if paintText and t == TEXT_TIER else 0)
+		lastTifo.append(tf)
 	return out
 
 func _halton(i, base):

@@ -278,9 +278,13 @@ func initStadium():
 		# 8v8 is played in a packed Bernabeu. In New UCL only Real Madrid's home games are; every
 		# other match uses the game's default stadium.
 		# The UCL final is always played at the Bernabeu.
-		if not _inUCL() or _isRealMadrid(Global.t1) or Global.final:
+		# The other big clubs play at home in their own grounds (BowlStadium.GROUNDS).
+		var ground = _homeGround(Global.t1)
+		if (_inUCL() and Global.final) or ground == "bernabeu" or (ground == "" and not _inUCL()):
 			_useBowlStadium(gs, "bernabeu")
 			atBernabeu = true
+		elif ground != "":
+			_useBowlStadium(gs, ground)
 	awayFans = gs.find_node("AwayFans")
 	
 	
@@ -1792,6 +1796,20 @@ func _madrid2017Late():
 			for p in t.players:
 				if p.has_meta("squadSlot"):
 					t.setPlayerParams(p, p.get_meta("squadSlot"))
+
+# The home ground of one of the big eight clubs ("" for anyone else).
+const HOME_GROUNDS = {"barcelona": "campnou", "bayern": "allianz", "arsenal": "emirates",
+	"man city": "etihad", "man utd": "oldtrafford", "psg": "parc", "atletico": "metropolitano"}
+func _homeGround(td):
+	if td == null:
+		return ""
+	if _isRealMadrid(td):
+		return "bernabeu"
+	var n = str(td.get("teamname")).to_lower()
+	for k in HOME_GROUNDS:
+		if k in n:
+			return HOME_GROUNDS[k]
+	return ""
 
 func _isRealMadrid(td):
 	if td == null:

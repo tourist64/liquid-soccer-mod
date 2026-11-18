@@ -154,7 +154,7 @@ func _initBowlCrowd():
 	for c in get_children():
 		if c is MultiMeshInstance and c != $MultiMeshInstance and c != $MultiMeshInstance7:
 			c.visible = false
-	if bowl.paintText:
+	if bowl.paintText and bowl.tifoCrowd:
 		# Tifo: fans on the letters wear the home shirt (Shirt2), the ones around them navy (Shirt).
 		mat.set_shader_param("Shirt", bowl.tifoBg)
 	_fillCrowd($MultiMeshInstance7, bowl.seats(int(4800 * bowl.crowdScale), false), bowl.lastTifo)
