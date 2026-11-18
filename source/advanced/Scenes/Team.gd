@@ -243,7 +243,7 @@ func setPlayerParams( var p, var i):
 		# more for top keepers.
 		var saveBox = p.find_node("AreaTest", true, false)
 		if saveBox != null:
-			var reach = 1.08 + 0.12 * p.get_meta("rushClass")
+			var reach = 1.4 + 0.12 * p.get_meta("rushClass")
 			# Longer along his body (the box's x axis runs up the spine), so a full-stretch dive
 			# reaches further into the top corners: Neuer about +50%.
 			saveBox.scale = Vector3(reach + 0.15 * p.get_meta("rushClass"), reach, reach)

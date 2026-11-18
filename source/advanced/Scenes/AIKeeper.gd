@@ -256,7 +256,13 @@ func activeState():
 
 	if not _diving():
 		
-		if Global.ballvel.length() < 30 and (db < 12) and (db > 4) and ( not myTeam.posession) and myTeam._ballInBox():
+		# Loose balls in the box: claim them from further away and at a higher pace than before.
+		# With an attacker on the ball he stays patient (the old range), so he isn't sold diving
+		# at a dribbler's feet and left on the floor for the shot.
+		var loose = ball._isFree()
+		var claimPace = BOX_CLAIM_PACE if loose else 30.0
+		var claimDist = BOX_CLAIM_DIST if loose else 12.0
+		if Global.ballvel.length() < claimPace and (db < claimDist) and (db > (3 if loose else 4)) and ( not myTeam.posession) and myTeam._ballInBox():
 			
 			state = pstate.DIVE
 			tostate = pstate.ACTIVE
@@ -737,12 +743,15 @@ func incomingState():
 # least quick enough to reach the ball's line as it gets there (Keeper.gd still caps it at the
 # keeper's dive speed, so lesser keepers can be beaten, and stops it just past the line).
 const DIVE_DECAY = 0.02
-# In a full dive his hands end up about 8.5 ahead of his feet (his neck, where saves are
-# judged, about 6.5), so the feet are aimed short of the ball's line by this much and his
-# head and hands arrive on it. A short sideways lean reaches less.
-const DIVE_HAND_REACH = 6.0
-const CLOSE_HAND_REACH = 3.0
-const BLOCK_GAP = 2.0
+# In a full dive his body stretches out ahead of his feet: spine about 3.5, neck 6.7, hands 8.5.
+# Saves happen when the ball meets the save box on his spine, so the feet are aimed this far short
+# of the ball's line and the middle of his body (with his arms beyond it) arrives on it.
+const DIVE_HAND_REACH = 3.5
+const CLOSE_HAND_REACH = 1.5
+# Shots coming within this of his body are stood up to and taken, never dived away from.
+const BLOCK_GAP = 3.5
+const BOX_CLAIM_PACE = 50.0
+const BOX_CLAIM_DIST = 18.0
 func _handAim(intP, reach):
 	var d = intP - pos
 	d.y = 0.0
