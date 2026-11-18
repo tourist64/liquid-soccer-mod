@@ -66,6 +66,10 @@ func _initialize():
 	
 	
 func _physics_process(delta):
+	# Safety net: whoever ends up with the ball, by any route (trap, first touch, pickup), is
+	# pulled up if he was flagged offside when it was played.
+	if Global.gameOn and offsideFlags.size() > 0 and player != null and offsideFlags.has(player):
+		_callOffside(player)
 	
 	
 	sa.global_transform.origin = global_transform.origin + linear_velocity * delta * 1.2
@@ -202,6 +206,10 @@ func _brakeAtLines(pstate):
 		pstate.angular_velocity *= after / before
 
 func _ballTrapped( var cplayer):
+	# A restart's offside exemption covers only its own delivery: once anyone has the ball in
+	# live play it's gone, so it can never leak into the next pass in open play.
+	if Global.gameOn:
+		offsideExempt = false
 	passGuard = false
 	if _callOffside(cplayer):
 		return
@@ -471,6 +479,8 @@ func _on_Ball_body_entered(body):
 				Game._hitP()
 			
 			lastPlayer = body.get_parent()
+			if offsideFlags.has(lastPlayer) and _callOffside(lastPlayer):
+				return
 		elif body.get_collision_layer_bit(22):
 			$PostSounds.play()
 			trail.render = false
@@ -490,6 +500,8 @@ func _on_Ball_body_entered(body):
 		
 		if body.get_collision_layer_bit(7):
 			lastPlayer = body.get_parent()
+			if offsideFlags.has(lastPlayer) and _callOffside(lastPlayer):
+				return
 			
 				
 			linear_velocity *= 0.85
@@ -497,6 +509,8 @@ func _on_Ball_body_entered(body):
 		Game._hitP()
 	elif (state == bstate.OPEN) and body.get_collision_layer_bit(7):
 		lastPlayer = body.get_parent()
+		if offsideFlags.has(lastPlayer) and _callOffside(lastPlayer):
+			return
 		
 		lastPlayer._ballHit()
 		
