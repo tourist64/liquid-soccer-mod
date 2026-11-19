@@ -123,12 +123,25 @@ func _quadratic_bezier(p0: Vector3, p1: Vector3, p2: Vector3, t: float):
 	
 
 
+const PRESS_OFFSIDE_FREE = 15.0
 const BALL_STATES = [pstate.POSESSION, pstate.PCOLLECT, pstate.PRESS, pstate.INTERCEPT, pstate.HEAD, pstate.PICKUP, pstate.KICKER, pstate.SHOOT, pstate.SLIDE, pstate.BIKE, pstate.PCONTROL, pstate.PENALTY, pstate.THROWIN, pstate.HOLDING]
+# May he cross the onside line right now? Only when he's going for the ball itself (receiving
+# a pass meant for him, or winning a ball that's right there). Pressing or cutting out a pass far
+# from the ball doesn't count.
+func _offsideFree():
+	if myTeam.passto == myPlayer:
+		return true
+	if not (state in BALL_STATES):
+		return false
+	if (state == pstate.PRESS or state == pstate.INTERCEPT) and myPlayer.translation.distance_to(Global.ballpos) > PRESS_OFFSIDE_FREE:
+		return false
+	return true
+
 func seek( var t):
 	
 	# Off the ball everyone stays strictly onside (and drops back if caught offside). Only
 	# going for the ball itself - receiving a pass, pressing, intercepting, heading - may cross it.
-	if not (state in BALL_STATES or myTeam.passto == myPlayer):
+	if not _offsideFree():
 		t = myTeam._keepOnside(t, myPlayer.myID)
 	var diff = (t - pos)
 

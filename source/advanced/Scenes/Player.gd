@@ -883,6 +883,12 @@ func _physics_process(delta):
 		view.y = 0.0
 		
 		myHeadArea.translation = myHead.translation * myHeadFix + headoffset
+		# Hard onside rule for every AI player: unless he's going for the ball, he can't step
+		# beyond the onside line (whatever nudged him there), only back towards it.
+		if isAI and Global.gameOn and myID > 0 and carded < 2 and not AI._offsideFree():
+			var lim = myTeam._onsideLine() - ONSIDE_HARD_MARGIN
+			if translation.x * myTeam.playDir > lim and velocity.x * myTeam.playDir > 0.0:
+				velocity.x = 0.0
 		velocity = move_and_slide(velocity, up, false, 4)
 		_update_movement_animation()
 		
@@ -1074,7 +1080,10 @@ func _holdScore(holder):
 	var chance = lerp(0.25, 0.12, res)
 	return min(hold, TACKLE_ROLL * (1.0 - chance)) - pBallWin * BALL_WIN_BONUS
 
+const ONSIDE_HARD_MARGIN = 1.0
 const HEADER_AIM_WIDTH = 0.75
+const HEADER_OPEN_NET = 12.0    # keeper this far from the middle of his goal: an open net
+const HEADER_OPEN_AIM = 0.4
 func _on_HeadArea_body_entered(_body):
 	if (_body != ball) or ( not Global.gameOn) or not ball._isFree() or not canHead:
 		return
@@ -1097,6 +1106,11 @@ func _on_HeadArea_body_entered(_body):
 				var awayL = (myGoalL - gmid).dot(k - gmid) < 0.0
 				var skill = pAerial if aerialRated else 0.6
 				aim = (- 1.0 if awayL else 1.0) * clamp(lerp(0.35, 0.9, skill) + rand_range( - 0.25, 0.25) * (1.2 - skill), 0.1, 1.0)
+				# Open net (keeper stranded away from the middle of his goal): just put it into the
+				# empty half, well inside the post.
+				var kOff = Vector2(k.x - gmid.x, k.z - gmid.z).length()
+				if kOff > HEADER_OPEN_NET:
+					aim = (- 1.0 if awayL else 1.0) * HEADER_OPEN_AIM
 			
 			
 			shotV = lerp(myGoalL, myGoalR, smoothstep( - 1, 1, aim))
@@ -1110,6 +1124,9 @@ func _on_HeadArea_body_entered(_body):
 			
 			var headPower = lerp(82.0, 105.0, pAerial) if aerialRated else 92.0
 			var headdir = shotV.normalized() * headPower
+			# The ball keeps a quarter of its pace when it's struck (SmartBall._shootBall); take the
+			# cross's leftover speed off so the header goes where he aims, not on towards the far post.
+			headdir -= ball.linear_velocity * 0.25
 			if sign(transform.basis.z.x) == sign(myTeam.playDir):
 				headdir = (myGoal - translation).normalized()
 				ball._tapBall(headdir * 60.0 + Vector3(0, rand_range(20, 25), 0), self)

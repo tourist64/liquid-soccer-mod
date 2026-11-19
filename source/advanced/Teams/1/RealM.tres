@@ -124,7 +124,7 @@ player5 = {
 }
 player6 = {
 "aggression": 5.0,
-"aerial": 10.0,
+"aerial": 8.0,
 "agility": 9.0,
 "curl": 8.5,
 "facehair": 0,
