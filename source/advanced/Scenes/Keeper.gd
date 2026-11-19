@@ -20,6 +20,8 @@ var pDiveAgile = 1.5
 var pAcc
 var pDiveSpeed = 30
 const DIVE_STOP_PAST = 0.6
+const DIVE_POST_EXTRA = 1.5
+const ELITE_REACH = 6.5
 var pBurst = 12
 var dBurst = 12
 var carded = 0
@@ -315,6 +317,9 @@ func _process( var delta):
 				# Shot dives keep reading the ball (curl, late deflections, his slower left-side
 				# dive) and steer his slide onto it, as fast as he can dive, stopping once there.
 				var pr = AI._predictShot(translation.x)
+				# Never slide beyond the posts: a ball heading past them is going wide anyway.
+				var gHalf = abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5 + DIVE_POST_EXTRA
+				pr.z = clamp(pr.z, AI.dGoal.z - gHalf, AI.dGoal.z + gHalf)
 				var gap = pr.z - translation.z
 				var want = 0.0
 				if abs(gap) > AI.diveReach + DIVE_STOP_PAST:
@@ -352,8 +357,9 @@ func _process( var delta):
 		
 		
 	myRoot.process(delta)
+var saveBoxNode = null
 func _physics_process(delta):
-	
+	_eliteFingertips()
 	if not replay:
 		
 		
@@ -531,6 +537,25 @@ func doSave():
 	
 	
 	
+# Elite keepers (Neuer): a shot at his goal that comes within arm's reach of his body is saved,
+# fingertips or a strong hand, whether he's set or mid-dive.
+func _eliteFingertips():
+	if not (has_meta("eliteKeeper") and get_meta("eliteKeeper")):
+		return
+	if not Global.gameOn or Global.penOn or not canSave or not canControl or not ball._isShooting():
+		return
+	var sh = ball.shooter
+	if sh == null or sh.get("myTeam") == myTeam:
+		return
+	if sign(Global.ballvel.x) != sign(AI.dGoal.x):
+		return
+	if saveBoxNode == null:
+		saveBoxNode = find_node("AreaTest", true, false)
+		if saveBoxNode == null:
+			return
+	if (Global.ballpos - saveBoxNode.global_transform.origin).length() < ELITE_REACH:
+		doSave()
+
 func _on_TestSaveArea_area_entered(_area):
 	
 	if ((Global.gameOn) or ((Global.penShoot) and Global.penOn)) and (canControl) and canSave:

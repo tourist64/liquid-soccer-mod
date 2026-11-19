@@ -157,6 +157,7 @@ func setupFormation():
 
 const HUMAN_COURTOIS_NERF = 0.75
 const SHARP_KEEPER_RATING = 8.5
+const ELITE_KEEPER_RATING = 11.5
 func setPlayerParams( var p, var i):
 	# Remember which squad entry this player came from (subs reorder the players array).
 	p.set_meta("squadSlot", i)
@@ -236,6 +237,8 @@ func setPlayerParams( var p, var i):
 		# Keepers rated above 8.5 (agility and smart) track the ball sharply: quicker footwork
 		# and dives that stop right on the ball's line (AIKeeper.seek, Keeper.gd).
 		p.set_meta("sharpKeeper", (float(pp["agility"]) + float(pp["smart"])) * 0.5 > SHARP_KEEPER_RATING)
+		# The very best (Neuer) also get a fingertip save on anything within arm's reach (Keeper.gd).
+		p.set_meta("eliteKeeper", (float(pp["agility"]) + float(pp["smart"])) * 0.5 >= ELITE_KEEPER_RATING)
 		# Top keepers dive faster too (Keeper.gd caps a dive at pDiveSpeed).
 		p.set_meta("diveFast", 1.0 + 0.25 * p.get_meta("rushClass"))
 		p.pDiveSpeed = 30.0 * p.get_meta("diveFast")
