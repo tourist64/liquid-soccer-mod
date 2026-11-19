@@ -528,7 +528,13 @@ func _on_Ball_input_event(_camera, _event, _click_position, _click_normal, _shap
 # --- 11v11 offside --------------------------------------------------------------------
 # Offside is judged the moment the ball is played and called if a flagged player touches it.
 # Corners, throw-ins and goal kicks set offsideExempt so their first kick cannot be offside.
+const OFFSIDE_KICK_REACH = 10.0
 func _recordOffside(kicker):
+	# Only a player actually at the ball can play it: a stray call from someone far away (an AI
+	# acting on a stale possession) must not wipe the snapshot taken when the ball was played.
+	var kn = kicker.get("myPlayer") if kicker != null and kicker.get("myPlayer") != null else kicker
+	if kn != null and kn is Spatial and (kn.global_transform.origin - global_transform.origin).length() > OFFSIDE_KICK_REACH:
+		return
 	offsideFlags.clear()
 	if kicker == null or kicker.get("myTeam") == null:
 		return
