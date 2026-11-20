@@ -453,12 +453,22 @@ func _resetTeam(_AI, ourKick):
 func _lineup( var ourKick):
 	Global.teamsReady[teamID - 1] = false
 	var i = 0
+	var spots = []
 	for NB in players:
 		
 		var xp = max(formation[i].x, 30 * Global.ps)
 		if playDir == 1:
 			xp = min(formation[i].x, - 30 * Global.ps)
-		NB.AI.setTarget(Vector3(xp, 0, formation[i].y))
+		var spot = Vector3(xp, 0, formation[i].y)
+		# Players whose spots are pulled back to the same place (e.g. a striker and an attacking
+		# midfielder both held 30 behind halfway) are spread out sideways instead of stacked.
+		if i > 0 and i < Global.squad:
+			var tries = 0
+			while tries < 6 and _kickoffClash(spot, spots):
+				spot.z += KICKOFF_SPREAD * (1.0 if tries % 2 == 0 else - 2.0) * (1.0 if spot.z <= 0.0 else - 1.0)
+				tries += 1
+			spots.append(spot)
+		NB.AI.setTarget(spot)
 		NB.AI._kickoff()
 		i += 1
 	if (ourKick):
@@ -468,6 +478,13 @@ func _lineup( var ourKick):
 			Game.kickTaker = _closestPToBall()
 	state = teamState.LINEUP
 	$AITimer.start()
+const KICKOFF_SPREAD = 12.0
+func _kickoffClash(spot, spots):
+	for o in spots:
+		if Vector2(o.x - spot.x, o.z - spot.z).length() < 8.0 * Global.ps:
+			return true
+	return false
+
 func _goGameAttack( var t):
 	
 	state = teamState.ATTACK
