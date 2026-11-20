@@ -887,8 +887,12 @@ func _physics_process(delta):
 		# beyond the onside line (whatever nudged him there), only back towards it.
 		if isAI and Global.gameOn and myID > 0 and carded < 2 and not AI._offsideFree():
 			var lim = myTeam._onsideLine() - ONSIDE_HARD_MARGIN
-			if translation.x * myTeam.playDir > lim and velocity.x * myTeam.playDir > 0.0:
+			var past = translation.x * myTeam.playDir - lim
+			if past > 0.0 and velocity.x * myTeam.playDir > 0.0:
 				velocity.x = 0.0
+			# Already beyond it (the line stepped up or he got pushed): get back onside now.
+			if past > ONSIDE_HARD_MARGIN:
+				velocity.x = - myTeam.playDir * max(abs(velocity.x), pOSpeed * ONSIDE_RETREAT_PACE)
 		velocity = move_and_slide(velocity, up, false, 4)
 		_update_movement_animation()
 		
@@ -1081,6 +1085,7 @@ func _holdScore(holder):
 	return min(hold, TACKLE_ROLL * (1.0 - chance)) - pBallWin * BALL_WIN_BONUS
 
 const ONSIDE_HARD_MARGIN = 1.0
+const ONSIDE_RETREAT_PACE = 0.6
 const HEADER_AIM_WIDTH = 0.75
 const HEADER_OPEN_NET = 12.0    # keeper this far from the middle of his goal: an open net
 const HEADER_OPEN_AIM = 0.4

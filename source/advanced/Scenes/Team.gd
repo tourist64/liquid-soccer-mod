@@ -1175,7 +1175,55 @@ func _getPlayPos(pid):
 	# The anchor screens the middle without the ball instead of drifting wide.
 	if tdata.anchorId == pid and not _onTheBall():
 		p.z = clamp(p.z, - ANCHOR_HALF_WIDTH * Global.ps, ANCHOR_HALF_WIDTH * Global.ps)
-	return p
+	return _boxDropPos(p, pid)
+
+# --- Falling back into the box (boxDrop) --------------------------------------------------
+# When the other side has the ball in our half, everyone runs back towards our box: the back
+# four to just in front of goal, the rest to the edge of the box, squeezed into the middle and
+# shifted towards the ball. The high line is untouched until the ball crosses halfway.
+const BOX_DROP_FROM = 150.0     # starts falling back once the ball is this close to our goal
+const BOX_DROP_FULL = 85.0      # fully in the box shape from here on
+const BOX_BACK_DEPTH = 13.0     # back four: about 5 m off the goal line
+const BOX_REST_DEPTH = 30.0     # everyone else: the edge of the box
+const BOX_SQUEEZE = 0.45        # how much of each player's width he keeps
+const BOX_BALL_SHIFT = 0.3      # slide across towards the ball's side
+const BOX_GOAL_SIDE = 5.0       # never stand nearer halfway than the ball
+const BOX_MAX_WIDTH = 50.0
+
+func _boxDropWeight():
+	if tdata.boxDrop <= 0.0 or isCorner or not Global.gameOn or _onTheBall():
+		return 0.0
+	var ballDepth = abs(Global.ballpos.x - dGoal.x)
+	return (1.0 - smoothstep(BOX_DROP_FULL * Global.ps, BOX_DROP_FROM * Global.ps, ballDepth)) * tdata.boxDrop
+
+func _boxDropPos(p, pid):
+	if pid == 0:
+		return p
+	var w = _boxDropWeight()
+	if w <= 0.0:
+		return p
+	var shape = tdata.def[pid - 1]
+	var deeper = 0
+	for i in range(1, Global.squad):
+		var other = tdata.def[i - 1].y
+		if other > shape.y or (other == shape.y and i < pid):
+			deeper += 1
+	var depth = BOX_BACK_DEPTH if deeper < BLOCK_BACK_FOUR else BOX_REST_DEPTH
+	var ballDepth = abs(Global.ballpos.x - dGoal.x)
+	depth = min(depth * Global.ps, max(ballDepth - BOX_GOAL_SIDE * Global.ps, 6.0 * Global.ps))
+	var width = p.z * BOX_SQUEEZE + Global.ballpos.z * BOX_BALL_SHIFT
+	width = clamp(width, - BOX_MAX_WIDTH * Global.ps, BOX_MAX_WIDTH * Global.ps)
+	var spot = Vector3(dGoal.x - sign(dGoal.x) * depth, p.y, width)
+	# Never further from goal than the shape already had him.
+	if abs(spot.x - dGoal.x) > abs(p.x - dGoal.x):
+		spot.x = p.x
+	return p.linear_interpolate(spot, w)
+
+# Out of position while we're being attacked: sprint back.
+func _boxDropSprint(pl):
+	if _boxDropWeight() < 0.5:
+		return false
+	return (pl.translation - dGoal).length() > (Global.ballpos - dGoal).length() - BOX_GOAL_SIDE * Global.ps
 
 # --- Guardiola-style defending (pepLine, counterPress, anchorId) ---------------------------
 const ANCHOR_HALF_WIDTH = 12.0      # anchor stays within 12 units (~3.5 m) of the centre

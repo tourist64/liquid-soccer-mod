@@ -25,6 +25,7 @@ aggression = 8
 approach = 2.0
 League = 1
 offsideTrap = 1.0
+boxDrop = 1.0
 player0 = {
 "aggression": 6.0,
 "agility": 9.5,

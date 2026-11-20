@@ -131,6 +131,10 @@ const BALL_STATES = [pstate.POSESSION, pstate.PCOLLECT, pstate.PRESS, pstate.INT
 func _offsideFree():
 	if myTeam.passto == myPlayer:
 		return true
+	# A team-mate has the ball (or his pass is going to someone else): nobody else may be
+	# beyond the line, whatever he's doing, or the next pass is offside.
+	if myTeam.posession and myTeam.pplayer != null and myTeam.pplayer != myPlayer:
+		return false
 	if not (state in BALL_STATES):
 		return false
 	if (state == pstate.PRESS or state == pstate.INTERCEPT) and myPlayer.translation.distance_to(Global.ballpos) > PRESS_OFFSIDE_FREE:
@@ -436,6 +440,9 @@ func playingState():
 	var _close = seek(t)
 	# Unit-shape teams sprint to their spot when the team switches between attack and defence.
 	if myTeam.tdata.unitShape > 0.0 and _close > UNIT_SPRINT_GAP and myPlayer.pSpeed <= myPlayer.pOSpeed and (myTeam._onTheBall() or not myTeam.opponent._onTheBall() or (myPlayer.translation - myTeam.dGoal).length() > (Global.ballpos - myTeam.dGoal).length()):
+		myPlayer._burst()
+	# Box-drop teams sprint back when the ball is past them in our half.
+	elif _close > UNIT_SPRINT_GAP * 0.5 and myPlayer.pSpeed <= myPlayer.pOSpeed and myTeam._boxDropSprint(myPlayer):
 		myPlayer._burst()
 
 

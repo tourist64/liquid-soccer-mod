@@ -41,6 +41,8 @@ export (float) var offsideTrap = 0.0
 # Possession-and-pressure back line (0-1), Guardiola style: compact with midfield, drops off when an
 # opponent has clean time in midfield. Replaces the offside trap for the sides that use it.
 export (float) var pepLine = 0.0
+# Without the ball, how hard the whole team falls back into its own box when attacked (0-1).
+export (float) var boxDrop = 0.0
 # Counter-press (0-1): for 6 seconds after losing the ball the three nearest players swarm the carrier.
 export (float) var counterPress = 0.0
 # Holding midfielder who screens centrally and never man-marks wide (player number, 0 = none).
