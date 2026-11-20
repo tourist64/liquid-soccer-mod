@@ -238,6 +238,10 @@ func _ballCaught( var cplayer):
 	if not canSave:
 		return false
 	offsideFlags.clear()
+	# A keeper's catch in live play also ends any restart's exemption, so his long kick or throw
+	# afterwards is judged for offside like any other pass.
+	if Global.gameOn:
+		offsideExempt = false
 	trail.render = false
 	linear_velocity = Vector3.ZERO
 		

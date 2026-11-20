@@ -2609,7 +2609,8 @@ func _onsideLine():
 		# Read the line where it is about to be: a high line stepping up drags it back, so
 		# runners pull back with it instead of being caught offside.
 		var depths = []
-		for o in opponent.players:
+		for oi in range(0, Global.squad):
+			var o = opponent.players[oi]
 			if o.carded < 2:
 				var d = o.translation.x * playDir
 				var v = o.velocity.x * playDir if o.velocity is Vector3 else 0.0
@@ -2637,7 +2638,8 @@ func _isOffsidePosition(p):
 	if depth <= 0.0 or depth <= ball.translation.x * playDir:
 		return false
 	var depths = []
-	for o in opponent.players:
+	for oi in range(0, Global.squad):
+		var o = opponent.players[oi]
 		if o.carded < 2:
 			depths.append(o.translation.x * playDir)
 	depths.sort()
@@ -2650,7 +2652,8 @@ var kickLine = 0.0
 
 func _kickOffsideLine():
 	var depths = []
-	for o in opponent.players:
+	for oi in range(0, Global.squad):
+		var o = opponent.players[oi]
 		if o.carded < 2:
 			depths.append(o.translation.x * playDir)
 	depths.sort()
