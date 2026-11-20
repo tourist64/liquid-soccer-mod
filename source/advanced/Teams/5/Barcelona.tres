@@ -182,6 +182,6 @@ player11 = {
 "speed": 8.5
 }
 def = [ Vector2( 0.38, 0.66 ), Vector2( 0.6, 0.67 ), Vector2( 0.5, 0.62 ), Vector2( 0.62, 0.6 ), Vector2( 0.24, 0.56 ), Vector2( 0.76, 0.56 ), Vector2( 0.5, 0.52 ) ]
-mid = [ Vector2( 0.38, 0.47 ), Vector2( 0.6, 0.47 ), Vector2( 0.5, 0.34 ), Vector2( 0.62, 0.4 ), Vector2( 0.18, 0.3 ), Vector2( 0.82, 0.3 ), Vector2( 0.5, 0.26 ) ]
-att = [ Vector2( 0.38, 0.42 ), Vector2( 0.6, 0.42 ), Vector2( 0.5, 0.3 ), Vector2( 0.62, 0.26 ), Vector2( 0.18, 0.14 ), Vector2( 0.82, 0.14 ), Vector2( 0.5, 0.08 ) ]
+mid = [ Vector2( 0.38, 0.5 ), Vector2( 0.6, 0.5 ), Vector2( 0.5, 0.34 ), Vector2( 0.62, 0.4 ), Vector2( 0.18, 0.3 ), Vector2( 0.82, 0.3 ), Vector2( 0.5, 0.26 ) ]
+att = [ Vector2( 0.38, 0.5 ), Vector2( 0.6, 0.5 ), Vector2( 0.5, 0.3 ), Vector2( 0.62, 0.26 ), Vector2( 0.18, 0.14 ), Vector2( 0.82, 0.14 ), Vector2( 0.5, 0.08 ) ]
 cor = [ Vector2( 0.62, 0.08 ), Vector2( 0.47, 0.1 ), Vector2( 0.5, 0.24 ), Vector2( 0.56, 0.22 ), Vector2( 0.4, 0.06 ), Vector2( 0.53, 0.12 ), Vector2( 0.45, 0.16 ) ]
