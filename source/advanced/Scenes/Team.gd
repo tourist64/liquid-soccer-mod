@@ -158,6 +158,7 @@ func setupFormation():
 const HUMAN_COURTOIS_NERF = 0.75
 const SHARP_KEEPER_RATING = 8.5
 const ELITE_KEEPER_RATING = 11.5
+const ELITE_FINGER_REACH = 9.0
 const LONG_KEEPERS = ["T Courtois"]
 func setPlayerParams( var p, var i):
 	# Remember which squad entry this player came from (subs reorder the players array).
@@ -240,6 +241,15 @@ func setPlayerParams( var p, var i):
 		p.set_meta("sharpKeeper", (float(pp["agility"]) + float(pp["smart"])) * 0.5 > SHARP_KEEPER_RATING)
 		# The very best (Neuer) also get a fingertip save on anything within arm's reach (Keeper.gd).
 		p.set_meta("eliteKeeper", (float(pp["agility"]) + float(pp["smart"])) * 0.5 >= ELITE_KEEPER_RATING)
+		# Fingertip reach (Keeper.gd): good keepers save anything that comes this close to their
+		# body; the best by far for Neuer. Keepers rated 8.5 or below have none.
+		var kr = (float(pp["agility"]) + float(pp["smart"])) * 0.5
+		var reachF = 0.0
+		if kr >= ELITE_KEEPER_RATING:
+			reachF = ELITE_FINGER_REACH
+		elif kr > SHARP_KEEPER_RATING:
+			reachF = lerp(3.5, 5.0, min(p.get_meta("rushClass"), 1.0))
+		p.set_meta("fingerReach", reachF)
 		# Keepers who always go long: every goal kick, catch and ball at his feet is a lofted kick.
 		p.set_meta("longKeeper", str(pp.get("name", "")) in LONG_KEEPERS)
 		# Top keepers dive faster too (Keeper.gd caps a dive at pDiveSpeed).

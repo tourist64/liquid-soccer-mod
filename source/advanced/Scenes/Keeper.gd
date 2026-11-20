@@ -537,10 +537,11 @@ func doSave():
 	
 	
 	
-# Elite keepers (Neuer): a shot at his goal that comes within arm's reach of his body is saved,
-# fingertips or a strong hand, whether he's set or mid-dive.
+# Good keepers (fingerReach, set in Team.gd; Neuer most of all): a shot at his goal that comes
+# within that reach of his body is saved, fingertips or a strong hand, whether set or mid-dive.
 func _eliteFingertips():
-	if not (has_meta("eliteKeeper") and get_meta("eliteKeeper")):
+	var reach = get_meta("fingerReach") if has_meta("fingerReach") else 0.0
+	if reach <= 0.0:
 		return
 	if not Global.gameOn or Global.penOn or not canSave or not canControl or not ball._isShooting():
 		return
@@ -553,7 +554,7 @@ func _eliteFingertips():
 		saveBoxNode = find_node("AreaTest", true, false)
 		if saveBoxNode == null:
 			return
-	if (Global.ballpos - saveBoxNode.global_transform.origin).length() < ELITE_REACH:
+	if (Global.ballpos - saveBoxNode.global_transform.origin).length() < reach:
 		doSave()
 
 func _on_TestSaveArea_area_entered(_area):
