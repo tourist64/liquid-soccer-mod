@@ -660,6 +660,9 @@ func incomingState():
 		# His dive to the left (diveLF*) stretches out later than the one to the right, so his
 		# body has to slide nearly all the way to the ball's line on that side.
 		var reachF = LEFT_DIVE_REACH if divedir > 0 else DIVE_HAND_REACH
+		# Low balls: his body stretches along the ground more slowly, so he slides most of the way.
+		if intP.y < LOW_DIVE_HEIGHT:
+			reachF = min(reachF, LOW_DIVE_REACH)
 		var aimF = intP if pen else _handAim(intP, reachF)
 		diveTrack = not pen
 		diveReach = reachF
@@ -769,6 +772,7 @@ const DIVE_DECAY = 0.02
 const DIVE_HAND_REACH = 3.5
 const CLOSE_HAND_REACH = 1.5
 const LEFT_DIVE_REACH = 0.8
+const LOW_DIVE_REACH = 1.2
 # Shots coming within this of his body are stood up to and taken, never dived away from.
 const BLOCK_GAP = 2.0
 const LOW_DIVE_HEIGHT = 2.5
