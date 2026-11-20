@@ -158,6 +158,7 @@ func setupFormation():
 const HUMAN_COURTOIS_NERF = 0.75
 const SHARP_KEEPER_RATING = 8.5
 const ELITE_KEEPER_RATING = 11.5
+const LONG_KEEPERS = ["T Courtois"]
 func setPlayerParams( var p, var i):
 	# Remember which squad entry this player came from (subs reorder the players array).
 	p.set_meta("squadSlot", i)
@@ -239,6 +240,8 @@ func setPlayerParams( var p, var i):
 		p.set_meta("sharpKeeper", (float(pp["agility"]) + float(pp["smart"])) * 0.5 > SHARP_KEEPER_RATING)
 		# The very best (Neuer) also get a fingertip save on anything within arm's reach (Keeper.gd).
 		p.set_meta("eliteKeeper", (float(pp["agility"]) + float(pp["smart"])) * 0.5 >= ELITE_KEEPER_RATING)
+		# Keepers who always go long: every goal kick, catch and ball at his feet is a lofted kick.
+		p.set_meta("longKeeper", str(pp.get("name", "")) in LONG_KEEPERS)
 		# Top keepers dive faster too (Keeper.gd caps a dive at pDiveSpeed).
 		p.set_meta("diveFast", 1.0 + 0.25 * p.get_meta("rushClass"))
 		p.pDiveSpeed = 30.0 * p.get_meta("diveFast")
@@ -1991,11 +1994,16 @@ func _penalty():
 	ball.translation = Vector3(Game.penend * - 100 * Global.ps, 1.0, 0.0)
 	
 	
-	# Taker: a designated one on the pitch (Ronaldo), else the last player not sent off. Chosen
-	# before anyone moves, so everyone's spot (_getPenPosition) knows who it is.
-	for i in range(0, Global.squad):
-		if players[i].carded < 2:
+	# Taker: a designated one on the pitch (Ronaldo), else the best shooter on the pitch (not the
+	# keeper, not sent off). Chosen before anyone moves, so everyone's spot (_getPenPosition)
+	# knows who it is.
+	var bestShot = - 1.0
+	for i in range(1, Global.squad):
+		if players[i].carded < 2 and players[i].pShoot > bestShot:
+			bestShot = players[i].pShoot
 			Game.kickTaker = players[i]
+	if bestShot < 0.0:
+		Game.kickTaker = players[0]
 	var star = _penStar()
 	if star != null:
 		Game.kickTaker = star
@@ -2005,7 +2013,7 @@ func _penalty():
 		
 		players[i]._loseControl()
 	pplayer = Game.kickTaker
-	# Whoever takes it (the last player not sent off) stands just behind the spot.
+	# Whoever takes it stands just behind the spot.
 	if pplayer != null:
 		pplayer.AI.target = Vector3(Game.penend * - 91 * Global.ps, 0, 0)
 

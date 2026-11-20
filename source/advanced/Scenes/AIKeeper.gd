@@ -371,6 +371,9 @@ func tryPass( var isThrow):
 			myTeam._switchPControl(myTeam.passto)
 		
 		
+func _goesLong():
+	return myPlayer.has_meta("longKeeper") and myPlayer.get_meta("longKeeper")
+
 func tryLongPass():
 	
 	
@@ -395,7 +398,10 @@ func posessionState():
 		if _hasBall():
 			var close = seek()
 			if (close < 8) and not (diving):
-				tryPass(false)
+				if _goesLong():
+					tryLongPass()
+				else:
+					tryPass(false)
 			view = vel
 	
 		
@@ -408,7 +414,7 @@ func caughtState():
 	if not _diving() and ball._isCaught():
 		var close = seek()
 		if (close < 8):
-			if rand_range(0.0, 1.0) > myTeam.tictacs:
+			if rand_range(0.0, 1.0) > myTeam.tictacs and not _goesLong():
 				
 				_throwOut()
 			else:
@@ -477,7 +483,7 @@ func kickerState():
 		myPlayer.canControl = false
 		
 		var r = rand_range(0, 1)
-		if r > myTeam.tictacs:
+		if r > myTeam.tictacs and not _goesLong():
 			tryPass(false)
 		else:
 			tryLongPass()
