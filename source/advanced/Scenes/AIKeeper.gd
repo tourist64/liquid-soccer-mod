@@ -520,7 +520,31 @@ func _predictShot(planeX):
 # beside or level with him) may never cross his own line, so reading it at x = his x sent him
 # to wherever the ball was after four seconds: the wrong way, or nowhere.
 func _shotClosest(near):
-	return _simShot(dGoal.x, near)
+	var pt = _simShot(dGoal.x, near)
+	# Lesser keepers misread a shot's line a little (a fixed amount for the whole shot, set when
+	# it's struck), across the ball's path.
+	if readErr != 0.0:
+		var v = ball.linear_velocity
+		var perp = Vector3(- v.z, 0.0, v.x)
+		if perp.length() > 0.1:
+			pt += perp.normalized() * readErr
+	return pt
+
+# --- Keeper quality ---------------------------------------------------------------------------
+# keeperQuality (Team.gd, 0 to 1 from his rating) sets how well he deals with a shot: a top keeper
+# reacts at once, reads it exactly and gets his body right across; a poor one is a few frames
+# late, misjudges its line by up to READ_ERR and leaves more to his stretch.
+const REACT_FRAMES = 8
+const READ_ERR = 3.0
+var readErr = 0.0
+func _quality():
+	return myPlayer.get_meta("keeperQuality") if myPlayer.has_meta("keeperQuality") else 0.5
+
+func _reactFrames():
+	return int(round(REACT_FRAMES * (1.0 - _quality())))
+
+func _rollReadErr():
+	readErr = rand_range(- 1.0, 1.0) * READ_ERR * (1.0 - _quality())
 
 func _shotStartVel():
 	var v = ball.linear_velocity
@@ -643,6 +667,10 @@ func incomingState():
 	if shottype == 3 or shottype == 4:
 		velval *= HEADER_DIVE
 	
+	# A shot struck near him: lesser keepers take a few frames to react (he carries on moving
+	# as he was). Shots picked up later in their flight have had that time already.
+	if not pen and dcount == 0 and Engine.get_physics_frames() - shotFrame < _reactFrames():
+		return
 	isUp = false
 	dview = Global.ballpos
 	myPlayer.canSave = true
@@ -906,7 +934,9 @@ func _onTarget():
 const DIVE_STRETCH_TIME = 0.35
 const MIN_REACH_SCALE = 0.3
 func _reachScale(t):
-	return clamp(t / DIVE_STRETCH_TIME, MIN_REACH_SCALE, 1.0)
+	var full = clamp(t / DIVE_STRETCH_TIME, MIN_REACH_SCALE, 1.0)
+	# Only the better keepers get their body all the way across in that time.
+	return lerp(1.0, full, lerp(0.25, 1.0, _quality()))
 
 # A shot is dived for once it's this close in time (or, for a quick one, LONG_DIVE distance).
 const DIVE_LEAD_TIME = 0.4
@@ -1148,6 +1178,9 @@ func _shotIncoming( var A, var shotV, var _curl, var stype):
 	shotFrame = Engine.get_physics_frames()
 	shooter = A
 	pen = (state == pstate.PENALTY) or Global.penOn
+	readErr = 0.0
+	if not pen:
+		_rollReadErr()
 	
 	shottype = stype
 	
@@ -1184,6 +1217,9 @@ func _penShotIncoming( var A, var shotV, var _curl, var stype):
 	shotFrame = Engine.get_physics_frames()
 	shooter = A
 	pen = not stype
+	readErr = 0.0
+	if not pen:
+		_rollReadErr()
 	if state == pstate.SHOOTOUT:
 		
 		myPlayer._savePenalty()
