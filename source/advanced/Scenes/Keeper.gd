@@ -318,7 +318,9 @@ func _process( var delta):
 				# dive) and steer his slide onto it, as fast as he can dive, stopping once there.
 				var pr = AI._predictShot(translation.x)
 				# Never slide beyond the posts: a ball heading past them is going wide anyway.
-				var gHalf = abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5 + DIVE_POST_EXTRA
+				# (Unless it's going in: off his line at an angle, the near-post ball crosses his
+				# line wider than the post.)
+				var gHalf = max(abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5 + DIVE_POST_EXTRA, AI._shotReachZ())
 				pr.z = clamp(pr.z, AI.dGoal.z - gHalf, AI.dGoal.z + gHalf)
 				var gap = pr.z - translation.z
 				var want = 0.0

@@ -603,7 +603,8 @@ func incomingState():
 		intP.y *= 0.5 + 0.5 * smoothstep(90, 180, shotDir.length())
 	
 	intP.x = clamp(intP.x, - 135.0 * Global.ps, 135.0 * Global.ps)
-	intP.z = clamp(intP.z, - 20.0, 20.0)
+	var zLim = 20.0 if pen else max(20.0, _shotReachZ())
+	intP.z = clamp(intP.z, dGoal.z - zLim, dGoal.z + zLim)
 	
 	
 	
@@ -778,6 +779,18 @@ const BLOCK_GAP = 2.0
 const LOW_DIVE_HEIGHT = 2.5
 const BOX_CLAIM_PACE = 50.0
 const BOX_CLAIM_DIST = 18.0
+# How far across his own line (from the middle of the goal) a shot's crossing point may be
+# taken. Off his line at an angle, a shot inside the near post crosses his line wider than the
+# post, so capping it at the goal's width made him pull back inside, away from the ball.
+const ON_TARGET_MARGIN = 2.0
+const ON_TARGET_REACH = 45.0
+func _shotReachZ():
+	var half = abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5
+	var atGoal = _predictShot(dGoal.x)
+	if abs(atGoal.z - dGoal.z) < half + ON_TARGET_MARGIN:
+		return ON_TARGET_REACH
+	return half + 1.5
+
 func _handAim(intP, reach):
 	var d = intP - pos
 	d.y = 0.0
