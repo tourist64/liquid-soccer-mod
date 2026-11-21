@@ -217,14 +217,17 @@ func longShotState():
 	
 	# Keep reading the shot as it flies (it may be curling), allowing for the swing like the
 	# close-range dive does.
+	var tArr = 0.0
 	if ball._isShooting():
-		var lt = _predictShot(pos.x)
+		var lt = _shotClosest(pos)
+		tArr = predT
 		lt.y = 0
 		lt.x = clamp(lt.x, - 135.0 * Global.ps, 135.0 * Global.ps)
 		longTarget = lt
 	# Every keeper goes into a full dive at a long shot once it's close enough (reading the curl
 	# like any dive), not just a run: from 30 units for an ordinary keeper to 45 for the best.
-	if ball._isShooting() and (Global.ballpos - pos).length() < lerp(LONG_DIVE_MIN, LONG_DIVE_DIST, min(_rushClass(), 1.0)) and not _diving():
+	# A slow one (bouncing, rolling) also has to be close in time, or he'd be down too early.
+	if ball._isShooting() and (Global.ballpos - pos).length() < lerp(LONG_DIVE_MIN, LONG_DIVE_DIST, min(_rushClass(), 1.0)) and tArr <= _diveLeadTime() and not _diving():
 		dcount = 1
 		changeState(pstate.INCOMING)
 		return
@@ -494,40 +497,120 @@ func kickerState():
 		
 		
 	
-# Where a shot will actually cross the plane x = planeX, simulating the ball's own flight: the
-# curl push SmartBall applies every frame (curl.z sideways, fading 2% a frame; curl.y up/down),
-# gravity (20 x gravity_scale 2), air damping 0.2 and a soft bounce. Curl that bends a shot back
-# inside the post is read correctly, not just offset.
+# Where a shot will actually cross the plane x = planeX, simulating the ball's own flight. The
+# model was fitted to the real ball (Bullet physics, measured in a headless run of the engine):
+# the curl push SmartBall applies every frame while shooting (curl.z sideways, fading 2% a frame;
+# curl.y up/down), gravity (20 x gravity_scale 2), its air damping, the extra drag SmartBall puts
+# on curled shots, bounces that keep half the vertical pace but scrub horizontal pace off with
+# ground friction (and cut the curl, like SmartBall does on contact), and a rolling ball losing
+# pace along the grass. Before, bounces and rolling were barely slowed, so low driven and
+# bouncing shots arrived much later than he expected. predT is set to the seconds until then.
+var predT = 0.0
+var shotFrame = - 100
+const BALL_REST_Y = 0.76
+const SIM_FRAMES = 240
 func _predictShot(planeX):
-	var p = ball.translation
+	if abs(_shotStartVel().x) < 1.0:
+		predT = 0.0
+		return intersectShot(Global.ballvel)
+	return _simShot(planeX, null)
+
+# The point where the shot passes closest to `near` (flat, ignoring height), up to the goal line,
+# with predT the seconds until then. A shot across him from a tight angle (a near-post ball from
+# beside or level with him) may never cross his own line, so reading it at x = his x sent him
+# to wherever the ball was after four seconds: the wrong way, or nowhere.
+func _shotClosest(near):
+	return _simShot(dGoal.x, near)
+
+func _shotStartVel():
 	var v = ball.linear_velocity
 	# Right as a shot is struck the kick hasn't reached the ball's velocity yet (it lands next
 	# physics step), so read the shot from the kick itself; otherwise the keeper "predicted" the
-	# ball where it stood and dived towards the shooter.
-	if shotDir != null and typeof(shotDir) == TYPE_VECTOR3 and v.length() < shotDir.length() * 0.5:
+	# ball where it stood and dived towards the shooter. Only then: a shot that has since slowed
+	# on the grass was being read along its original line, not where it had curled to.
+	if Engine.get_physics_frames() - shotFrame <= 2 and shotDir != null and typeof(shotDir) == TYPE_VECTOR3 and v.length() < shotDir.length() * 0.5:
 		v = shotDir
-	var cz = ball.curl.z
-	var cy = ball.curl.y
+	return v
+
+func _simShot(planeX, near):
+	var p = ball.translation
+	var v = _shotStartVel()
+	var shooting = ball.state == ball.bstate.SHOOTING or (Engine.get_physics_frames() - shotFrame <= 2)
+	var crossing = ball.state == ball.bstate.CROSSING
+	var curl = ball.curl
+	var cz = curl.z
+	var cy = curl.y
+	var drag = ball.drag if shooting and typeof(ball.drag) == TYPE_VECTOR3 and ball.drag != Vector3.ZERO else Vector3.ONE
+	var rest = min(BALL_REST_Y, p.y)
 	var dt = 1.0 / 60.0
-	if abs(v.x) < 1.0:
-		return intersectShot(Global.ballvel)
-	for _i in range(240):
-		var left = v.normalized().cross(Vector3.UP)
-		if v.x < 0.0:
-			left = - left
-		v += (cz * left + cy * Vector3.UP) * dt * 50.0
-		cz *= 0.98
+	var best = p
+	var bestT = 0.0
+	var bestD = 1e9
+	if near != null:
+		bestD = Vector2(p.x - near.x, p.z - near.z).length()
+	for i in range(SIM_FRAMES):
+		if shooting:
+			var left = v.normalized().cross(Vector3.UP)
+			if v.x < 0.0:
+				left = - left
+			v += (cz * left + cy * Vector3.UP) * dt * 50.0
+			cz *= 0.98
+		elif crossing:
+			v += curl * dt * 50.0
+			curl *= 0.98
 		v.y -= 40.0 * dt
-		v *= 1.0 - 0.2 * dt
+		v *= 1.0 - 0.3 * dt
+		v.x *= drag.x
+		v.z *= drag.z
 		var np = p + v * dt
-		if np.y < 0.1:
-			np.y = 0.1
-			v.y = abs(v.y) * 0.5
-		if sign(np.x - planeX) != sign(p.x - planeX):
-			var k = (planeX - p.x) / (np.x - p.x)
-			return p + (np - p) * k
+		if np.y <= rest:
+			np.y = rest
+			if v.y < - 3.0:
+				var vin = - v.y
+				v.y = vin * 0.5
+				var hl = Vector2(v.x, v.z).length()
+				if hl > 0.01:
+					var k = (hl - min(vin * 1.5, hl * 2.0 / 7.0)) / hl
+					v.x *= k
+					v.z *= k
+				cz *= 0.2
+				cy *= 0.2
+				curl *= 0.2
+			else:
+				v.y = 0.0
+				var hs = Vector2(v.x, v.z).length()
+				if hs > 0.01:
+					var k2 = max(hs - min(0.61, hs * 0.0145), 0.0) / hs
+					v.x *= k2
+					v.z *= k2
+		var crossed = sign(np.x - planeX) != sign(p.x - planeX)
+		var kx = 1.0
+		if crossed:
+			kx = (planeX - p.x) / (np.x - p.x)
+		if near == null:
+			if crossed:
+				predT = (i + kx) * dt
+				return p + (np - p) * kx
+		else:
+			# Closest point of this step's segment (only up to the goal line).
+			var a = Vector2(p.x - near.x, p.z - near.z)
+			var b = Vector2(np.x - p.x, np.z - p.z) * kx
+			var bl = b.length_squared()
+			var t = 0.0
+			if bl > 0.000001:
+				t = clamp(- a.dot(b) / bl, 0.0, 1.0)
+			var d = (a + b * t).length()
+			if d < bestD:
+				bestD = d
+				best = p + (np - p) * kx * t
+				bestT = (i + kx * t) * dt
+			elif d > bestD + 1.0 or crossed:
+				break
+			if crossed:
+				break
 		p = np
-	return p
+	predT = bestT if near != null else SIM_FRAMES * dt
+	return best if near != null else p
 
 func intersectShot(shdir):
 	var nvel = shdir.normalized()
@@ -575,7 +658,15 @@ func incomingState():
 	
 	
 	var shotvel = R.length()
-	if shotvel < 90 and (dcount > 0):
+	if pen:
+		if shotvel < 90 and (dcount > 0):
+			changeState(pstate.ACTIVE)
+			return
+	elif dcount > 0 and (shotvel < BOX_CLAIM_PACE or (shotvel < 90 and not _onTarget())):
+		# Picked up late (into his area, or a long shot getting close): only a ball slow enough
+		# to claim, or a soft one going wide, is left to the ordinary play. Before, anything
+		# under 90 was, and low, bouncing and placed shots lose a lot of pace on the grass: they
+		# came in at 50 to 90, too quick to claim, and he just watched them go past him.
 		changeState(pstate.ACTIVE)
 		return
 	
@@ -589,9 +680,18 @@ func incomingState():
 		else:
 			intP += ball.curl.z * left * - 1.85 * flip
 	else:
-		# Read the real flight, curl and dip included.
-		intP = _predictShot(pos.x)
+		# Read the real flight, curl, dip and bounces included: where it passes closest to him.
+		intP = _shotClosest(pos)
+	var tArr = predT
 	intP.y = max(intP.y, 0.1)
+	# A slow (bouncing, rolling) shot still a long way off: keep going across and dive when it's
+	# close in time, as for a long shot. Diving at once left him down on the grass before it got
+	# there.
+	if not pen and tArr > _diveLeadTime():
+		longTarget = intP
+		longTarget.y = 0
+		state = pstate.LONGSHOT
+		return
 	
 	divedir = 0
 	
@@ -664,6 +764,8 @@ func incomingState():
 		# Low balls: his body stretches along the ground more slowly, so he slides most of the way.
 		if intP.y < LOW_DIVE_HEIGHT:
 			reachF = min(reachF, LOW_DIVE_REACH)
+		if not pen:
+			reachF *= _reachScale(tArr)
 		var aimF = intP if pen else _handAim(intP, reachF)
 		diveTrack = not pen
 		diveReach = reachF
@@ -680,14 +782,15 @@ func incomingState():
 		
 			
 		if not pen:
-			_quickDive(aimF)
+			_quickDive(aimF, tArr)
 		# Stop the slide once his head and hands are on the ball's line (Keeper.gd), not his feet.
 		diveStopOn = false
 		if not pen:
 			_setDiveStop(aimF)
 		divevel = vel
 	else:
-		var aimC = intP if pen else _handAim(intP, CLOSE_HAND_REACH)
+		var reachC = CLOSE_HAND_REACH if pen else CLOSE_HAND_REACH * _reachScale(tArr)
+		var aimC = intP if pen else _handAim(intP, reachC)
 		diveTrack = not pen
 		diveReach = CLOSE_HAND_REACH
 		vel = (aimC - pos) * Vector3(1.5, 4.5, 4.5)
@@ -697,7 +800,7 @@ func incomingState():
 			vel *= rand_range(0.9, 1.0)
 			fk = false
 		if not pen:
-			_quickDive(aimC)
+			_quickDive(aimC, tArr)
 		# Stop the slide once his head and hands are on the ball's line (Keeper.gd), not his feet.
 		diveStopOn = false
 		if not pen:
@@ -785,11 +888,31 @@ const BOX_CLAIM_DIST = 18.0
 const ON_TARGET_MARGIN = 2.0
 const ON_TARGET_REACH = 45.0
 func _shotReachZ():
+	if _onTarget():
+		return ON_TARGET_REACH
+	return abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5 + 1.5
+
+func _onTarget():
+	var keepT = predT
 	var half = abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5
 	var atGoal = _predictShot(dGoal.x)
-	if abs(atGoal.z - dGoal.z) < half + ON_TARGET_MARGIN:
-		return ON_TARGET_REACH
-	return half + 1.5
+	predT = keepT
+	return abs(atGoal.z - dGoal.z) < half + ON_TARGET_MARGIN and atGoal.y < 10.5
+
+# His body takes time to stretch out in a dive (low ones most of all). With the ball only a
+# moment away there isn't that time, so his body itself has to get across onto its line: the
+# reach he leaves to his stretch shrinks with the time left. Close near-post shots got a dive
+# that barely moved him, his arms still on the way out as the ball went by.
+const DIVE_STRETCH_TIME = 0.35
+const MIN_REACH_SCALE = 0.3
+func _reachScale(t):
+	return clamp(t / DIVE_STRETCH_TIME, MIN_REACH_SCALE, 1.0)
+
+# A shot is dived for once it's this close in time (or, for a quick one, LONG_DIVE distance).
+const DIVE_LEAD_TIME = 0.4
+const DIVE_LEAD_TOP = 0.45
+func _diveLeadTime():
+	return lerp(DIVE_LEAD_TIME, DIVE_LEAD_TOP, min(_rushClass(), 1.0))
 
 func _handAim(intP, reach):
 	var d = intP - pos
@@ -812,18 +935,23 @@ func _setDiveStop(pt):
 	diveStopZ = pt.z
 	diveStopDir = d.normalized() if diveStopOn else Vector3.ZERO
 
-func _quickDive(intP):
+func _quickDive(intP, t):
 	var fast = myPlayer.get_meta("diveFast") if myPlayer.has_meta("diveFast") else 1.0
 	var k = DIVE_DECAY * fast
-	var t = abs(pos.x - Global.ballpos.x) / max(abs(Global.ballvel.x), 20.0)
+	# Time from the ball's own predicted flight: right at the strike Global.ballvel is still the
+	# dribble (or the player's run), which made a close shot look slow and his push tiny.
 	var n = max(t * 60.0, 1.0)
 	var covered = (1.0 - pow(1.0 - k, n)) / k / 60.0
-	var need = (intP.z - pos.z) / covered
+	var gap = intP - pos
+	gap.y = 0.0
+	var need = gap / covered
 	# Never ask for more than the keeper's dive speed: Keeper.gd caps the speed each frame but
 	# not the push itself, so an oversized push kept him sliding flat out past the ball.
-	need = clamp(need, - myPlayer.pDiveSpeed, myPlayer.pDiveSpeed)
-	if abs(need) > abs(vel.z):
-		vel.z = need
+	need = need.limit_length(myPlayer.pDiveSpeed)
+	var cur = Vector3(vel.x, 0.0, vel.z)
+	if need.length() > cur.length():
+		vel.x = need.x
+		vel.z = need.z
 
 func _penaltyDive( var ddir):
 	diveStopOn = false
@@ -1017,6 +1145,7 @@ func _shotIncoming( var A, var shotV, var _curl, var stype):
 	myPlayer.canSave = true
 	myPlayer.canControl = true
 	shotDir = shotV
+	shotFrame = Engine.get_physics_frames()
 	shooter = A
 	pen = (state == pstate.PENALTY) or Global.penOn
 	
@@ -1052,6 +1181,7 @@ func _penShotIncoming( var A, var shotV, var _curl, var stype):
 	myPlayer.canSave = true
 	myPlayer.canControl = true
 	shotDir = shotV
+	shotFrame = Engine.get_physics_frames()
 	shooter = A
 	pen = not stype
 	if state == pstate.SHOOTOUT:
