@@ -93,17 +93,17 @@ player4 = {
 "speed": 6.5
 }
 player5 = {
-"aggression": 7.0,
-"agility": 9.5,
-"curl": 9.5,
-"facehair": 1,
-"hair": Color( 0.850, 0.700, 0.400, 1 ),
-"hairtype": 6,
-"name": "A Griezmann",
+"aggression": 6.5,
+"agility": 10.0,
+"curl": 9.0,
+"facehair": 0,
+"hair": Color( 0.050, 0.040, 0.030, 1 ),
+"hairtype": 1,
+"name": "A Lookman",
 "shoot": 9.0,
-"skin": Color( 0.960, 0.800, 0.690, 1 ),
-"smart": 10.0,
-"speed": 7.5
+"skin": Color( 0.330, 0.210, 0.140, 1 ),
+"smart": 9.0,
+"speed": 9.5
 }
 player6 = {
 "aggression": 8.5,
@@ -132,17 +132,17 @@ player7 = {
 "speed": 9.0
 }
 player8 = {
-"aggression": 7.5,
-"agility": 7.5,
-"curl": 8.0,
+"aggression": 6.5,
+"agility": 9.0,
+"curl": 10.0,
 "facehair": 0,
-"hair": Color( 0.250, 0.150, 0.080, 1 ),
+"hair": Color( 0.300, 0.200, 0.110, 1 ),
 "hairtype": 2,
-"name": "M Ruggeri",
-"shoot": 6.0,
+"name": "A Grimaldo",
+"shoot": 8.0,
 "skin": Color( 0.960, 0.800, 0.690, 1 ),
-"smart": 8.5,
-"speed": 8.0
+"smart": 9.5,
+"speed": 8.5
 }
 player9 = {
 "aggression": 6.0,
@@ -171,17 +171,19 @@ player10 = {
 "speed": 9.5
 }
 player11 = {
-"aggression": 10.0,
-"agility": 7.0,
-"curl": 5.0,
-"facehair": 0,
-"hair": Color( 0.120, 0.080, 0.050, 1 ),
-"hairtype": 1,
-"name": "J Gimenez",
-"shoot": 5.0,
+"aggression": 10.5,
+"agility": 7.5,
+"aerial": 9.0,
+"curl": 5.5,
+"facehair": 1,
+"hair": Color( 0.080, 0.050, 0.040, 1 ),
+"hairtype": 6,
+"strength": 9.0,
+"name": "C Romero",
+"shoot": 5.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 9.0,
-"speed": 7.5
+"speed": 8.0
 }
 def = [ Vector2( 0.2, 0.8 ), Vector2( 0.5, 0.87 ), Vector2( 0.8, 0.8 ), Vector2( 0.5, 0.74 ), Vector2( 0.4, 0.52 ), Vector2( 0.62, 0.66 ), Vector2( 0.5, 0.52 ) ]
 mid = [ Vector2( 0.15, 0.6 ), Vector2( 0.5, 0.72 ), Vector2( 0.85, 0.6 ), Vector2( 0.5, 0.56 ), Vector2( 0.4, 0.26 ), Vector2( 0.62, 0.46 ), Vector2( 0.5, 0.26 ) ]

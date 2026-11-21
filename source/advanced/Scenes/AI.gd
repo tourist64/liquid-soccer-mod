@@ -2008,6 +2008,9 @@ func _on_DangerZone_body_entered(body):
 	# control is left to you).
 	if ( not _moving()) or (body != myPlayer.ball) or not (Global.gameOn) or not myPlayer.ball._canHead() or not myPlayer.canControl:
 		return
+	# Your own corners: your team-mates leave the header (and the tap-in) to you.
+	if not myTeam.AIteam and myPlayer.ball.cornerBall and myPlayer.ball.shooter != null and myPlayer.ball.shooter.get("myTeam") == myTeam:
+		return
 	# A low cross across the box to a man in a good spot is tapped in first time (yours too).
 	if _tapInChance() and _tapInContact():
 		_tapIn()

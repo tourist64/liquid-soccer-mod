@@ -192,17 +192,17 @@ player10 = {
 "speed": 8.5
 }
 player11 = {
-"aggression": 6.5,
-"agility": 9.0,
-"curl": 8.0,
+"aggression": 6.0,
+"agility": 9.5,
+"curl": 9.0,
 "facehair": 0,
 "hair": Color( 0.080, 0.050, 0.040, 1 ),
 "hairtype": 1,
-"name": "G Martinelli",
-"shoot": 8.0,
-"skin": Color( 0.780, 0.570, 0.450, 1 ),
+"name": "C Tzolis",
+"shoot": 8.5,
+"skin": Color( 0.920, 0.760, 0.650, 1 ),
 "smart": 8.5,
-"speed": 9.5
+"speed": 9.0
 }
 def = [ Vector2( 0.2, 0.8 ), Vector2( 0.8, 0.8 ), Vector2( 0.38, 0.87 ), Vector2( 0.62, 0.87 ), Vector2( 0.5, 0.74 ), Vector2( 0.76, 0.56 ), Vector2( 0.62, 0.66 ) ]
 mid = [ Vector2( 0.15, 0.6 ), Vector2( 0.85, 0.6 ), Vector2( 0.38, 0.72 ), Vector2( 0.62, 0.72 ), Vector2( 0.5, 0.56 ), Vector2( 0.82, 0.3 ), Vector2( 0.62, 0.46 ) ]

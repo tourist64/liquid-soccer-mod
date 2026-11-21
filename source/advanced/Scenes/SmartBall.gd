@@ -6,6 +6,8 @@ var shooter = null
 var isShot = false
 
 var curl = Vector3.ZERO
+# The ball in the air is a corner delivery (nobody has touched it since).
+var cornerBall = false
 var drag = Vector3.ZERO
 var Game = null
 var oob = false
@@ -206,6 +208,7 @@ func _brakeAtLines(pstate):
 		pstate.angular_velocity *= after / before
 
 func _ballTrapped( var cplayer):
+	cornerBall = false
 	# A restart's offside exemption covers only its own delivery: once anyone has the ball in
 	# live play it's gone, so it can never leak into the next pass in open play.
 	if Global.gameOn:
@@ -233,6 +236,7 @@ func _ballFree():
 	isShot = false
 		
 func _ballCaught( var cplayer):
+	cornerBall = false
 	passGuard = false
 	
 	if not canSave:
@@ -255,6 +259,7 @@ func _ballCaught( var cplayer):
 	
 
 func _shootBall( var shootr, var direction, var curldirection):
+	cornerBall = false
 	passGuard = false
 	if state == bstate.CAUGHT or _callOffside(shootr):
 		return
@@ -317,6 +322,7 @@ func _crossBall( var direction, var passer, var curld, var islow):
 	if _callOffside(passer):
 		return
 	_recordOffside(passer)
+	cornerBall = abs(translation.x) > 130.0 * Global.ps and abs(translation.z) > 75.0 * Global.ps
 	
 	linear_velocity *= 0.25
 	var d = direction
@@ -357,6 +363,7 @@ func _crossBall( var direction, var passer, var curld, var islow):
 
 
 func _tapBall( var direction, var passer):
+	cornerBall = false
 	passGuard = false
 	if _callOffside(passer):
 		return
