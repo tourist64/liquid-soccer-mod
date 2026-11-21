@@ -1175,7 +1175,35 @@ func _getPlayPos(pid):
 	# The anchor screens the middle without the ball instead of drifting wide.
 	if tdata.anchorId == pid and not _onTheBall():
 		p.z = clamp(p.z, - ANCHOR_HALF_WIDTH * Global.ps, ANCHOR_HALF_WIDTH * Global.ps)
-	return _boxDropPos(p, pid)
+	return _boxDropPos(_fullBackTuck(p, pid), pid)
+
+# --- Full-backs who tuck in -----------------------------------------------------------------
+# They hold their flank, but once the ball is near our goal and central or on the far side,
+# they drift in towards the centre-backs to help; with the ball on their own wing they stay out.
+const TUCK_PLAYERS = ["A Hakimi", "N Mendes"]
+const TUCK_FROM = 140.0        # ball this close to our goal: start drifting in
+const TUCK_FULL = 70.0
+const TUCK_SHARE = 0.3         # give up to 30% of his width
+const TUCK_MIN_WIDTH = 42.0    # never closer than this to the middle (centre-backs are ~24)
+const TUCK_OWN_WING = 40.0     # ball this far out on his side: he stays wide
+
+func _fullBackTuck(p, pid):
+	if pid == 0 or not Global.gameOn or _onTheBall():
+		return p
+	var pl = players[pid]
+	var slot = pl.get_meta("squadSlot") if pl.has_meta("squadSlot") else pid
+	if not (_playerName(slot) in TUCK_PLAYERS):
+		return p
+	var ballDepth = abs(Global.ballpos.x - dGoal.x)
+	var w = 1.0 - smoothstep(TUCK_FULL * Global.ps, TUCK_FROM * Global.ps, ballDepth)
+	var side = sign(p.z)
+	if w <= 0.0 or side == 0:
+		return p
+	w *= 1.0 - smoothstep(10.0 * Global.ps, TUCK_OWN_WING * Global.ps, Global.ballpos.z * side)
+	var tucked = side * max(abs(p.z) * (1.0 - TUCK_SHARE), TUCK_MIN_WIDTH * Global.ps)
+	if abs(tucked) < abs(p.z):
+		p.z = lerp(p.z, tucked, w)
+	return p
 
 # --- Falling back into the box (boxDrop) --------------------------------------------------
 # When the other side has the ball in our half, everyone runs back towards our box: the back
