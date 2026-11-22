@@ -2202,12 +2202,21 @@ func _goalkick( var side, var e):
 	state = teamState.LINEUP
 	pplayer = Game.kickTaker
 	
+const GOAL_KICK_DEEPEST = 128.0
 func _defendGoalkick():
 	ball._ballFree()
 	momentum = false
 	for i in range(0, Global.squad):
 		players[i].AI._kickoff()
-		players[i].AI.target = _getPlayPos(players[i].myID) - Vector3(30.0 * Global.ps * playDir, 0, 0)
+		if i == 0:
+			# The keeper waits on his usual spot. Pushed back with the rest he was sent 40 units
+			# behind his own goal line and stood there, behind the net, every time.
+			players[i].AI.target = Vector3(formation[0].x, 0, 0)
+			continue
+		var t = _getPlayPos(players[i].myID) - Vector3(30.0 * Global.ps * playDir, 0, 0)
+		# Never past our own goal line.
+		t.x = clamp(t.x, - GOAL_KICK_DEEPEST * Global.ps, GOAL_KICK_DEEPEST * Global.ps)
+		players[i].AI.target = t
 		
 
 	state = teamState.LINEUP
