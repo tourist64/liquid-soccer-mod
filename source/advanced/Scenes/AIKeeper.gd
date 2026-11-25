@@ -510,6 +510,8 @@ var shotFrame = - 100
 const BALL_REST_Y = 0.76
 const SIM_FRAMES = 240
 func _predictShot(planeX):
+	if not smartShot:
+		return _predictShotOld(planeX)
 	if abs(_shotStartVel().x) < 1.0:
 		predT = 0.0
 		return intersectShot(Global.ballvel)
@@ -520,31 +522,7 @@ func _predictShot(planeX):
 # beside or level with him) may never cross his own line, so reading it at x = his x sent him
 # to wherever the ball was after four seconds: the wrong way, or nowhere.
 func _shotClosest(near):
-	var pt = _simShot(dGoal.x, near)
-	# Lesser keepers misread a shot's line a little (a fixed amount for the whole shot, set when
-	# it's struck), across the ball's path.
-	if readErr != 0.0:
-		var v = ball.linear_velocity
-		var perp = Vector3(- v.z, 0.0, v.x)
-		if perp.length() > 0.1:
-			pt += perp.normalized() * readErr
-	return pt
-
-# --- Keeper quality ---------------------------------------------------------------------------
-# keeperQuality (Team.gd, 0 to 1 from his rating) sets how well he deals with a shot: a top keeper
-# reacts at once, reads it exactly and gets his body right across; a poor one is a few frames
-# late, misjudges its line by up to READ_ERR and leaves more to his stretch.
-const REACT_FRAMES = 8
-const READ_ERR = 3.0
-var readErr = 0.0
-func _quality():
-	return myPlayer.get_meta("keeperQuality") if myPlayer.has_meta("keeperQuality") else 0.5
-
-func _reactFrames():
-	return int(round(REACT_FRAMES * (1.0 - _quality())))
-
-func _rollReadErr():
-	readErr = rand_range(- 1.0, 1.0) * READ_ERR * (1.0 - _quality())
+	return _simShot(dGoal.x, near)
 
 func _shotStartVel():
 	var v = ball.linear_velocity
@@ -636,6 +614,38 @@ func _simShot(planeX, near):
 	predT = bestT if near != null else SIM_FRAMES * dt
 	return best if near != null else p
 
+# The original read, for a close shot (anyone but Neuer).
+func _predictShotOld(planeX):
+	var p = ball.translation
+	var v = ball.linear_velocity
+	# Right as a shot is struck the kick hasn't reached the ball's velocity yet (it lands next
+	# physics step), so read the shot from the kick itself; otherwise the keeper "predicted" the
+	# ball where it stood and dived towards the shooter.
+	if shotDir != null and typeof(shotDir) == TYPE_VECTOR3 and v.length() < shotDir.length() * 0.5:
+		v = shotDir
+	var cz = ball.curl.z
+	var cy = ball.curl.y
+	var dt = 1.0 / 60.0
+	if abs(v.x) < 1.0:
+		return intersectShot(Global.ballvel)
+	for _i in range(240):
+		var left = v.normalized().cross(Vector3.UP)
+		if v.x < 0.0:
+			left = - left
+		v += (cz * left + cy * Vector3.UP) * dt * 50.0
+		cz *= 0.98
+		v.y -= 40.0 * dt
+		v *= 1.0 - 0.2 * dt
+		var np = p + v * dt
+		if np.y < 0.1:
+			np.y = 0.1
+			v.y = abs(v.y) * 0.5
+		if sign(np.x - planeX) != sign(p.x - planeX):
+			var k = (planeX - p.x) / (np.x - p.x)
+			return p + (np - p) * k
+		p = np
+	return p
+
 func intersectShot(shdir):
 	var nvel = shdir.normalized()
 	
@@ -658,7 +668,17 @@ func intersectShot(shdir):
 	
 	return Global.ballpos + abs(t) * nvel
 	
+var smartShot = false
+func _eliteKeeper():
+	return myPlayer.get_meta("eliteKeeper") if myPlayer.has_meta("eliteKeeper") else false
+
 func incomingState():
+	if pen or not smartShot:
+		_incomingOld()
+	else:
+		_incomingNew()
+
+func _incomingNew():
 	
 	
 	var velval = myPlayer.pDiveAgile * 0.6 * (myPlayer.get_meta("diveFast") if myPlayer.has_meta("diveFast") else 1.0)
@@ -667,10 +687,6 @@ func incomingState():
 	if shottype == 3 or shottype == 4:
 		velval *= HEADER_DIVE
 	
-	# A shot struck near him: lesser keepers take a few frames to react (he carries on moving
-	# as he was). Shots picked up later in their flight have had that time already.
-	if not pen and dcount == 0 and Engine.get_physics_frames() - shotFrame < _reactFrames():
-		return
 	isUp = false
 	dview = Global.ballpos
 	myPlayer.canSave = true
@@ -893,6 +909,218 @@ func incomingState():
 	shotview = view
 	
 	
+# The original dive, for close shots (anyone but Neuer) and penalties.
+func _incomingOld():
+	
+	
+	var velval = myPlayer.pDiveAgile * 0.6 * (myPlayer.get_meta("diveFast") if myPlayer.has_meta("diveFast") else 1.0)
+	# Headers (shot types 3 and 4) are close and sudden: every keeper is a step slower to them,
+	# so a good corner header is a real chance even against Neuer.
+	if shottype == 3 or shottype == 4:
+		velval *= HEADER_DIVE
+	
+	isUp = false
+	dview = Global.ballpos
+	myPlayer.canSave = true
+	
+	
+	
+	var R = Global.ballvel
+	if pen:
+		R = shotDir
+		
+	
+	
+	
+	
+	var shotvel = R.length()
+	if shotvel < 90 and (dcount > 0):
+		changeState(pstate.ACTIVE)
+		return
+	
+	var intP = intersectShot(R)
+	var left = myPlayer.transform.basis.x
+	
+	if pen:
+		if dcount > 0:
+			intP += ball.curl.z * left * - 1.75 * flip
+			intP += ball.curl.y * Vector3.UP
+		else:
+			intP += ball.curl.z * left * - 1.85 * flip
+	else:
+		# Read the real flight, curl and dip included.
+		intP = _predictShot(pos.x)
+	intP.y = max(intP.y, 0.1)
+	
+	divedir = 0
+	
+	if (pen):
+		if rand_range(0.0, 18.0) > myPlayer.pAgility:
+			intP.z *= rand_range( - 1, 1)
+	
+	if pen:
+		intP.y *= 0.5 + 0.5 * smoothstep(90, 180, shotDir.length())
+	
+	intP.x = clamp(intP.x, - 135.0 * Global.ps, 135.0 * Global.ps)
+	var zLim = 20.0 if pen else max(20.0, _shotReachZ())
+	intP.z = clamp(intP.z, dGoal.z - zLim, dGoal.z + zLim)
+	
+	
+	
+	
+		
+	
+	var dif = intP - myPlayer.translation
+	var test = (myPlayer.translation - Global.ballpos).normalized().cross(Vector3.UP)
+	
+	var dp = test.dot(dif.normalized())
+	
+	
+	dif.y = 0
+	var noYdif = intP * Vector3(1.0, 0.0, 1.0) - myPlayer.translation
+	var dz = noYdif.length()
+	if intP.y > 3.0:
+		isUp = true
+	
+	
+	
+	
+	
+	
+	# A low ball a couple of steps away gets a proper low dive: the short "close" lean barely
+	# moves his body and keeps it at waist height, so low shots into the corner slipped by.
+	if dz > 5.0 or (not pen and dz > BLOCK_GAP and intP.y < LOW_DIVE_HEIGHT):
+		divedir = sign(dp)
+		
+		if (divedir > 0):
+			if (intP.y > 5):
+				myPlayer.myAState.travel("diveHF")
+				
+			elif (intP.y > 3):
+				myPlayer.myAState.travel("diveMF")
+				
+			else:
+				
+				myPlayer.myAState.travel("diveLF")
+		else:
+			if (intP.y > 5):
+				myPlayer.myAState.travel("diveHFR")
+			
+			elif (intP.y > 3):
+				myPlayer.myAState.travel("diveMFR")
+			
+			else:
+				
+				myPlayer.myAState.travel("diveLFR")
+		diving = true
+		state = pstate.DIVE
+		
+		tostate = pstate.ACTIVE
+		
+		# His dive to the left (diveLF*) stretches out later than the one to the right, so his
+		# body has to slide nearly all the way to the ball's line on that side.
+		var reachF = LEFT_DIVE_REACH if divedir > 0 else DIVE_HAND_REACH
+		# Low balls: his body stretches along the ground more slowly, so he slides most of the way.
+		if intP.y < LOW_DIVE_HEIGHT:
+			reachF = min(reachF, LOW_DIVE_REACH)
+		var aimF = intP if pen else _handAim(intP, reachF)
+		diveTrack = not pen
+		diveReach = reachF
+		vel = (aimF - pos) * Vector3(velval, velval * 3.0, velval)
+		vel.y = (intP - pos).y * velval * 3.0
+		
+		
+		
+		
+		
+		vel *= rand_range(0.95, 1.0)
+		
+		
+		
+			
+		if not pen:
+			_quickDiveOld(aimF)
+		# Stop the slide once his head and hands are on the ball's line (Keeper.gd), not his feet.
+		diveStopOn = false
+		if not pen:
+			_setDiveStop(aimF)
+		divevel = vel
+	else:
+		var aimC = intP if pen else _handAim(intP, CLOSE_HAND_REACH)
+		diveTrack = not pen
+		diveReach = CLOSE_HAND_REACH
+		vel = (aimC - pos) * Vector3(1.5, 4.5, 4.5)
+		vel.y = (intP - pos).y * 4.5
+		divedir = 0
+		if (fk):
+			vel *= rand_range(0.9, 1.0)
+			fk = false
+		if not pen:
+			_quickDiveOld(aimC)
+		# Stop the slide once his head and hands are on the ball's line (Keeper.gd), not his feet.
+		diveStopOn = false
+		if not pen:
+			_setDiveStop(aimC)
+		divevel = vel
+		# A shot straight at him: stand his ground and take it (jumping only for one over his
+		# head) rather than lean off to one side and let it in where he was standing.
+		if not pen and dz < BLOCK_GAP and intP.y <= 5.0:
+			vel = Vector3.ZERO
+			divevel = vel
+			diveStopOn = false
+			divedir = 0.0
+			diving = true
+			isUp = intP.y > 3.0
+			if isUp:
+				myPlayer.myAState.travel("diveUp")
+			elif sign(Global.ballvel.z) == sign(myTeam.playDir):
+				myPlayer.myAState.travel("collectR")
+			else:
+				myPlayer.myAState.travel("collectL")
+			state = pstate.DIVE
+			tostate = pstate.ACTIVE
+			view = dview
+			shotview = view
+			return
+		if (intP.y > 5.0):
+			divedir = 0.0
+			diving = true
+			isUp = true
+			myPlayer.myAState.travel("diveUp")
+			state = pstate.DIVE
+			
+			divevel.x *= 0.5
+			tostate = pstate.ACTIVE
+			
+			
+		else:
+			divedir = sign(dp)
+			
+			
+			
+			
+			
+			
+				
+			
+			
+			if divedir > 0:
+				
+				myPlayer.myAState.travel("closeleft")
+			else:
+				myPlayer.myAState.travel("closeright")
+			state = pstate.DIVE
+			
+			tostate = pstate.ACTIVE
+			
+			
+			
+			
+				
+	view = dview
+	shotview = view
+	
+	
 # A dive's push was set in proportion to the gap, so a short dive to the near post was slow
 # exactly when the ball arrives soonest, and long shots squeezed in there. Each dive is now at
 # least quick enough to reach the ball's line as it gets there (Keeper.gd still caps it at the
@@ -925,7 +1153,7 @@ func _onTarget():
 	var half = abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5
 	var atGoal = _predictShot(dGoal.x)
 	predT = keepT
-	return abs(atGoal.z - dGoal.z) < half + ON_TARGET_MARGIN and atGoal.y < 10.5
+	return abs(atGoal.z - dGoal.z) < half + ON_TARGET_MARGIN and (atGoal.y < 10.5 or not smartShot)
 
 # His body takes time to stretch out in a dive (low ones most of all). With the ball only a
 # moment away there isn't that time, so his body itself has to get across onto its line: the
@@ -934,9 +1162,7 @@ func _onTarget():
 const DIVE_STRETCH_TIME = 0.35
 const MIN_REACH_SCALE = 0.3
 func _reachScale(t):
-	var full = clamp(t / DIVE_STRETCH_TIME, MIN_REACH_SCALE, 1.0)
-	# Only the better keepers get their body all the way across in that time.
-	return lerp(1.0, full, lerp(0.25, 1.0, _quality()))
+	return clamp(t / DIVE_STRETCH_TIME, MIN_REACH_SCALE, 1.0)
 
 # A shot is dived for once it's this close in time (or, for a quick one, LONG_DIVE distance).
 const DIVE_LEAD_TIME = 0.4
@@ -982,6 +1208,19 @@ func _quickDive(intP, t):
 	if need.length() > cur.length():
 		vel.x = need.x
 		vel.z = need.z
+
+func _quickDiveOld(intP):
+	var fast = myPlayer.get_meta("diveFast") if myPlayer.has_meta("diveFast") else 1.0
+	var k = DIVE_DECAY * fast
+	var t = abs(pos.x - Global.ballpos.x) / max(abs(Global.ballvel.x), 20.0)
+	var n = max(t * 60.0, 1.0)
+	var covered = (1.0 - pow(1.0 - k, n)) / k / 60.0
+	var need = (intP.z - pos.z) / covered
+	# Never ask for more than the keeper's dive speed: Keeper.gd caps the speed each frame but
+	# not the push itself, so an oversized push kept him sliding flat out past the ball.
+	need = clamp(need, - myPlayer.pDiveSpeed, myPlayer.pDiveSpeed)
+	if abs(need) > abs(vel.z):
+		vel.z = need
 
 func _penaltyDive( var ddir):
 	diveStopOn = false
@@ -1178,9 +1417,9 @@ func _shotIncoming( var A, var shotV, var _curl, var stype):
 	shotFrame = Engine.get_physics_frames()
 	shooter = A
 	pen = (state == pstate.PENALTY) or Global.penOn
-	readErr = 0.0
-	if not pen:
-		_rollReadErr()
+	# Neuer reads every shot with the full model; everyone else only long shots (struck from
+	# outside his area), and closer ones the original way.
+	smartShot = _eliteKeeper() or not DZ
 	
 	shottype = stype
 	
@@ -1217,9 +1456,9 @@ func _penShotIncoming( var A, var shotV, var _curl, var stype):
 	shotFrame = Engine.get_physics_frames()
 	shooter = A
 	pen = not stype
-	readErr = 0.0
-	if not pen:
-		_rollReadErr()
+	# Neuer reads every shot with the full model; everyone else only long shots (struck from
+	# outside his area), and closer ones the original way.
+	smartShot = _eliteKeeper() or not DZ
 	if state == pstate.SHOOTOUT:
 		
 		myPlayer._savePenalty()

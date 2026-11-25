@@ -157,8 +157,6 @@ func setupFormation():
 
 const HUMAN_COURTOIS_NERF = 0.75
 const SHARP_KEEPER_RATING = 8.5
-const KEEPER_QUALITY_LOW = 6.0
-const KEEPER_QUALITY_HIGH = 12.0
 const ELITE_KEEPER_RATING = 11.5
 const ELITE_FINGER_REACH = 9.0
 const LONG_KEEPERS = ["T Courtois"]
@@ -252,10 +250,6 @@ func setPlayerParams( var p, var i):
 		elif kr > SHARP_KEEPER_RATING:
 			reachF = lerp(3.5, 5.0, min(p.get_meta("rushClass"), 1.0))
 		p.set_meta("fingerReach", reachF)
-		# Overall keeper quality, 0 to 1 (rating 6 and below = 0, 7 = 0.17, 8.5 = 0.42, 10 = 0.67,
-		# Neuer 12 = 1): how quickly he reacts to a shot, how well he reads its flight and how
-		# far his body slides across onto it (AIKeeper).
-		p.set_meta("keeperQuality", clamp((kr - KEEPER_QUALITY_LOW) / (KEEPER_QUALITY_HIGH - KEEPER_QUALITY_LOW), 0.0, 1.0))
 		# Keepers who always go long: every goal kick, catch and ball at his feet is a lofted kick.
 		p.set_meta("longKeeper", str(pp.get("name", "")) in LONG_KEEPERS)
 		# Top keepers dive faster too (Keeper.gd caps a dive at pDiveSpeed).
