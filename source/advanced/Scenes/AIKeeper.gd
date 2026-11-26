@@ -1199,14 +1199,22 @@ const ON_TARGET_REACH = 45.0
 func _shotReachZ():
 	if _onTarget():
 		return ON_TARGET_REACH
-	return abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5 + 1.5
+	return _mouthHalf() + BALL_RADIUS + 0.3
 
 func _onTarget():
 	var keepT = predT
-	var half = abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5
 	var atGoal = _predictShot(dGoal.x)
 	predT = keepT
-	return abs(atGoal.z - dGoal.z) < half + ON_TARGET_MARGIN and (atGoal.y < 10.5 or not smartShot)
+	return abs(atGoal.z - dGoal.z) < _mouthHalf() + BALL_RADIUS and (atGoal.y < 10.5 or not smartShot)
+
+# The goal is wider than its goalL/goalR markers say: measured in the game, the inside of each
+# post is 15.88 from the middle, not 13.04. Using the markers, a corner shot crossing 14.5 to 15.2
+# out counted as "going wide": his save was refused (Keeper._goingWide) and his dive capped short
+# of it, so low corner shots from distance went in far too often. Shooters still aim at the markers.
+const POST_INNER_RATIO = 15.88 / 13.036
+const BALL_RADIUS = 0.7
+func _mouthHalf():
+	return abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5 * POST_INNER_RATIO
 
 # His body takes time to stretch out in a dive (low ones most of all). With the ball only a
 # moment away there isn't that time, so his body itself has to get across onto its line: the
@@ -1802,7 +1810,7 @@ func _checkGoalThreat():
 	if bv.length() > 40.0 or bp.y > 2.0:
 		return
 	var zAtLine = bp.z + bv.z * t
-	var halfWidth = abs(myTeam.goalL.z) + 2.0
+	var halfWidth = _mouthHalf() + BALL_RADIUS
 	if abs(zAtLine) > halfWidth:
 		return
 	threatCooldownUntil = OS.get_ticks_msec() + 1500

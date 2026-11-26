@@ -20,7 +20,6 @@ var pDiveAgile = 1.5
 var pAcc
 var pDiveSpeed = 30
 const DIVE_STOP_PAST = 0.6
-const DIVE_POST_EXTRA = 1.5
 const ELITE_REACH = 6.5
 var pBurst = 12
 var dBurst = 12
@@ -324,7 +323,7 @@ func _process( var delta):
 				# Never slide beyond the posts: a ball heading past them is going wide anyway.
 				# (Unless it's going in: off his line at an angle, the near-post ball crosses his
 				# line wider than the post.)
-				var gHalf = max(abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5 + DIVE_POST_EXTRA, AI._shotReachZ())
+				var gHalf = max(AI._mouthHalf() + AI.BALL_RADIUS, AI._shotReachZ())
 				pr.z = clamp(pr.z, AI.dGoal.z - gHalf, AI.dGoal.z + gHalf)
 				var gap = pr - translation
 				gap.y = 0.0
@@ -491,8 +490,9 @@ func _goingWide():
 	if sign(Global.ballvel.x) != sign(lineX) or abs(Global.ballvel.x) < 5.0:
 		return false
 	var cross = AI._predictShot(lineX)
-	var half = abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5
-	return abs(cross.z) > half + 1.5 or cross.y > 10.5
+	# The real goal mouth (AI._mouthHalf), plus the ball's radius: anything that would even clip
+	# the post is still his to save.
+	return abs(cross.z - AI.dGoal.z) > AI._mouthHalf() + AI.BALL_RADIUS or cross.y > 10.5
 
 func doSave():
 	var saved = false
