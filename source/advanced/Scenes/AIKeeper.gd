@@ -522,7 +522,57 @@ func _predictShot(planeX):
 # beside or level with him) may never cross his own line, so reading it at x = his x sent him
 # to wherever the ball was after four seconds: the wrong way, or nowhere.
 func _shotClosest(near):
+	if not smartShot:
+		return _closestOld(near)
 	return _simShot(dGoal.x, near)
+
+# Close shots for keepers other than Neuer: the original flight model (no bounce or rolling
+# slowdown), but read where the ball passes closest to him and when, so he no longer dives the
+# wrong way (or nowhere) at a near-post shot across him, and his push isn't sized from the
+# dribble pace at the moment of the strike.
+func _closestOld(near):
+	var p = ball.translation
+	var v = _shotStartVel()
+	var cz = ball.curl.z
+	var cy = ball.curl.y
+	var dt = 1.0 / 60.0
+	var best = p
+	var bestT = 0.0
+	var bestD = Vector2(p.x - near.x, p.z - near.z).length()
+	for i in range(SIM_FRAMES):
+		var left = v.normalized().cross(Vector3.UP)
+		if v.x < 0.0:
+			left = - left
+		v += (cz * left + cy * Vector3.UP) * dt * 50.0
+		cz *= 0.98
+		v.y -= 40.0 * dt
+		v *= 1.0 - 0.2 * dt
+		var np = p + v * dt
+		if np.y < 0.1:
+			np.y = 0.1
+			v.y = abs(v.y) * 0.5
+		var crossed = sign(np.x - dGoal.x) != sign(p.x - dGoal.x)
+		var kx = 1.0
+		if crossed:
+			kx = (dGoal.x - p.x) / (np.x - p.x)
+		var a = Vector2(p.x - near.x, p.z - near.z)
+		var b = Vector2(np.x - p.x, np.z - p.z) * kx
+		var bl = b.length_squared()
+		var t = 0.0
+		if bl > 0.000001:
+			t = clamp(- a.dot(b) / bl, 0.0, 1.0)
+		var d = (a + b * t).length()
+		if d < bestD:
+			bestD = d
+			best = p + (np - p) * kx * t
+			bestT = (i + kx * t) * dt
+		elif d > bestD + 1.0 or crossed:
+			break
+		if crossed:
+			break
+		p = np
+	predT = bestT
+	return best
 
 func _shotStartVel():
 	var v = ball.linear_velocity
@@ -621,8 +671,8 @@ func _predictShotOld(planeX):
 	# Right as a shot is struck the kick hasn't reached the ball's velocity yet (it lands next
 	# physics step), so read the shot from the kick itself; otherwise the keeper "predicted" the
 	# ball where it stood and dived towards the shooter.
-	if shotDir != null and typeof(shotDir) == TYPE_VECTOR3 and v.length() < shotDir.length() * 0.5:
-		v = shotDir
+	# (Only right at the strike: a shot that has since slowed was read along its old line.)
+	v = _shotStartVel()
 	var cz = ball.curl.z
 	var cy = ball.curl.y
 	var dt = 1.0 / 60.0
@@ -909,7 +959,8 @@ func _incomingNew():
 	shotview = view
 	
 	
-# The original dive, for close shots (anyone but Neuer) and penalties.
+# The original dive, for close shots (anyone but Neuer) and penalties. Non-penalty shots read
+# where the ball passes him and when (_closestOld), but his reach and dive are the original ones.
 func _incomingOld():
 	
 	
@@ -949,7 +1000,9 @@ func _incomingOld():
 			intP += ball.curl.z * left * - 1.85 * flip
 	else:
 		# Read the real flight, curl and dip included.
-		intP = _predictShot(pos.x)
+		# Where it passes closest to him (fixes wrong-way dives at near-post shots across him).
+		intP = _shotClosest(pos)
+	var tArr = predT
 	intP.y = max(intP.y, 0.1)
 	
 	divedir = 0
@@ -1039,7 +1092,7 @@ func _incomingOld():
 		
 			
 		if not pen:
-			_quickDiveOld(aimF)
+			_quickDive(aimF, tArr)
 		# Stop the slide once his head and hands are on the ball's line (Keeper.gd), not his feet.
 		diveStopOn = false
 		if not pen:
@@ -1056,7 +1109,7 @@ func _incomingOld():
 			vel *= rand_range(0.9, 1.0)
 			fk = false
 		if not pen:
-			_quickDiveOld(aimC)
+			_quickDive(aimC, tArr)
 		# Stop the slide once his head and hands are on the ball's line (Keeper.gd), not his feet.
 		diveStopOn = false
 		if not pen:
@@ -1208,19 +1261,6 @@ func _quickDive(intP, t):
 	if need.length() > cur.length():
 		vel.x = need.x
 		vel.z = need.z
-
-func _quickDiveOld(intP):
-	var fast = myPlayer.get_meta("diveFast") if myPlayer.has_meta("diveFast") else 1.0
-	var k = DIVE_DECAY * fast
-	var t = abs(pos.x - Global.ballpos.x) / max(abs(Global.ballvel.x), 20.0)
-	var n = max(t * 60.0, 1.0)
-	var covered = (1.0 - pow(1.0 - k, n)) / k / 60.0
-	var need = (intP.z - pos.z) / covered
-	# Never ask for more than the keeper's dive speed: Keeper.gd caps the speed each frame but
-	# not the push itself, so an oversized push kept him sliding flat out past the ball.
-	need = clamp(need, - myPlayer.pDiveSpeed, myPlayer.pDiveSpeed)
-	if abs(need) > abs(vel.z):
-		vel.z = need
 
 func _penaltyDive( var ddir):
 	diveStopOn = false
