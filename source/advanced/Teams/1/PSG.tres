@@ -64,7 +64,7 @@ player2 = {
 "speed": 11.0
 }
 player3 = {
-"aggression": 7.0,
+"aggression": 8.5,
 "agility": 10.0,
 "curl": 10.0,
 "facehair": 1,
@@ -74,7 +74,7 @@ player3 = {
 "shoot": 8.5,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 10.0,
-"speed": 7.5
+"speed": 8.5
 }
 player4 = {
 "aggression": 10.0,
@@ -87,7 +87,7 @@ player4 = {
 "shoot": 8.0,
 "skin": Color( 0.880, 0.670, 0.550, 1 ),
 "smart": 10.0,
-"speed": 8.5
+"speed": 7.5
 }
 player5 = {
 "aggression": 5.0,
