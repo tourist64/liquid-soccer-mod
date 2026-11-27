@@ -509,6 +509,7 @@ var predT = 0.0
 var shotFrame = - 100
 const BALL_REST_Y = 0.76
 const SIM_FRAMES = 240
+const ROLL_CURL = 5.0 / 7.0
 func _predictShot(planeX):
 	if not smartShot:
 		return _predictShotOld(planeX)
@@ -539,6 +540,7 @@ func _closestOld(near):
 	var best = p
 	var bestT = 0.0
 	var bestD = Vector2(p.x - near.x, p.z - near.z).length()
+	var rest = min(BALL_REST_Y, p.y)
 	for i in range(SIM_FRAMES):
 		var left = v.normalized().cross(Vector3.UP)
 		if v.x < 0.0:
@@ -548,9 +550,18 @@ func _closestOld(near):
 		v.y -= 40.0 * dt
 		v *= 1.0 - 0.2 * dt
 		var np = p + v * dt
-		if np.y < 0.1:
-			np.y = 0.1
-			v.y = abs(v.y) * 0.5
+		if np.y < rest:
+			np.y = rest
+			if v.y < - 3.0:
+				# A real bounce: the ball keeps half its upward pace, and (as SmartBall does on
+				# contact) loses most of its spin, so it stops bending. Before, he expected the
+				# full bend after the bounce, went wide for it, then came back in.
+				v.y = abs(v.y) * 0.5
+				cz *= 0.2
+				cy *= 0.2
+			else:
+				# Rolling along the grass: no new contact, so the spin stays.
+				v.y = 0.0
 		var crossed = sign(np.x - dGoal.x) != sign(p.x - dGoal.x)
 		var kx = 1.0
 		if crossed:
@@ -605,7 +616,11 @@ func _simShot(planeX, near):
 			var left = v.normalized().cross(Vector3.UP)
 			if v.x < 0.0:
 				left = - left
-			v += (cz * left + cy * Vector3.UP) * dt * 50.0
+			# Rolling along the grass, friction holds back the sideways push: a rolling ball
+			# bends about 5/7 as much (fitted on the real ball). Without it a hard-bent low shot
+			# was read as curling right away from goal.
+			var rolling = p.y <= rest + 0.02 and abs(v.y) < 3.0
+			v += (cz * left * (ROLL_CURL if rolling else 1.0) + cy * Vector3.UP) * dt * 50.0
 			cz *= 0.98
 		elif crossing:
 			v += curl * dt * 50.0
@@ -676,6 +691,7 @@ func _predictShotOld(planeX):
 	var cz = ball.curl.z
 	var cy = ball.curl.y
 	var dt = 1.0 / 60.0
+	var rest = min(BALL_REST_Y, p.y)
 	if abs(v.x) < 1.0:
 		return intersectShot(Global.ballvel)
 	for _i in range(240):
@@ -687,9 +703,18 @@ func _predictShotOld(planeX):
 		v.y -= 40.0 * dt
 		v *= 1.0 - 0.2 * dt
 		var np = p + v * dt
-		if np.y < 0.1:
-			np.y = 0.1
-			v.y = abs(v.y) * 0.5
+		if np.y < rest:
+			np.y = rest
+			if v.y < - 3.0:
+				# A real bounce: the ball keeps half its upward pace, and (as SmartBall does on
+				# contact) loses most of its spin, so it stops bending. Before, he expected the
+				# full bend after the bounce, went wide for it, then came back in.
+				v.y = abs(v.y) * 0.5
+				cz *= 0.2
+				cy *= 0.2
+			else:
+				# Rolling along the grass: no new contact, so the spin stays.
+				v.y = 0.0
 		if sign(np.x - planeX) != sign(p.x - planeX):
 			var k = (planeX - p.x) / (np.x - p.x)
 			return p + (np - p) * k
@@ -1487,11 +1512,13 @@ func _rushClass():
 func longshotCalcTarget():
 		# Top keepers read a long shot almost at once.
 		yield(get_tree().create_timer(lerp(0.1, 0.03, _rushClass())), "timeout")
-		longTarget = intersectShot(Global.ballvel)
-		
-		
-		
-		
+		# Read it with the full flight (curl, dip, bounces), not as a straight line: the straight
+		# read sent him one way for a first moment, then the curl brought him back.
+		if ball._isShooting():
+			longTarget = _shotClosest(pos)
+			longTarget.x = clamp(longTarget.x, - 135.0 * Global.ps, 135.0 * Global.ps)
+		else:
+			longTarget = intersectShot(Global.ballvel)
 		longTarget.y = 0
 		changeState(pstate.LONGSHOT)
 		
