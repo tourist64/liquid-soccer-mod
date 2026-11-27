@@ -44,6 +44,8 @@ var diveStopOn = false
 var diveStopZ = 0.0
 var diveStopPoint = Vector3.ZERO
 var diveStopDir = Vector3.ZERO
+# Share of his dive speed he has for this shot: lower in a clean one-on-one (_isOneOnOne).
+var diveCap = 1.0
 # Shot dives keep reading the ball and steer onto it (Keeper.gd); how far short his feet aim.
 var diveTrack = false
 var diveReach = 0.0
@@ -264,7 +266,7 @@ func activeState():
 		# at a dribbler's feet and left on the floor for the shot.
 		var loose = ball._isFree()
 		var claimPace = BOX_CLAIM_PACE if loose else 30.0
-		var claimDist = BOX_CLAIM_DIST if loose else 12.0
+		var claimDist = BOX_CLAIM_DIST if loose else (ONE_V_ONE_CLAIM * Global.ps if _isOneOnOne(Global.ballpos) else 12.0)
 		if Global.ballvel.length() < claimPace and (db < claimDist) and (db > (3 if loose else 4)) and ( not myTeam.posession) and myTeam._ballInBox():
 			
 			state = pstate.DIVE
@@ -559,6 +561,7 @@ func incomingState():
 	# so a good corner header is a real chance even against Neuer.
 	if shottype == 3 or shottype == 4:
 		velval *= HEADER_DIVE
+	velval *= diveCap
 	
 	isUp = false
 	dview = Global.ballpos
@@ -821,7 +824,7 @@ func _quickDive(intP):
 	var need = (intP.z - pos.z) / covered
 	# Never ask for more than the keeper's dive speed: Keeper.gd caps the speed each frame but
 	# not the push itself, so an oversized push kept him sliding flat out past the ball.
-	need = clamp(need, - myPlayer.pDiveSpeed, myPlayer.pDiveSpeed)
+	need = clamp(need, - myPlayer.pDiveSpeed * diveCap, myPlayer.pDiveSpeed * diveCap)
 	if abs(need) > abs(vel.z):
 		vel.z = need
 
@@ -1021,6 +1024,7 @@ func _shotIncoming( var A, var shotV, var _curl, var stype):
 	pen = (state == pstate.PENALTY) or Global.penOn
 	
 	shottype = stype
+	diveCap = ONE_V_ONE_DIVE if (not pen and _isOneOnOne(A)) else 1.0
 	
 	if state == pstate.SHOOTOUT:
 		
@@ -1031,6 +1035,40 @@ func _shotIncoming( var A, var shotV, var _curl, var stype):
 		call_deferred("changeState", pstate.INCOMING)
 	else:
 		call_deferred("longshotCalcTarget")
+
+# One-on-ones: a shot from inside the penalty box with no defender between the shooter and goal.
+# The keeper read and reached these almost every time, so in a clean one-on-one he dives at only
+# part of his speed and his fingertip reach shrinks: a well-placed finish beats him, one struck
+# near him is still saved.
+const ONE_V_ONE_LANE = 6.0
+const ONE_V_ONE_DIVE = 0.72
+# ...and with the striker on the ball he holds his ground longer before diving at the feet.
+const ONE_V_ONE_CLAIM = 7.0
+# ...and his fingertip reach (Keeper._eliteFingertips) shrinks to this share, so a finish
+# placed away from him isn't pulled in.
+const ONE_V_ONE_FINGER = 0.5
+# ...and his save box (enlarged in Team.setPlayerParams) is cut back to about its normal size.
+const ONE_V_ONE_BOX = 0.8
+func _isOneOnOne(from):
+	if from == null:
+		return false
+	var toGoal = dGoal - from
+	toGoal.y = 0.0
+	var d = toGoal.length()
+	# Strictly inside our penalty box (same box as Team._ballInBox), on our end.
+	var inBox = abs(from.x) > 91.0 * Global.ps and abs(from.z) < 45.0 * Global.ps and sign(from.x) == sign(dGoal.x)
+	if not inBox or d < 0.01:
+		return false
+	var dir = toGoal / d
+	for pl in myTeam.players:
+		if pl == myPlayer or not is_instance_valid(pl) or not pl.is_inside_tree() or not pl.visible:
+			continue
+		var rel = pl.translation - from
+		rel.y = 0.0
+		var along = rel.dot(dir)
+		if along > 0.0 and along < d and (rel - dir * along).length() < ONE_V_ONE_LANE * Global.ps:
+			return false
+	return true
 
 func _rushClass():
 	return myPlayer.get_meta("rushClass") if myPlayer.has_meta("rushClass") else 0.0
@@ -1047,6 +1085,7 @@ func longshotCalcTarget():
 		changeState(pstate.LONGSHOT)
 		
 func _penShotIncoming( var A, var shotV, var _curl, var stype):
+	diveCap = 1.0
 	
 	myPlayer._loseControl()
 	myPlayer.canSave = true

@@ -327,7 +327,7 @@ func _process( var delta):
 				if abs(gap) > AI.diveReach + DIVE_STOP_PAST:
 					want = gap - sign(gap) * AI.diveReach
 				var tLeft = abs(translation.x - Global.ballpos.x) / max(abs(Global.ballvel.x), 20.0)
-				var need = clamp(want / max(tLeft, 0.05), - pDiveSpeed, pDiveSpeed)
+				var need = clamp(want / max(tLeft, 0.05), - pDiveSpeed * AI.diveCap, pDiveSpeed * AI.diveCap)
 				if want == 0.0:
 					AI.divevel.z = 0.0
 					velocity.z = 0.0
@@ -347,7 +347,7 @@ func _process( var delta):
 			
 			
 			
-			velocity = velocity.limit_length(pDiveSpeed)
+			velocity = velocity.limit_length(pDiveSpeed * (AI.diveCap if ball._isShooting() else 1.0))
 			
 			
 			
@@ -360,7 +360,25 @@ func _process( var delta):
 		
 	myRoot.process(delta)
 var saveBoxNode = null
+# In a one-on-one (AIKeeper._isOneOnOne) his enlarged save box shrinks back towards normal size
+# while the shot is on, so a finish placed past him isn't swallowed by an oversized box.
+func _oneOnOneBox():
+	if saveBoxNode == null:
+		saveBoxNode = find_node("AreaTest", true, false)
+		if saveBoxNode == null:
+			return
+	var shrink = AI.diveCap < 1.0 and ball._isShooting()
+	if not shrink:
+		if has_meta("oneOnOneBox"):
+			saveBoxNode.scale = get_meta("baseSaveBox")
+			remove_meta("oneOnOneBox")
+		return
+	if not has_meta("oneOnOneBox"):
+		set_meta("baseSaveBox", saveBoxNode.scale)
+		set_meta("oneOnOneBox", true)
+		saveBoxNode.scale = saveBoxNode.scale * AI.ONE_V_ONE_BOX
 func _physics_process(delta):
+	_oneOnOneBox()
 	_eliteFingertips()
 	if not replay:
 		
@@ -545,6 +563,8 @@ func _eliteFingertips():
 	var reach = get_meta("fingerReach") if has_meta("fingerReach") else 0.0
 	if reach <= 0.0:
 		return
+	if AI.diveCap < 1.0:
+		reach *= AI.ONE_V_ONE_FINGER
 	if not Global.gameOn or Global.penOn or not canSave or not canControl or not ball._isShooting():
 		return
 	var sh = ball.shooter
