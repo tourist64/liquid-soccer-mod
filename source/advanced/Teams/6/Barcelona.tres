@@ -93,16 +93,16 @@ player4 = {
 }
 player5 = {
 "aggression": 8.5,
-"agility": 9.5,
+"agility": 8.5,
 "curl": 8.0,
-"facehair": 0,
+"facehair": 1,
 "hair": Color( 0.050, 0.040, 0.030, 1 ),
-"hairtype": 1,
-"name": "G Jesus",
-"shoot": 8.0,
-"skin": Color( 0.620, 0.420, 0.300, 1 ),
-"smart": 9.0,
-"speed": 8.5
+"hairtype": 2,
+"name": "J Kounde",
+"shoot": 5.5,
+"skin": Color( 0.420, 0.270, 0.190, 1 ),
+"smart": 9.5,
+"speed": 9.0
 }
 player6 = {
 "aggression": 5.0,
@@ -132,16 +132,16 @@ player7 = {
 }
 player8 = {
 "aggression": 8.5,
-"agility": 8.5,
+"agility": 9.5,
 "curl": 8.0,
-"facehair": 1,
+"facehair": 0,
 "hair": Color( 0.050, 0.040, 0.030, 1 ),
-"hairtype": 2,
-"name": "J Kounde",
-"shoot": 5.5,
-"skin": Color( 0.420, 0.270, 0.190, 1 ),
-"smart": 9.5,
-"speed": 9.0
+"hairtype": 1,
+"name": "G Jesus",
+"shoot": 8.0,
+"skin": Color( 0.620, 0.420, 0.300, 1 ),
+"smart": 9.0,
+"speed": 8.5
 }
 player9 = {
 "aggression": 7.0,
@@ -182,7 +182,7 @@ player11 = {
 "smart": 9.0,
 "speed": 8.5
 }
-def = [ Vector2( 0.38, 0.66 ), Vector2( 0.6, 0.67 ), Vector2( 0.5, 0.62 ), Vector2( 0.62, 0.6 ), Vector2( 0.24, 0.56 ), Vector2( 0.76, 0.56 ), Vector2( 0.5, 0.52 ) ]
-mid = [ Vector2( 0.38, 0.55 ), Vector2( 0.6, 0.55 ), Vector2( 0.5, 0.34 ), Vector2( 0.62, 0.4 ), Vector2( 0.18, 0.3 ), Vector2( 0.82, 0.3 ), Vector2( 0.5, 0.26 ) ]
-att = [ Vector2( 0.38, 0.55 ), Vector2( 0.6, 0.55 ), Vector2( 0.5, 0.3 ), Vector2( 0.62, 0.26 ), Vector2( 0.18, 0.14 ), Vector2( 0.82, 0.14 ), Vector2( 0.5, 0.08 ) ]
+def = [ Vector2( 0.3, 0.68 ), Vector2( 0.5, 0.7 ), Vector2( 0.5, 0.6 ), Vector2( 0.4, 0.56 ), Vector2( 0.7, 0.68 ), Vector2( 0.76, 0.56 ), Vector2( 0.3, 0.5 ) ]
+mid = [ Vector2( 0.26, 0.56 ), Vector2( 0.5, 0.58 ), Vector2( 0.5, 0.42 ), Vector2( 0.4, 0.34 ), Vector2( 0.74, 0.56 ), Vector2( 0.82, 0.3 ), Vector2( 0.3, 0.26 ) ]
+att = [ Vector2( 0.24, 0.5 ), Vector2( 0.5, 0.55 ), Vector2( 0.5, 0.38 ), Vector2( 0.42, 0.24 ), Vector2( 0.78, 0.48 ), Vector2( 0.82, 0.14 ), Vector2( 0.32, 0.1 ) ]
 cor = [ Vector2( 0.62, 0.08 ), Vector2( 0.47, 0.1 ), Vector2( 0.5, 0.24 ), Vector2( 0.56, 0.22 ), Vector2( 0.4, 0.06 ), Vector2( 0.53, 0.12 ), Vector2( 0.45, 0.16 ) ]
