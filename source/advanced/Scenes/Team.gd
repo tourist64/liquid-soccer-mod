@@ -1183,8 +1183,8 @@ func _getPlayPos(pid):
 const TUCK_PLAYERS = ["A Hakimi", "N Mendes"]
 const TUCK_FROM = 140.0        # ball this close to our goal: start drifting in
 const TUCK_FULL = 70.0
-const TUCK_SHARE = 0.3         # give up to 30% of his width
-const TUCK_MIN_WIDTH = 42.0    # never closer than this to the middle (centre-backs are ~24)
+const TUCK_SHARE = 0.4         # give up to 40% of his width
+const TUCK_MIN_WIDTH = 30.0    # never closer than this to the middle (centre-backs are ~24)
 const TUCK_OWN_WING = 40.0     # ball this far out on his side: he stays wide
 
 func _fullBackTuck(p, pid):
