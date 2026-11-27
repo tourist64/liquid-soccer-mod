@@ -159,6 +159,12 @@ const HUMAN_COURTOIS_NERF = 0.75
 const SHARP_KEEPER_RATING = 8.5
 const ELITE_KEEPER_RATING = 11.5
 const ELITE_FINGER_REACH = 9.0
+# Fingertip reach for keepers rated above 8.5 up to Raya (Neuer has his own, above). Was 3.5 to 5,
+# which with the keepers' fixes left close-range shots going in only about a quarter of the time
+# against Raya. Tuned on scripted shots from 8 to 18 units out: about half go in against a 9.5
+# keeper, 40% against Courtois or Raya, 10% against Neuer.
+const FINGER_REACH_MIN = 3.6
+const FINGER_REACH_MAX = 4.6
 const LONG_KEEPERS = ["T Courtois"]
 func setPlayerParams( var p, var i):
 	# Remember which squad entry this player came from (subs reorder the players array).
@@ -248,7 +254,7 @@ func setPlayerParams( var p, var i):
 		if kr >= ELITE_KEEPER_RATING:
 			reachF = ELITE_FINGER_REACH
 		elif kr > SHARP_KEEPER_RATING:
-			reachF = lerp(3.5, 5.0, min(p.get_meta("rushClass"), 1.0))
+			reachF = lerp(FINGER_REACH_MIN, FINGER_REACH_MAX, min(p.get_meta("rushClass"), 1.0))
 		p.set_meta("fingerReach", reachF)
 		# Keepers who always go long: every goal kick, catch and ball at his feet is a lofted kick.
 		p.set_meta("longKeeper", str(pp.get("name", "")) in LONG_KEEPERS)
