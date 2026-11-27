@@ -20,7 +20,6 @@ var pDiveAgile = 1.5
 var pAcc
 var pDiveSpeed = 30
 const DIVE_STOP_PAST = 0.6
-const DIVE_POST_EXTRA = 1.5
 const ELITE_REACH = 6.5
 var pBurst = 12
 var dBurst = 12
@@ -316,24 +315,42 @@ func _process( var delta):
 			if AI.diveTrack and ball._isShooting():
 				# Shot dives keep reading the ball (curl, late deflections, his slower left-side
 				# dive) and steer his slide onto it, as fast as he can dive, stopping once there.
-				var pr = AI._predictShot(translation.x)
+				# Read where the ball passes closest to him (a shot across him from a tight angle
+				# may never cross his own line) and when, from its predicted flight: bouncing and
+				# rolling shots slow down, so the time is not just distance over current pace.
+				var pr = AI._shotClosest(translation)
+				var tLeft = AI.predT
 				# Never slide beyond the posts: a ball heading past them is going wide anyway.
 				# (Unless it's going in: off his line at an angle, the near-post ball crosses his
 				# line wider than the post.)
-				var gHalf = max(abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5 + DIVE_POST_EXTRA, AI._shotReachZ())
+				var gHalf = max(AI._mouthHalf() + AI.BALL_RADIUS, AI._shotReachZ())
 				pr.z = clamp(pr.z, AI.dGoal.z - gHalf, AI.dGoal.z + gHalf)
-				var gap = pr.z - translation.z
-				var want = 0.0
-				if abs(gap) > AI.diveReach + DIVE_STOP_PAST:
-					want = gap - sign(gap) * AI.diveReach
-				var tLeft = abs(translation.x - Global.ballpos.x) / max(abs(Global.ballvel.x), 20.0)
-				var need = clamp(want / max(tLeft, 0.05), - pDiveSpeed, pDiveSpeed)
-				if want == 0.0:
+				var gap = pr - translation
+				gap.y = 0.0
+				var gl = gap.length()
+				# (Neuer) The less time left, the less his stretch can cover: his body goes the rest.
+				var reach = AI.diveReach
+				if AI.smartShot:
+					reach *= AI._reachScale(tLeft)
+				var want = Vector3.ZERO
+				if gl > reach + DIVE_STOP_PAST:
+					want = gap - gap / gl * reach
+				var need = (want / max(tLeft, 0.05)).limit_length(pDiveSpeed)
+				var cur = Vector3(AI.divevel.x, 0.0, AI.divevel.z)
+				if tLeft <= 0.0:
+					# Already past him (or on him): nothing left to steer for.
+					pass
+				elif want == Vector3.ZERO:
+					AI.divevel.x = 0.0
 					AI.divevel.z = 0.0
+					velocity.x = 0.0
 					velocity.z = 0.0
-				elif sign(need) != sign(AI.divevel.z) or abs(need) > abs(AI.divevel.z):
-					AI.divevel.z = need
-					velocity.z = need
+				elif cur.dot(need) < need.length_squared():
+					# Too slow along the way he needs to go (or heading the wrong way): steer.
+					AI.divevel.x = need.x
+					AI.divevel.z = need.z
+					velocity.x = need.x
+					velocity.z = need.z
 				AI.diveStopOn = false
 			elif AI.diveStopOn:
 				var flat = translation - AI.diveStopPoint
@@ -473,8 +490,9 @@ func _goingWide():
 	if sign(Global.ballvel.x) != sign(lineX) or abs(Global.ballvel.x) < 5.0:
 		return false
 	var cross = AI._predictShot(lineX)
-	var half = abs(myTeam.goalL.z - myTeam.goalR.z) * 0.5
-	return abs(cross.z) > half + 1.5 or cross.y > 10.5
+	# The real goal mouth (AI._mouthHalf), plus the ball's radius: anything that would even clip
+	# the post is still his to save.
+	return abs(cross.z - AI.dGoal.z) > AI._mouthHalf() + AI.BALL_RADIUS or cross.y > 10.5
 
 func doSave():
 	var saved = false
