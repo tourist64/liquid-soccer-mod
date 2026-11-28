@@ -1171,7 +1171,7 @@ func _looseBall():
 	return not posession and passto == null and not opponent.posession and opponent.passto == null
 
 func _getPlayPos(pid):
-	var p = _holdForCross(_holdLine(_keepOnside(_getPlayPosRaw(pid), pid), pid), pid)
+	var p = _holdForCross(_holdLine(_keepOnside(_overlapRun(_getPlayPosRaw(pid), pid), pid), pid), pid)
 	# The anchor screens the middle without the ball instead of drifting wide.
 	if tdata.anchorId == pid and not _onTheBall():
 		p.z = clamp(p.z, - ANCHOR_HALF_WIDTH * Global.ps, ANCHOR_HALF_WIDTH * Global.ps)
@@ -1204,6 +1204,45 @@ func _fullBackTuck(p, pid):
 	if abs(tucked) < abs(p.z):
 		p.z = lerp(p.z, tucked, w)
 	return p
+
+# --- Full-backs who overlap ------------------------------------------------------------------
+# When a team-mate on his flank (a winger like Kvaratskhelia or Doue) carries the ball back
+# towards our goal, Hakimi or Mendes sprints past him up the touchline to offer the run in
+# behind. The run lasts a moment after the carrier stops dropping so it isn't cut off halfway.
+const OVERLAP_BACK_SPEED = 2.5    # carrier moving back towards our goal at least this fast
+const OVERLAP_SIDE = 15.0         # carrier this far out on the full-back's side of the pitch
+const OVERLAP_AHEAD = 50.0        # run to this far ahead of the carrier
+const OVERLAP_WIDTH = 78.0        # up the touchline
+const OVERLAP_HOLD = 2000         # keep running for 2 s after the trigger
+var overlapUntil = {}
+
+func _overlapRun(p, pid):
+	if pid == 0 or not Global.gameOn or not posession:
+		overlapUntil.erase(pid)
+		return p
+	var pl = players[pid]
+	var slot = pl.get_meta("squadSlot") if pl.has_meta("squadSlot") else pid
+	if not (_playerName(slot) in TUCK_PLAYERS):
+		return p
+	var c = ball.player
+	if c == null or c == pl or c.get("myTeam") != self:
+		overlapUntil.erase(pid)
+		return p
+	var side = sign(formation[pid + 2 * Global.squad].y)
+	if side == 0 or c.translation.z * side < OVERLAP_SIDE * Global.ps:
+		overlapUntil.erase(pid)
+		return p
+	var now = OS.get_ticks_msec()
+	if Global.ballvel.x * playDir < - OVERLAP_BACK_SPEED:
+		overlapUntil[pid] = now + OVERLAP_HOLD
+	if overlapUntil.get(pid, 0) < now:
+		return p
+	var x = c.translation.x + OVERLAP_AHEAD * Global.ps * playDir
+	x = clamp(x * playDir, - 60.0 * Global.ps, 125.0 * Global.ps) * playDir
+	return Vector3(x, p.y, side * OVERLAP_WIDTH * Global.ps)
+
+func _overlapping(pl):
+	return overlapUntil.get(pl.myID, 0) >= OS.get_ticks_msec()
 
 # --- Falling back into the box (boxDrop) --------------------------------------------------
 # When the other side has the ball in our half, everyone runs back towards our box: the back

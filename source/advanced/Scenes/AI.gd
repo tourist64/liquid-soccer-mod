@@ -444,6 +444,9 @@ func playingState():
 	# Box-drop teams sprint back when the ball is past them in our half.
 	elif _close > UNIT_SPRINT_GAP * 0.5 and myPlayer.pSpeed <= myPlayer.pOSpeed and myTeam._boxDropSprint(myPlayer):
 		myPlayer._burst()
+	# Overlapping full-backs sprint past the winger.
+	elif _close > 6.0 and myPlayer.pSpeed <= myPlayer.pOSpeed and myTeam._overlapping(myPlayer):
+		myPlayer._burst()
 
 
 func supportState():
